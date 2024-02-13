@@ -1,0 +1,59 @@
+{
+  "id": 25245,
+  "url": "https://www.tvmaze.com/shows/25245/babylon-berlin",
+  "name": "Babylon Berlin",
+  "type": "Scripted",
+  "language": "German",
+  "genres": [
+    "Drama",
+    "Crime",
+    "Thriller"
+  ],
+  "status": "Running",
+  "runtime": 45,
+  "averageRuntime": 52,
+  "premiered": "2017-10-13",
+  "ended": null,
+  "officialSite": "https://babylon-berlin.com/de/",
+  "schedule": {
+    "time": "20:15",
+    "days": [
+      "Friday"
+    ]
+  },
+  "rating": {
+    "average": 8
+  },
+  "weight": 95,
+  "network": {
+    "id": 1355,
+    "name": "Sky 1",
+    "country": {
+      "name": "Germany",
+      "code": "DE",
+      "timezone": "Europe/Busingen"
+    },
+    "officialSite": null
+  },
+  "webChannel": null,
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 323945,
+    "imdb": "tt4378376"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/151/378358.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/151/378358.jpg"
+  },
+  "summary": "<p>A metropolis in turmoil. From economy to culture, politics to the underworld – everything is in the grip of radical change.</p><p>Speculation and inflation are already tearing away at the foundations of the still young Weimar Republic. Growing poverty and unemployment stand in stark contrast to the excesses and indulgence of the city's night life and its overflowing creative energy.</p><p>Gereon Rath, a young police inspector from Cologne, is transferred to Berlin in order to solve a criminal case – a porno ring run by the Berlin Mafia. What at first glance appears to be simply a matter of extortion soon reveals itself to be a scandal that will forever change the lives of both Gereon and his closest associates.</p><p>Together with stenotypist Charlotte Ritter and his partner Bruno Wolter, Rath is confronted with a tangled web of corruption, drug dealing, and weapons trafficking, forcing him into an existential conflict as he is torn between loyalty and uncovering the truth. And we are left wondering: in this story, who is friend and who is foe?</p><p>With the political unrest spurred by May Day demonstrations and rising National Socialism, even an institution like the \"Rote Burg,\" Berlin's police headquarters and the centre of democracy and the constitutional state, is increasingly becoming the melting pot of a democracy whose days are numbered.</p>",
+  "updated": 1704795318,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/25245"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2413585"
+    }
+  }
+}

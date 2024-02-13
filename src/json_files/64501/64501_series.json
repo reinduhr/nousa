@@ -1,0 +1,68 @@
+{
+  "id": 64501,
+  "url": "https://www.tvmaze.com/shows/64501/the-walking-dead-daryl-dixon",
+  "name": "The Walking Dead: Daryl Dixon",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "Action",
+    "Horror"
+  ],
+  "status": "Running",
+  "runtime": null,
+  "averageRuntime": 56,
+  "premiered": "2023-09-10",
+  "ended": null,
+  "officialSite": "https://www.amc.com/shows/the-walking-dead-daryl-dixon--1060742",
+  "schedule": {
+    "time": "21:00",
+    "days": [
+      "Sunday"
+    ]
+  },
+  "rating": {
+    "average": 7.5
+  },
+  "weight": 99,
+  "network": {
+    "id": 20,
+    "name": "AMC",
+    "country": {
+      "name": "United States",
+      "code": "US",
+      "timezone": "America/New_York"
+    },
+    "officialSite": null
+  },
+  "webChannel": {
+    "id": 453,
+    "name": "AMC+",
+    "country": {
+      "name": "United States",
+      "code": "US",
+      "timezone": "America/New_York"
+    },
+    "officialSite": "https://www.amcplus.com/"
+  },
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 427464,
+    "imdb": "tt13062500"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/475/1188617.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/475/1188617.jpg"
+  },
+  "summary": "<p><b>The Walking Dead: Daryl Dixon</b> is a spinoff series set in The Walking Dead Universe that centers around the eponymous character. Daryl washes ashore in France, raising the ire of a splintered but growing autocratic movement centered in Paris and endangering a young boy at the heart of a benevolent religious movement.<br /> </p>",
+  "updated": 1698697629,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/64501"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2637342"
+    }
+  }
+}

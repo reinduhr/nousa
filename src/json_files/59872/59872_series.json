@@ -1,0 +1,57 @@
+{
+  "id": 59872,
+  "url": "https://www.tvmaze.com/shows/59872/shoresy",
+  "name": "Shoresy",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Comedy",
+    "Action",
+    "Sports"
+  ],
+  "status": "To Be Determined",
+  "runtime": null,
+  "averageRuntime": 26,
+  "premiered": "2022-05-13",
+  "ended": null,
+  "officialSite": "https://www.crave.ca/en/tv-shows/shoresy",
+  "schedule": {
+    "time": "",
+    "days": []
+  },
+  "rating": {
+    "average": 7.5
+  },
+  "weight": 93,
+  "network": null,
+  "webChannel": {
+    "id": 109,
+    "name": "Crave",
+    "country": {
+      "name": "Canada",
+      "code": "CA",
+      "timezone": "America/Halifax"
+    },
+    "officialSite": "https://www.crave.ca/en"
+  },
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 409902,
+    "imdb": "tt18249282"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/479/1199908.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/479/1199908.jpg"
+  },
+  "summary": "<p>A spinoff of Letterkenny features <b>Shoresy</b>. The foul-mouthed but extremely talented hockey player with a high-pitched voice. He moves to Sudbury to help a struggling Senior triple-A hockey team determined never to lose again.</p>",
+  "updated": 1699199563,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/59872"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2668248"
+    }
+  }
+}

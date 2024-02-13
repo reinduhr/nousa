@@ -1,0 +1,62 @@
+{
+  "id": 5,
+  "url": "https://www.tvmaze.com/shows/5/true-detective",
+  "name": "True Detective",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "Crime",
+    "Thriller"
+  ],
+  "status": "Running",
+  "runtime": 60,
+  "averageRuntime": 62,
+  "premiered": "2014-01-12",
+  "ended": null,
+  "officialSite": "https://www.max.com/shows/true-detective/9a4a3645-74e0-4e4d-9f35-31464b402357",
+  "schedule": {
+    "time": "21:00",
+    "days": [
+      "Sunday"
+    ]
+  },
+  "rating": {
+    "average": 8.2
+  },
+  "weight": 100,
+  "network": {
+    "id": 8,
+    "name": "HBO",
+    "country": {
+      "name": "United States",
+      "code": "US",
+      "timezone": "America/New_York"
+    },
+    "officialSite": "https://www.hbo.com/"
+  },
+  "webChannel": null,
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": 31369,
+    "thetvdb": 270633,
+    "imdb": "tt2356777"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/490/1226764.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/490/1226764.jpg"
+  },
+  "summary": "<p>Touch darkness and darkness touches you back. <b>True Detective</b> centers on troubled cops and the investigations that drive them to the edge. Each season features a new cast and a new case.</p><p><i><b>True Detective</b></i> is an American anthology crime drama television series created and written by Nic Pizzolatto. </p>",
+  "updated": 1707609277,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/5"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2710559"
+    },
+    "nextepisode": {
+      "href": "https://api.tvmaze.com/episodes/2710560"
+    }
+  }
+}

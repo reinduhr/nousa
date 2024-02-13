@@ -1,0 +1,53 @@
+{
+  "id": 58225,
+  "url": "https://www.tvmaze.com/shows/58225/that-90s-show",
+  "name": "That '90s Show",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "Comedy",
+    "Romance"
+  ],
+  "status": "Running",
+  "runtime": null,
+  "averageRuntime": 23,
+  "premiered": "2023-01-19",
+  "ended": null,
+  "officialSite": "https://www.netflix.com/title/81288370",
+  "schedule": {
+    "time": "",
+    "days": []
+  },
+  "rating": {
+    "average": 5.3
+  },
+  "weight": 95,
+  "network": null,
+  "webChannel": {
+    "id": 1,
+    "name": "Netflix",
+    "country": null,
+    "officialSite": "https://www.netflix.com/"
+  },
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 411173,
+    "imdb": "tt15591076"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/442/1106924.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/442/1106924.jpg"
+  },
+  "summary": "<p>Set in Wisconsin in 1995, <b>That '90s Show</b> follows Leia Forman, daughter of Eric and Donna, who is visiting her grandparents for the summer where she bonds with a new generation of Point Place kids under the watchful eye of Kitty and the stern glare of Red. Sex, drugs and rock 'n roll never dies, it just changes clothes.</p>",
+  "updated": 1675472635,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/58225"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2474243"
+    }
+  }
+}

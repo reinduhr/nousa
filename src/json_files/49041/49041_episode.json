@@ -1,0 +1,27 @@
+[
+  {
+    "id": 2672080,
+    "url": "https://www.tvmaze.com/episodes/2672080/fallout-1x01-the-end",
+    "name": "The End",
+    "season": 1,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2024-04-12",
+    "airtime": "",
+    "airstamp": "2024-04-12T12:00:00+00:00",
+    "runtime": null,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2672080"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/49041"
+      }
+    }
+  }
+]

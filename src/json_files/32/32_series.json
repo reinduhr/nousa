@@ -1,0 +1,59 @@
+{
+  "id": 32,
+  "url": "https://www.tvmaze.com/shows/32/fargo",
+  "name": "Fargo",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "Comedy",
+    "Crime"
+  ],
+  "status": "To Be Determined",
+  "runtime": 60,
+  "averageRuntime": 67,
+  "premiered": "2014-04-15",
+  "ended": null,
+  "officialSite": "http://www.fxnetworks.com/fargo",
+  "schedule": {
+    "time": "22:00",
+    "days": [
+      "Tuesday"
+    ]
+  },
+  "rating": {
+    "average": 8.7
+  },
+  "weight": 100,
+  "network": {
+    "id": 13,
+    "name": "FX",
+    "country": {
+      "name": "United States",
+      "code": "US",
+      "timezone": "America/New_York"
+    },
+    "officialSite": null
+  },
+  "webChannel": null,
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": 35276,
+    "thetvdb": 269613,
+    "imdb": "tt2802850"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/487/1219631.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/487/1219631.jpg"
+  },
+  "summary": "<p><b>Fargo </b>is a seasonal anthology crime drama with some dark comical elements, inspired by the film <i>Fargo</i> written by the Coen brothers. Each season follows a new case and new characters, all entrenched in the trademark humor, murder and \"Minnesota nice\" that has made the film an enduring classic.</p>",
+  "updated": 1705858263,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/32"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2668530"
+    }
+  }
+}

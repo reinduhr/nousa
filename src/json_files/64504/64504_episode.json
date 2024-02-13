@@ -1,0 +1,152 @@
+[
+  {
+    "id": 2691148,
+    "url": "https://www.tvmaze.com/episodes/2691148/the-walking-dead-the-ones-who-live-1x01-years",
+    "name": "Years",
+    "season": 1,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2024-02-25",
+    "airtime": "",
+    "airstamp": "2024-02-25T17:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": "<p>In another world, built on a war against the dead, Rick Grimes and Michonne attempt to find each other and who they were.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2691148"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  },
+  {
+    "id": 2747136,
+    "url": "https://www.tvmaze.com/episodes/2747136/the-walking-dead-the-ones-who-live-1x02-gone",
+    "name": "Gone",
+    "season": 1,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2024-03-03",
+    "airtime": "21:00",
+    "airstamp": "2024-03-04T02:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2747136"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  },
+  {
+    "id": 2747137,
+    "url": "https://www.tvmaze.com/episodes/2747137/the-walking-dead-the-ones-who-live-1x03-bye",
+    "name": "Bye",
+    "season": 1,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2024-03-10",
+    "airtime": "21:00",
+    "airstamp": "2024-03-11T01:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2747137"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  },
+  {
+    "id": 2747138,
+    "url": "https://www.tvmaze.com/episodes/2747138/the-walking-dead-the-ones-who-live-1x04-what-we",
+    "name": "What We",
+    "season": 1,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2024-03-17",
+    "airtime": "21:00",
+    "airstamp": "2024-03-18T01:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2747138"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  },
+  {
+    "id": 2747139,
+    "url": "https://www.tvmaze.com/episodes/2747139/the-walking-dead-the-ones-who-live-1x05-become",
+    "name": "Become",
+    "season": 1,
+    "number": 5,
+    "type": "regular",
+    "airdate": "2024-03-24",
+    "airtime": "21:00",
+    "airstamp": "2024-03-25T01:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2747139"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  },
+  {
+    "id": 2747140,
+    "url": "https://www.tvmaze.com/episodes/2747140/the-walking-dead-the-ones-who-live-1x06-episode-6",
+    "name": "Episode 6",
+    "season": 1,
+    "number": 6,
+    "type": "regular",
+    "airdate": "2024-03-31",
+    "airtime": "21:00",
+    "airstamp": "2024-04-01T01:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": null,
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2747140"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64504"
+      }
+    }
+  }
+]

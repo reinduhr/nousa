@@ -1,0 +1,55 @@
+{
+  "id": 55352,
+  "url": "https://www.tvmaze.com/shows/55352/clarksons-farm",
+  "name": "Clarkson's Farm",
+  "type": "Documentary",
+  "language": "English",
+  "genres": [
+    "Comedy",
+    "Adventure"
+  ],
+  "status": "Running",
+  "runtime": null,
+  "averageRuntime": 47,
+  "premiered": "2021-06-11",
+  "ended": null,
+  "officialSite": "https://www.primevideo.com/detail/Clarksons-Farm/0SHGKA0J8D4G01ZGD647627NEJ/",
+  "schedule": {
+    "time": "",
+    "days": []
+  },
+  "rating": {
+    "average": 8.4
+  },
+  "weight": 98,
+  "network": null,
+  "webChannel": {
+    "id": 3,
+    "name": "Prime Video",
+    "country": null,
+    "officialSite": "https://www.primevideo.com"
+  },
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 378165,
+    "imdb": "tt10541088"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/446/1116043.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/446/1116043.jpg"
+  },
+  "summary": "<p>Jeremy Clarkson looks into the real life of a farmer as he's is faced with the challenges of running a successful farm and farm shop at his own farm, Diddly Squat Farm.</p>",
+  "updated": 1706964246,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/55352"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2488085"
+    },
+    "nextepisode": {
+      "href": "https://api.tvmaze.com/episodes/2760825"
+    }
+  }
+}

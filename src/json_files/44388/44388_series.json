@@ -1,0 +1,58 @@
+{
+  "id": 44388,
+  "url": "https://www.tvmaze.com/shows/44388/masters-of-the-air",
+  "name": "Masters of the Air",
+  "type": "Scripted",
+  "language": "English",
+  "genres": [
+    "Drama",
+    "War",
+    "History"
+  ],
+  "status": "Running",
+  "runtime": null,
+  "averageRuntime": 54,
+  "premiered": "2024-01-26",
+  "ended": null,
+  "officialSite": "https://tv.apple.com/show/masters-of-the-air/umc.cmc.7bxcni0vwgll9kmicq738k5q2",
+  "schedule": {
+    "time": "",
+    "days": [
+      "Friday"
+    ]
+  },
+  "rating": {
+    "average": 7.3
+  },
+  "weight": 100,
+  "network": null,
+  "webChannel": {
+    "id": 310,
+    "name": "Apple TV+",
+    "country": null,
+    "officialSite": "https://tv.apple.com/"
+  },
+  "dvdCountry": null,
+  "externals": {
+    "tvrage": null,
+    "thetvdb": 370853,
+    "imdb": "tt2640044"
+  },
+  "image": {
+    "medium": "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253902.jpg",
+    "original": "https://static.tvmaze.com/uploads/images/original_untouched/501/1253902.jpg"
+  },
+  "summary": "<p><b>Masters of the Air </b>follows the men of the 100th Bomb Group (the \"Bloody Hundredth\") as they conduct perilous bombing raids over Nazi Germany and grapple with the frigid conditions, lack of oxygen and sheer terror of combat conducted at 25,000 feet in the air. Portraying the psychological and emotional price paid by these young men as they helped destroy the horror of Hitler's Third Reich, is at the heart of <i>Masters of the Air</i>. Some were shot down and captured; some were wounded or killed. And some were lucky enough to make it home. Regardless of individual fate, a toll was exacted on them all.</p>",
+  "updated": 1707479740,
+  "_links": {
+    "self": {
+      "href": "https://api.tvmaze.com/shows/44388"
+    },
+    "previousepisode": {
+      "href": "https://api.tvmaze.com/episodes/2659667"
+    },
+    "nextepisode": {
+      "href": "https://api.tvmaze.com/episodes/2659668"
+    }
+  }
+}

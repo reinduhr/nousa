@@ -1,0 +1,1259 @@
+[
+  {
+    "id": 930855,
+    "url": "https://www.tvmaze.com/episodes/930855/the-grand-tour-1x01-the-holy-trinity",
+    "name": "The Holy Trinity",
+    "season": 1,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2016-11-18",
+    "airtime": "",
+    "airstamp": "2016-11-18T12:00:00+00:00",
+    "runtime": 71,
+    "rating": {
+      "average": 8.3
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/85/213152.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/85/213152.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson, Richard Hammond and James May start their brand new car show with hundreds of cars, thousands of people, a fire spitting metal scorpion and a squadron of jets in the California desert, plus three amazing hybrid hypercars and a brilliant BMW.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/930855"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 946060,
+    "url": "https://www.tvmaze.com/episodes/946060/the-grand-tour-1x02-operation-desert-stumble",
+    "name": "Operation Desert Stumble",
+    "season": 1,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2016-11-25",
+    "airtime": "",
+    "airstamp": "2016-11-25T12:00:00+00:00",
+    "runtime": 58,
+    "rating": {
+      "average": 6.3
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/86/215562.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/86/215562.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson, Richard Hammond and James May pitch their travelling tent in Johannesburg, South Africa from where they introduce their unusual attempts to become special forces soldiers and a test of the Aston Martin Vulcan. Also in this show, James is forced to try something called spinning.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/946060"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 946061,
+    "url": "https://www.tvmaze.com/episodes/946061/the-grand-tour-1x03-opera-arts-and-donuts",
+    "name": "Opera, Arts, and Donuts",
+    "season": 1,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2016-12-02",
+    "airtime": "",
+    "airstamp": "2016-12-02T12:00:00+00:00",
+    "runtime": 63,
+    "rating": {
+      "average": 7.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/87/218245.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/87/218245.jpg"
+    },
+    "summary": "<p>The travelling tent lands on the quayside in Whitby, England where Jeremy Clarkson, Richard Hammond and James May introduce a modern take on the traditional Italian grand tour featuring an Aston Martin DB11, a Rolls-Royce Dawn and an uninvited guest. Also in this show, Jeremy faces the consequences of a foolish bet and Simon Pegg is the star guest.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/946061"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955073,
+    "url": "https://www.tvmaze.com/episodes/955073/the-grand-tour-1x04-enviro-mental",
+    "name": "Enviro-mental",
+    "season": 1,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2016-12-09",
+    "airtime": "",
+    "airstamp": "2016-12-09T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 6.6
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/88/220777.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/88/220777.jpg"
+    },
+    "summary": "<p>The studio tent is back in Whitby, England as Jeremy Clarkson introduces an almost impartial test of the Porsche 911 GT3 RS against the BMW M4 GTS, and the three hosts attempt to make cars from sustainable materials. Comedian Jimmy Carr is the celebrity guest.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955073"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955074,
+    "url": "https://www.tvmaze.com/episodes/955074/the-grand-tour-1x05-moroccan-roll",
+    "name": "Moroccan Roll",
+    "season": 1,
+    "number": 5,
+    "type": "regular",
+    "airdate": "2016-12-16",
+    "airtime": "",
+    "airstamp": "2016-12-16T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 6.8
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/89/223135.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/89/223135.jpg"
+    },
+    "summary": "<p>The Grand Tour studio arrives in Rotterdam where Jeremy Clarkson, Richard Hammond and James May introduce a lightweight sport car test featuring the Alfa Romeo 4C Spider, the Mazda MX5 and the Zenos E10 in the stunning landscapes of Morocco. Also in this show, Hammond and May play a traditional board game using cars and Dutch band Golden Earring are the guest stars.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955074"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955075,
+    "url": "https://www.tvmaze.com/episodes/955075/the-grand-tour-1x06-happy-finnish-christmas",
+    "name": "Happy Finnish Christmas",
+    "season": 1,
+    "number": 6,
+    "type": "regular",
+    "airdate": "2016-12-23",
+    "airtime": "",
+    "airstamp": "2016-12-23T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 6.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/90/225700.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/90/225700.jpg"
+    },
+    "summary": "<p>The Grand Tour tent is in Kakslauttanen, Finland, deep within the Arctic Circle with a show in which Richard Hammond and Jeremy Clarkson compare the Ford Mustang V8 and the Ford Focus RS, James May recounts the bitter 1960s battle for endurance racing supremacy between Ferrari and Ford, and the presenters run through some ideal Christmas gifts for car fans.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955075"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955076,
+    "url": "https://www.tvmaze.com/episodes/955076/the-grand-tour-1x07-the-beach-buggy-boys-part-1",
+    "name": "The Beach (Buggy) Boys - Part 1",
+    "season": 1,
+    "number": 7,
+    "type": "regular",
+    "airdate": "2016-12-30",
+    "airtime": "",
+    "airstamp": "2016-12-30T12:00:00+00:00",
+    "runtime": 45,
+    "rating": {
+      "average": 7.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/91/227957.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/91/227957.jpg"
+    },
+    "summary": "<p>In the first of two special shows, Jeremy Clarkson, Richard Hammond and James May are challenged to complete an epic journey across Namibia in three beach buggies, each built to their personal spec. What starts off as a simple determination to win an argument with their boss turns into an amazing adventure across some of the most incredible desert scenery Africa has to offer.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955076"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1021495,
+    "url": "https://www.tvmaze.com/episodes/1021495/the-grand-tour-1x08-the-beach-buggy-boys-part-2",
+    "name": "The Beach (Buggy) Boys - Part 2",
+    "season": 1,
+    "number": 8,
+    "type": "regular",
+    "airdate": "2016-12-31",
+    "airtime": "",
+    "airstamp": "2016-12-31T12:00:00+00:00",
+    "runtime": 60,
+    "rating": {
+      "average": 7.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/91/228304.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/91/228304.jpg"
+    },
+    "summary": "<p>In the second show of a two-part special, Jeremy Clarkson, Richard Hammond and James May are battling across Namibia in a quest to prove that beach buggies are brilliant. Having survived the challenges of the desert, the trio must now brace themselves for even greater hardship involving rough roads, camping, rhino conservation and a rather unusual river crossing.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1021495"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955079,
+    "url": "https://www.tvmaze.com/episodes/955079/the-grand-tour-1x09-berks-to-the-future",
+    "name": "Berks to the Future",
+    "season": 1,
+    "number": 9,
+    "type": "regular",
+    "airdate": "2017-01-06",
+    "airtime": "",
+    "airstamp": "2017-01-06T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 7.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/92/230185.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/92/230185.jpg"
+    },
+    "summary": "<p>The Grand Tour tent pitches up in Stuttgart, Germany from where James May introduces a test of the highly advanced Honda NSX, Jeremy Clarkson tries to invent a new sort of SUV, Richard Hammond creates a machine to protect him from a future apocalypse, and the three hosts attempt to generate electricity from everyday activities.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955079"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955080,
+    "url": "https://www.tvmaze.com/episodes/955080/the-grand-tour-1x10-dumb-fight-at-the-ok-coral",
+    "name": "Dumb Fight at the O.K. Coral",
+    "season": 1,
+    "number": 10,
+    "type": "regular",
+    "airdate": "2017-01-13",
+    "airtime": "",
+    "airstamp": "2017-01-13T12:00:00+00:00",
+    "runtime": 61,
+    "rating": {
+      "average": 6.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/93/232789.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/93/232789.jpg"
+    },
+    "summary": "<p>The Grand Tour travelling tent arrives in Nashville, Tennessee from where Jeremy Clarkson, Richard Hammond and James May introduce their attempt to save the world's coral reefs using only a selection of car body shells and some extremely inept boat driving. Also in this show, Jeremy finally indulges his series-long Alfa Romeo obsession with a test of the new, 500 horsepower Giulia Quadrifoglio and AC/DC singer Brian Johnson comes to the tent to try his hand at Celebrity Brain Crash.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955080"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 955081,
+    "url": "https://www.tvmaze.com/episodes/955081/the-grand-tour-1x11-italian-lessons",
+    "name": "Italian Lessons",
+    "season": 1,
+    "number": 11,
+    "type": "regular",
+    "airdate": "2017-01-20",
+    "airtime": "",
+    "airstamp": "2017-01-20T12:00:00+00:00",
+    "runtime": 61,
+    "rating": {
+      "average": 7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/94/235085.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/94/235085.jpg"
+    },
+    "summary": "<p>From the shores of Loch Ness in Scotland, Jeremy Clarkson, Richard Hammond and James May introduce their attempts to buy used Maseratis for a bargain price and then use them to tour the drizzle flecked landscapes of the North of France. Also in this programme, Richard takes the Abarth 124 Spider to the Eboladrome, Jeremy comes up with a way to install cutting edge features in an older car, and Olympic cycling champion turned car racer Sir Chris Hoy is invited to try Celebrity Brain Crash.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/955081"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1022685,
+    "url": "https://www.tvmaze.com/episodes/1022685/the-grand-tour-1x12-censored-to-censored",
+    "name": "[censored] to [censored]",
+    "season": 1,
+    "number": 12,
+    "type": "regular",
+    "airdate": "2017-01-27",
+    "airtime": "",
+    "airstamp": "2017-01-27T12:00:00+00:00",
+    "runtime": 63,
+    "rating": {
+      "average": 7.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/95/237962.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/95/237962.jpg"
+    },
+    "summary": "<p>The Grand Tour tent is once again in Loch Ness, Scotland after a monster discovery since the last show. This week, the hosts tour central Europe in a Jaguar F-Pace, a Bentley Bentayga and a Range Rover Autobiography, arguing over which is the best SUV and trying not to giggle at road signs. Also in this show, Jeremy kills preconceptions as he laps the Eboladrome in a Lexus GS F, the hosts examine the point of launch control, and Hollywood legend Tim Burton is invited to play Celebrity Brain Crash.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1022685"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1049662,
+    "url": "https://www.tvmaze.com/episodes/1049662/the-grand-tour-1x13-past-v-future",
+    "name": "Past v Future",
+    "season": 1,
+    "number": 13,
+    "type": "regular",
+    "airdate": "2017-02-03",
+    "airtime": "",
+    "airstamp": "2017-02-03T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/96/240801.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/96/240801.jpg"
+    },
+    "summary": "<p>The Grand Tour tent is in Dubai for the final show of the season in which Jeremy Clarkson pits his old fashioned Volkswagen Golf GTI against James May's electrically powered BMW i3, Richard Hammond learns how to drift, James is forced to take part in a weird sport called winching, and the Bugatti Veyron drag races against the Porsche 918 Spyder.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1049662"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1347674,
+    "url": "https://www.tvmaze.com/episodes/1347674/the-grand-tour-2x01-past-present-or-future",
+    "name": "Past, Present or Future",
+    "season": 2,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2017-12-08",
+    "airtime": "",
+    "airstamp": "2017-12-08T12:00:00+00:00",
+    "runtime": 70,
+    "rating": {
+      "average": 6.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/137/344426.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/137/344426.jpg"
+    },
+    "summary": "<p>For the opening episode, We are in Switzerland where the presenters compare a Lamborghini Aventador S, a Honda NSX and an all-electric Croatian supercar called the Rimac Concept One in a battle of past, present and future. Richard's hillclimb takes an unexpected turn. And Ricky Wilson of The Voice UK and David Hasselhoff from America's Got Talent go head-to-head in the all-new Celebrity Face Off.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1347674"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1370181,
+    "url": "https://www.tvmaze.com/episodes/1370181/the-grand-tour-2x02-the-falls-guys",
+    "name": "The Falls Guys",
+    "season": 2,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2017-12-15",
+    "airtime": "",
+    "airstamp": "2017-12-15T12:00:00+00:00",
+    "runtime": 70,
+    "rating": {
+      "average": 7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/138/346454.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/138/346454.jpg"
+    },
+    "summary": "<p>We are in New York to find the fastest way from the Big Apple to Niagara Falls in a race featuring Jeremy in the new Ford GT versus James May on public transportation, dragging an injured Richard Hammond. Also, Jeremy tests the Mercedes-AMG GT R at the Eboladrome, cricketer Kevin Pietersen goes against baseball's Brian Wilson in Celebrity Face Off, and The American test driver is replaced.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1370181"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1370182,
+    "url": "https://www.tvmaze.com/episodes/1370182/the-grand-tour-2x03-bah-humbug-atti",
+    "name": "Bah Humbug-atti",
+    "season": 2,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2017-12-22",
+    "airtime": "",
+    "airstamp": "2017-12-22T12:00:00+00:00",
+    "runtime": 61,
+    "rating": {
+      "average": 6.6
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/139/348441.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/139/348441.jpg"
+    },
+    "summary": "<p>In this episode, Jeremy Clarkson asks if Europe's glamour set still need their jets and helicopters or if they'd be better off with a car: the new, 1479 horsepower Bugatti Chiron with an epic cross-Europe dash. James May tests if the new Kia Stinger GT is faster than gravity itself with a race against some skateboarders. Plus May joins Richard Hammond to relieve the boredom of office lunchtimes with the all-new sport of car park racing. In Celebrity Face Off actor Hugh Bonneville goes against naturalist Casey Anderson to find the world's fastest person who lives with a bear.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1370182"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1378493,
+    "url": "https://www.tvmaze.com/episodes/1378493/the-grand-tour-2x04-unscripted",
+    "name": "Unscripted",
+    "season": 2,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2017-12-29",
+    "airtime": "",
+    "airstamp": "2017-12-29T12:00:00+00:00",
+    "runtime": 64,
+    "rating": {
+      "average": 6.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/140/350075.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/140/350075.jpg"
+    },
+    "summary": "<p>In this episode Jeremy Clarkson, Richard Hammond and James May attempt to show what would happen if The Grand Tour made a completely unscripted film with no pre-arranged locations, no set-up stunts, and no planned incidents. All they agree is that the starting point will be in Croatia, where Jeremy arrives in an Audi TT RS, Richard turns up with a not-at-all-comparable Ariel Nomad, and James brings along an old Lada which he has decided to turn into a fire engine. What follows is a demonstration of why some kind of script is generally a good thing. Also in this show, Richard takes the new McLaren 720S to the Eboladrome and in Celebrity Face Off Michael Ball goes head-to-head against Alfie Boe to find the world's fastest classical singer with an interesting connection to the British motor industry.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1378493"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1378702,
+    "url": "https://www.tvmaze.com/episodes/1378702/the-grand-tour-2x05-up-down-and-round-the-farm",
+    "name": "Up, Down and Round the Farm",
+    "season": 2,
+    "number": 5,
+    "type": "regular",
+    "airdate": "2018-01-05",
+    "airtime": "",
+    "airstamp": "2018-01-05T12:00:00+00:00",
+    "runtime": 59,
+    "rating": {
+      "average": 6.5
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/140/351012.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/140/351012.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson decides to make one of those Ken Block-style car skidding videos that are very popular on the internet using an old Subaru and a suitable swathe of English farmland. His endeavours are swiftly dismantled by Richard Hammond and James May who are on hand in the studio tent to reveal some of the embarrassing behind-the-scenes footage. Also in this show, May makes a rare trip to the Eboladrome test track to try out the tiny Volkswagen Up! GTI while Richard Hammond is in Dubai rummaging in the toy box of machinery and coming out with an incredible high-speed tracked vehicle called the Ripsaw. Plus, Celebrity Face Off sets out to find the world's fastest person with a failed early career in a band as Preacher star Dominic Cooper goes head-to-head against comedian Bill Bailey.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1378702"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1383882,
+    "url": "https://www.tvmaze.com/episodes/1383882/the-grand-tour-2x06-jaaaaaaaags",
+    "name": "Jaaaaaaaags",
+    "season": 2,
+    "number": 6,
+    "type": "regular",
+    "airdate": "2018-01-12",
+    "airtime": "",
+    "airstamp": "2018-01-12T12:00:00+00:00",
+    "runtime": 64,
+    "rating": {
+      "average": 7.1
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/141/353667.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/141/353667.jpg"
+    },
+    "summary": "<p>In this show, Jeremy Clarkson, Richard Hammond and James May set out to prove that old Jaguars are not only stylish and roguish, but also strong and reliable with a road trip across Colorado. Along the way they set laps around a punishing dirt track and test 0-100-0 performance at America's highest commercial airport before embarking on one of the most perilous challenges they've ever attempted; avoiding the expense of lift passes and ski equipment by going skiing in their cars. Also in this show, Celebrity Face Off finds the world's fastest actor whose middle name is George by pitting Luke Evans against Kiefer Sutherland.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1383882"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1387629,
+    "url": "https://www.tvmaze.com/episodes/1387629/the-grand-tour-2x07-its-a-gas-gas-gas",
+    "name": "It's a Gas, Gas, Gas",
+    "season": 2,
+    "number": 7,
+    "type": "regular",
+    "airdate": "2018-01-19",
+    "airtime": "",
+    "airstamp": "2018-01-19T12:00:00+00:00",
+    "runtime": 65,
+    "rating": {
+      "average": 7.5
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/142/355539.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/142/355539.jpg"
+    },
+    "summary": "<p>In this episode, Richard Hammond and James May work out that the average motorist loses 36 days of their lives filling up with fuel. The pair vow to do something about it using their skill and ingenuity to invent a system for filling up on the move. Also in this show; Hammond is at the Eboladrome track to test a new, hardcore version of the Lamborghini Huracan called the Performante, Meanwhile, Jeremy Clarkson tells us the story behind one of motorsport's greatest battle; the epic struggle between the mighty Audi Quattros and the underdog Lancia 037s in the 1983 world rally championship. Plus, Celebrity Face Off finds the world's fastest person who makes a living hitting or strangling other men, as boxer Anthony Joshua goes head-to-head against WWE star Bill Goldberg.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1387629"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1391801,
+    "url": "https://www.tvmaze.com/episodes/1391801/the-grand-tour-2x08-blasts-from-the-past",
+    "name": "Blasts from the Past",
+    "season": 2,
+    "number": 8,
+    "type": "regular",
+    "airdate": "2018-01-26",
+    "airtime": "",
+    "airstamp": "2018-01-26T12:00:00+00:00",
+    "runtime": 68,
+    "rating": {
+      "average": 7.5
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/142/357322.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/142/357322.jpg"
+    },
+    "summary": "<p>In this episode, Jeremy Clarkson and Richard Hammond visit some evocative old motorsport locations in Europe using a pair of re-born 1950s sports cars, painstakingly rebuilt by their manufacturers to the original designs. With Clarkson in the Aston Martin DB4 GT lightweight and Hammond in the Jaguar XKSS, the pair start their adventure on the street circuit in Pau, France before their fun is interrupted by the arrival of James May in a modern Honda Civic Type R which he insists is better in every way. Also in this show, Jeremy takes care of some unfinished business by track testing the Ford GT first seen on the road in episode 2. Plus, Celebrity Face Off finds the world's fastest drummer from a band beginning with the letter P as Stewart Copeland from The Police competes against Pink Floyd's Nick Mason.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1391801"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1397211,
+    "url": "https://www.tvmaze.com/episodes/1397211/the-grand-tour-2x09-breaking-badly",
+    "name": "Breaking, Badly",
+    "season": 2,
+    "number": 9,
+    "type": "regular",
+    "airdate": "2018-02-02",
+    "airtime": "",
+    "airstamp": "2018-02-02T12:00:00+00:00",
+    "runtime": 65,
+    "rating": {
+      "average": 6.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/143/359576.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/143/359576.jpg"
+    },
+    "summary": "<p>The Grand Tour attempts to set a new British water speed record for amphibious cars. A staggering 85 percent of all people who try to break records on water are killed but this doesn't put off Clarkson, Hammond and May as they set about building their own road legal machine from an unholy union of car, boat and jet engine and then use it to spear across the choppy waters of a vast lake during something called \"Coniston Speed Week\". Also in this show, Jeremy makes a nostalgic trip to the Eboladrome to drive a pair of incredible supercars from the early 1990s, the Jaguar XJ220 and the Bugatti EB 110 Super Sport. Plus, Celebrity Face Off finds the world's fastest magician as Dynamo goes head-to-head against Penn &amp; Teller.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1397211"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1403072,
+    "url": "https://www.tvmaze.com/episodes/1403072/the-grand-tour-2x10-oh-canada",
+    "name": "Oh, Canada",
+    "season": 2,
+    "number": 10,
+    "type": "regular",
+    "airdate": "2018-02-09",
+    "airtime": "",
+    "airstamp": "2018-02-09T12:00:00+00:00",
+    "runtime": 67,
+    "rating": {
+      "average": 6.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/144/361926.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/144/361926.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson, Richard Hammond and James May reluctantly agree to test three SUVs in the rugged landscapes of Canada. Clarkson in the Alfa Romeo Stelvio Quadrifoglio, Hammond in the Porsche Macan Turbo Performance Pack and May in the Range Rover Velar. The boys will test their cars' sporting side at a race track and their utilitarian side with some enormous dogs, before ending in an epic race across the snowy mountains. Also in this show, Jeremy embarks on a legally perilous test of the Tesla Model X. This will mark the first time we've seen him drive a Tesla on-screen since the controversial Roadster review in 2008. Plus, Celebrity Face Off finds the world's fastest golf enthusiast as Rory McIlroy takes on Paris Hilton.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1403072"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1406944,
+    "url": "https://www.tvmaze.com/episodes/1406944/the-grand-tour-2x11-feed-the-world",
+    "name": "Feed the World",
+    "season": 2,
+    "number": 11,
+    "type": "regular",
+    "airdate": "2018-02-16",
+    "airtime": "",
+    "airstamp": "2018-02-16T12:00:00+00:00",
+    "runtime": 56,
+    "rating": {
+      "average": 7.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/145/363259.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/145/363259.jpg"
+    },
+    "summary": "<p>In a mini special The Grand Tour decides to tackle world hunger by transporting fish from the bountiful coast of Mozambique to the impoverished interior using a Nissan pick-up, a Mercedes 200T, and a TVS Star motorcycle. Along the way they encounter mud, accidents, and fish preservation issues on what turns out to be an epic, challenging and extraordinary journey.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1406944"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1571790,
+    "url": "https://www.tvmaze.com/episodes/1571790/the-grand-tour-3x01-motown-funk",
+    "name": "Motown Funk",
+    "season": 3,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2019-01-18",
+    "airtime": "",
+    "airstamp": "2019-01-18T12:00:00+00:00",
+    "runtime": 69,
+    "rating": {
+      "average": 7.6
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/180/450975.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/180/450975.jpg"
+    },
+    "summary": "<p>In the first episode of a brand new season, Jeremy Clarkson, Richard Hammond and James May make a pilgrimage to Detroit to drive three highly tuned muscle cars on the deserted streets of this once-great motor city. Also in this show, Jeremy drives the super-lightweight, super-hardcore, 789 horsepower McLaren Senna.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1571790"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1592859,
+    "url": "https://www.tvmaze.com/episodes/1592859/the-grand-tour-3x02-colombia-special-part-1",
+    "name": "Colombia Special Part 1",
+    "season": 3,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2019-01-25",
+    "airtime": "",
+    "airstamp": "2019-01-25T12:00:00+00:00",
+    "runtime": 55,
+    "rating": {
+      "average": 7.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/181/453507.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/181/453507.jpg"
+    },
+    "summary": "<p>In a 2-Part Colombia Special Jeremy Clarkson, Richard Hammond and James May are tasked with getting Amazon some new, high quality screensaver photos depicting interesting animals. To do this, the guys go to Colombia, with Clarkson in a Jeep Wrangler, Hammond in a Chevrolet Silverado pick-up and May crammed into a tiny Fiat Panda 4x4. This show contains scenes that donkey enthusiasts may find disturbing.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1592859"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1592860,
+    "url": "https://www.tvmaze.com/episodes/1592860/the-grand-tour-3x03-colombia-special-part-2",
+    "name": "Colombia Special Part 2",
+    "season": 3,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2019-01-26",
+    "airtime": "",
+    "airstamp": "2019-01-26T12:00:00+00:00",
+    "runtime": 66,
+    "rating": {
+      "average": 7.5
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/181/453739.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/181/453739.jpg"
+    },
+    "summary": "<p>In a 2-Part Colombia Special Jeremy Clarkson, Richard Hammond and James May are tasked with getting Amazon some new, high quality screensaver photos depicting interesting animals. To do this, the guys go to Colombia, with Clarkson in a Jeep Wrangler, Hammond in a Chevrolet Silverado pick-up and May crammed into a tiny Fiat Panda 4x4. This show contains scenes that donkey enthusiasts may find disturbing.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1592860"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1595158,
+    "url": "https://www.tvmaze.com/episodes/1595158/the-grand-tour-3x04-pick-up-put-downs",
+    "name": "Pick Up Put Downs",
+    "season": 3,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2019-02-01",
+    "airtime": "",
+    "airstamp": "2019-02-01T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 7.1
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/182/455055.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/182/455055.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson, Richard Hammond and James May test pick-up trucks with a series of challenges built around the many stages of life in the developing world, starting with rural subsistence and running through the toppling of the dictator, the descent into civil war, and the bit where some idiot blows up a helicopter. Clarkson has a Volkswagen Amarok, Hammond has a Ford Ranger while May is in the new Mercedes X-class. Along the way there are chases and races and quite a lot of needless gunfire until the best pick-up is decided upon by everyone except James. Also,in this show, Jeremy is at the Eboladrome to test the snorting, swollen, near-600 horsepower Jaguar XE Project 8.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1595158"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1599265,
+    "url": "https://www.tvmaze.com/episodes/1599265/the-grand-tour-3x05-an-itchy-urus",
+    "name": "An Itchy Urus",
+    "season": 3,
+    "number": 5,
+    "type": "regular",
+    "airdate": "2019-02-08",
+    "airtime": "",
+    "airstamp": "2019-02-08T12:00:00+00:00",
+    "runtime": 59,
+    "rating": {
+      "average": 6.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/182/456996.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/182/456996.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson heads to Sweden to test the new Lamborghini Urus SUV on slushy, slippery roads and in an action-packed ice race across a frozen lake against Grand Tour driver Abbie Eaton in a Porsche 911 Turbo. Back in the UK, James May pays a rare visit to the Eboladrome to try the Alpine A110, a French sports car that hopes to succeed where most French sports car fail by getting more than two people to buy it. Also in this episode, Richard Hammond profiles Scottish racing driver Jim Clark – a quiet and modest man whose achievements on track made him arguably the greatest of all time, before his life was tragically cut short.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1599265"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1604851,
+    "url": "https://www.tvmaze.com/episodes/1604851/the-grand-tour-3x06-chinese-food-for-thought",
+    "name": "Chinese Food for Thought",
+    "season": 3,
+    "number": 6,
+    "type": "regular",
+    "airdate": "2019-02-15",
+    "airtime": "",
+    "airstamp": "2019-02-15T12:00:00+00:00",
+    "runtime": 71,
+    "rating": {
+      "average": 7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/186/465560.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/186/465560.jpg"
+    },
+    "summary": "<p>Jeremy Clarkson, Richard Hammond and James May are in the vast Chinese megacity of Chongqing with some valuable consumer advice for business people across all of China; don't spend huge sums on a brand new luxury car when you could pop over to Europe, buy a second-hand executive limo and ship it home for a fraction of the cost. To prove their point, the three hosts tour the city and beyond in an old Mercedes S600, an ageing BMW 750iL and a 20-year-old Cadillac STS, encountering a door empire, a sinister camera network, a flame spitting drone and a range of in-car entertainment features along the way. Chongqing is regarded by many as the Detroit of China, and sources suggest that the boys will be filming a piece investigating the industrial development of the city's car industry. Clarkson will also be testing the Hongqi L5 Limousine – something he was very much looking forward to. Also in this show, The Grand Tour discovers an ultra-fast electric supercar called the NIO EP9 and foolishly gives the job of testing it to Richard Hammond.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1604851"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1608649,
+    "url": "https://www.tvmaze.com/episodes/1608649/the-grand-tour-3x07-well-aged-scotch",
+    "name": "Well Aged Scotch",
+    "season": 3,
+    "number": 7,
+    "type": "regular",
+    "airdate": "2019-02-22",
+    "airtime": "",
+    "airstamp": "2019-02-22T12:00:00+00:00",
+    "runtime": 67,
+    "rating": {
+      "average": 6.8
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/186/465570.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/186/465570.jpg"
+    },
+    "summary": "<p>In this episode, Jeremy Clarkson, Richard Hammond and James May set out to prove that not all classic cars have become insanely expensive by finding rare and desirable machines that have yet to accelerate up the appreciation curve. With Clarkson in an Alfa Romeo GTV6, Hammond in a Fiat X1/9 and May in a Lancia Gamma Coupe, the three set off on a road trip around the top of Scotland taking in the sensational driving roads of the North Coast 500, winding their way through some of the most breathtaking scenery in the world to a soundtrack of grinding gearboxes, malfunctioning wipers and Richard Hammond complaining about how horribly cold he is. Also in this show, Jeremy is at the Eboladrome to test the new BMW M5 super saloon against the same-but-different Alpina B5.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1608649"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1611952,
+    "url": "https://www.tvmaze.com/episodes/1611952/the-grand-tour-3x08-international-buffoons-vacation",
+    "name": "International Buffoons Vacation",
+    "season": 3,
+    "number": 8,
+    "type": "regular",
+    "airdate": "2019-03-01",
+    "airtime": "",
+    "airstamp": "2019-03-01T12:00:00+00:00",
+    "runtime": 82,
+    "rating": {
+      "average": 6.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/186/465567.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/186/465567.jpg"
+    },
+    "summary": "<p>In this special episode, Jeremy Clarkson, Richard Hammond and James May are forced to go on an RV holiday in the southwestern United States, despite regarding such things as slow, uncomfortable and pointless. Pushed to breaking point within 24 hours, the hosts decide to take matters into their own hands by each buying a used RV which they can then modify to suit their own personal preferences before continuing their vacation across Nevada in comfort, or a near approximation of it.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1611952"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1614787,
+    "url": "https://www.tvmaze.com/episodes/1614787/the-grand-tour-3x09-aston-astronauts-and-angelinas-children",
+    "name": "Aston, Astronauts and Angelina's Children",
+    "season": 3,
+    "number": 9,
+    "type": "regular",
+    "airdate": "2019-03-08",
+    "airtime": "",
+    "airstamp": "2019-03-08T12:00:00+00:00",
+    "runtime": 62,
+    "rating": {
+      "average": 6.6
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/186/467075.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/186/467075.jpg"
+    },
+    "summary": "<p>In a varied episode, Richard Hammond is at the Eboladrome to drive the new Aston Martin V8 Vantage and find out if the tiny British company has made a sports car that can match the mighty Porsche 911 at last. James May is in a historical frame of mind as he looks back at the cars driven by the astronauts of the ground-breaking Apollo moon missions and takes a spine-tingling ride in Neil Armstrong's actual Corvette. Meanwhile, Jeremy Clarkson embarks on an elaborate and extremely thorough test of the Citroen C3 Aircross as he attempts to demonstrate to his sceptical colleagues that it is spacious, versatile and better than an elephant.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1614787"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1619278,
+    "url": "https://www.tvmaze.com/episodes/1619278/the-grand-tour-3x10-the-youth-vote",
+    "name": "The Youth Vote",
+    "season": 3,
+    "number": 10,
+    "type": "regular",
+    "airdate": "2019-03-15",
+    "airtime": "",
+    "airstamp": "2019-03-15T12:00:00+00:00",
+    "runtime": 64,
+    "rating": {
+      "average": 6.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/186/467071.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/186/467071.jpg"
+    },
+    "summary": "<p>In this episode, Jeremy Clarkson, Richard Hammond and James May celebrate the affordable, practical and fun wonder that is the hot hatchback. With Clarkson in the VW Polo GTI, Hammond in the Ford Fiesta ST and May in the unpronounceable Toyota Yaris GRMN, the three head to the Grand Tour rallycross track until they're told to stop mucking around and make these cars appeal to the young. Armed with stickers, slogans and social media, the three embark on a series of challenges involving fake punctures, mis-spelt rappers and a juicing disaster. Also in this show, Hammond and May are at the Eboladrome comparing two icons of the ‘80s, the Lamborghini Countach and the Ferrari Testarossa.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1619278"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1621853,
+    "url": "https://www.tvmaze.com/episodes/1621853/the-grand-tour-3x11-sea-to-unsalty-sea",
+    "name": "Sea to Unsalty Sea",
+    "season": 3,
+    "number": 11,
+    "type": "regular",
+    "airdate": "2019-03-22",
+    "airtime": "",
+    "airstamp": "2019-03-22T12:00:00+00:00",
+    "runtime": 73,
+    "rating": {
+      "average": 7.8
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/188/471607.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/188/471607.jpg"
+    },
+    "summary": "<p>In this episode Jeremy Clarkson, Richard Hammond and James May are driving the Aston Martin DBS, the Bentley Continental GT and the BMW M850i on an epic 1000 kilometre trip from the shores of the salt water Black Sea in Georgia to the edge of the freshwater Caspian Sea in Azerbaijan. Their purpose? They'll be attempting to find the best car for someone who lives in Georgia but really craves freshwater fish. Because that makes sense, right? Along the way, they encounter strange bathing regimes, moveable borders, incredible monuments and a bladder bursting way to check track performance before arriving in the Azerbaijani capital, Baku, for a race and then some bream.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1621853"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1625711,
+    "url": "https://www.tvmaze.com/episodes/1625711/the-grand-tour-3x12-legends-and-luggage",
+    "name": "Legends and Luggage",
+    "season": 3,
+    "number": 12,
+    "type": "regular",
+    "airdate": "2019-03-29",
+    "airtime": "",
+    "airstamp": "2019-03-29T12:00:00+00:00",
+    "runtime": 58,
+    "rating": {
+      "average": 7.1
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/189/474442.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/189/474442.jpg"
+    },
+    "summary": "<p>In this episode, Jeremy Clarkson tests two modernised versions of classic Lancias, one a thorough update of the Delta Integrale, the other a completely new take on the legendary Stratos. Meanwhile, James May looks back at the incredible story of the Porsche 917, from its early days as an unpromising widow maker to its evolution into one of the most successful racing cars of all time. Also in this show, Richard Hammond joins Clarkson at Stansted airport as the pair attempt to speed up the journey from check-in to security to the actual aeroplane by devising two radical takes on the idea of motorised hand luggage.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1625711"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1629616,
+    "url": "https://www.tvmaze.com/episodes/1629616/the-grand-tour-3x13-survival-of-the-fattest",
+    "name": "Survival of the Fattest",
+    "season": 3,
+    "number": 13,
+    "type": "regular",
+    "airdate": "2019-04-05",
+    "airtime": "",
+    "airstamp": "2019-04-05T12:00:00+00:00",
+    "runtime": 92,
+    "rating": {
+      "average": 8.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/189/474441.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/189/474441.jpg"
+    },
+    "summary": "<p>In a special episode, Jeremy Clarkson, Richard Hammond and James May are dropped in the vast wilderness of Mongolia and told to await a delivery which turns out to be some basic rations and all the flat-packed parts they need to assemble a vehicle in which they can escape to civilisation. Navigating their way out of this epic, enormous and completely people-free terrain is going to be hard enough, especially with only a few days' worth of food and clean water to see them through, but first they've got to build an entire car, and one of the ‘engineers' is the world's most ham-fisted hammer enthusiast.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1629616"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1632957,
+    "url": "https://www.tvmaze.com/episodes/1632957/the-grand-tour-3x14-funeral-for-a-ford",
+    "name": "Funeral for a Ford",
+    "season": 3,
+    "number": 14,
+    "type": "regular",
+    "airdate": "2019-04-12",
+    "airtime": "",
+    "airstamp": "2019-04-12T12:00:00+00:00",
+    "runtime": 57,
+    "rating": {
+      "average": 8.5
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/190/475863.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/190/475863.jpg"
+    },
+    "summary": "<p>In the final episode of the series, Jeremy Clarkson, Richard Hammond and James May present a short and informative history class on one of the bedrocks of British life; the medium-sized Ford saloon. Starting with the Cortina of the 1960s and ‘70s, the three chart the history of the car that changed British society and provided transport for millions of dads including Clarkson senior and father May though not, to his annoyance, Richard's dad. To cover the ‘80s part of this documentary, Richard takes to the track in the legendary Sierra RS Cosworth before all three hosts re-group to celebrate the Ford Mondeo and this model's unique claim to fame. Since the Mondeo seems certain to cease production without replacement in the coming years, the history lesson ends with a touching memorial service to this totem of British life.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1632957"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1760901,
+    "url": "https://www.tvmaze.com/episodes/1760901/the-grand-tour-4x01-the-grand-tour-presents-seamen",
+    "name": "The Grand Tour Presents: Seamen",
+    "season": 4,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2019-12-13",
+    "airtime": "",
+    "airstamp": "2019-12-13T12:00:00+00:00",
+    "runtime": 92,
+    "rating": {
+      "average": 7.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/231/577885.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/231/577885.jpg"
+    },
+    "summary": "<p>The route begins in Cambodia at Siem Reap and then winds downriver to Tonlé Sap lake, before joining the Mekong Delta and sailing into Vietnam. The final port of call is Vung Tau, in south Vietnam.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1760901"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 1806590,
+    "url": "https://www.tvmaze.com/episodes/1806590/the-grand-tour-4x02-the-grand-tour-presents-a-massive-hunt",
+    "name": "The Grand Tour Presents: A Massive Hunt",
+    "season": 4,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2020-12-17",
+    "airtime": "",
+    "airstamp": "2020-12-17T12:00:00+00:00",
+    "runtime": 91,
+    "rating": {
+      "average": 8.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/289/723198.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/289/723198.jpg"
+    },
+    "summary": "<p>The intrepid trio find themselves back on four wheels for their latest adventure. Armed with sports cars, Richard, James and Jeremy think they are in for a cushy road trip as they arrive on the exotic island of Reunion and race on the world's most expensive piece of tarmac. But a bizarre challenge propels them to Madagascar where they must tackle the world's toughest road.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/1806590"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 2130833,
+    "url": "https://www.tvmaze.com/episodes/2130833/the-grand-tour-4x03-the-grand-tour-presents-lochdown",
+    "name": "The Grand Tour Presents: Lochdown",
+    "season": 4,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2021-07-30",
+    "airtime": "",
+    "airstamp": "2021-07-30T12:00:00+00:00",
+    "runtime": 90,
+    "rating": {
+      "average": 8.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/344/862167.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/344/862167.jpg"
+    },
+    "summary": "<p>Confined to the UK by Covid, Jeremy, Richard and James embark on a Lockdown Special to find out just why American 70s cars never took off in Britain. At the wheel of a Cadillac Coupe De Ville, a Lincoln Continental and a Buick Riviera in stunning Scottish surroundings, the three hosts undergo many mishaps and adventures before embarking on one of their toughest challenges yet.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2130833"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 2221968,
+    "url": "https://www.tvmaze.com/episodes/2221968/the-grand-tour-4x04-the-grand-tour-presents-carnage-a-trois",
+    "name": "The Grand Tour Presents: Carnage a Trois",
+    "season": 4,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2021-12-17",
+    "airtime": "",
+    "airstamp": "2021-12-17T12:00:00+00:00",
+    "runtime": 68,
+    "rating": {
+      "average": 8.2
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/384/960825.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/384/960825.jpg"
+    },
+    "summary": "<p>In this second Lockdown Special, the trio dive into the bizarre world of French car culture. On an epic road trip starting in the Welsh hills, they dish up a hair raising mountain climb, bomb defusals, propellor powered cars, helicopter stunts and the most thrilling race of their lives before reaching the English Channel for a jaw dropping medieval climax. And a soupcon of French art house cinema.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2221968"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 2380291,
+    "url": "https://www.tvmaze.com/episodes/2380291/the-grand-tour-5x01-the-grand-tour-presents-a-scandi-flick",
+    "name": "The Grand Tour Presents: A Scandi Flick",
+    "season": 5,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2022-09-16",
+    "airtime": "",
+    "airstamp": "2022-09-16T12:00:00+00:00",
+    "runtime": 100,
+    "rating": {
+      "average": 8.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056291.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/422/1056291.jpg"
+    },
+    "summary": "<p>In their first post pandemic road trip, Jeremy, Richard and James head for the icy wastes of the Scandinavian Arctic Circle. At the wheel of their three favourite rally cars the boys embark on a catastrophe filled adventure that takes in Cold War sub bases, frozen lake race tracks, crashes and ski resort chaos as they drag their homemade houses from the coast of Norway to the Russian Border.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2380291"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 2549143,
+    "url": "https://www.tvmaze.com/episodes/2549143/the-grand-tour-5x02-the-grand-tour-eurocrash",
+    "name": "The Grand Tour: Eurocrash",
+    "season": 5,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2023-06-16",
+    "airtime": "",
+    "airstamp": "2023-06-16T12:00:00+00:00",
+    "runtime": 106,
+    "rating": {
+      "average": 7.7
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/461/1154818.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/461/1154818.jpg"
+    },
+    "summary": "<p>Jeremy, Richard and James head to Central Europe on a road trip nobody has ever thought of, in cars nobody would ever dream of. This epic 1400-mile journey takes them from Gdańsk in Poland, through Slovakia, Hungary and Slovenia. They sample some Soviet style Formula 1, are attacked by deadly archers, recruit a famous racing driver and take part in a spectacular Fast and Furious climax.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2549143"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  },
+  {
+    "id": 2759149,
+    "url": "https://www.tvmaze.com/episodes/2759149/the-grand-tour-5x03-the-grand-tour-sand-job",
+    "name": "The Grand Tour: Sand Job",
+    "season": 5,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2024-02-16",
+    "airtime": "",
+    "airstamp": "2024-02-16T12:00:00+00:00",
+    "runtime": null,
+    "rating": {
+      "average": null
+    },
+    "image": null,
+    "summary": "<p>In the remote African country of Mauritania, our trio follow in the footsteps of the legendary Paris-Dakar rally. Instead of bespoke Dakar racers, the boys must complete their journey in cheap modified sports cars. Their journey begins with the world's longest train and sees them tackle the killer Sahara and perilous river crossings, whilst protecting their precious fuel bowser from exploding.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2759149"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/17078"
+      }
+    }
+  }
+]

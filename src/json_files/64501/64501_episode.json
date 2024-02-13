@@ -1,0 +1,170 @@
+[
+  {
+    "id": 2579483,
+    "url": "https://www.tvmaze.com/episodes/2579483/the-walking-dead-daryl-dixon-1x01-lame-perdue",
+    "name": "L'âme Perdue",
+    "season": 1,
+    "number": 1,
+    "type": "regular",
+    "airdate": "2023-09-10",
+    "airtime": "21:00",
+    "airstamp": "2023-09-11T01:00:00+00:00",
+    "runtime": 61,
+    "rating": {
+      "average": 8.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/476/1190962.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/476/1190962.jpg"
+    },
+    "summary": "<p>Following his departure from The Commonwealth, Daryl Dixon washes ashore in France, raising the ire of a splintered but growing autocratic movement centered in Paris and endangering a young boy at the heart of a benevolent religious movement.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2579483"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  },
+  {
+    "id": 2629727,
+    "url": "https://www.tvmaze.com/episodes/2629727/the-walking-dead-daryl-dixon-1x02-alouette",
+    "name": "Alouette",
+    "season": 1,
+    "number": 2,
+    "type": "regular",
+    "airdate": "2023-09-17",
+    "airtime": "21:00",
+    "airstamp": "2023-09-18T01:00:00+00:00",
+    "runtime": 61,
+    "rating": {
+      "average": 8.3
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/477/1193137.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/477/1193137.jpg"
+    },
+    "summary": "<p>Daryl, Isabelle, Laurent and Sylvie face trouble on the road; Isabelle remembers the day the hungry ones appeared; Laurent struggles to fit in.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2629727"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  },
+  {
+    "id": 2629728,
+    "url": "https://www.tvmaze.com/episodes/2629728/the-walking-dead-daryl-dixon-1x03-paris-sera-toujours-paris",
+    "name": "Paris Sera Toujours Paris",
+    "season": 1,
+    "number": 3,
+    "type": "regular",
+    "airdate": "2023-09-24",
+    "airtime": "21:00",
+    "airstamp": "2023-09-25T01:00:00+00:00",
+    "runtime": 50,
+    "rating": {
+      "average": 8.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/478/1195684.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/478/1195684.jpg"
+    },
+    "summary": "<p>The group's arrival in Paris brings help from old friends and attention from new foes.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2629728"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  },
+  {
+    "id": 2636734,
+    "url": "https://www.tvmaze.com/episodes/2636734/the-walking-dead-daryl-dixon-1x04-la-dame-de-fer",
+    "name": "La Dame de Fer",
+    "season": 1,
+    "number": 4,
+    "type": "regular",
+    "airdate": "2023-10-01",
+    "airtime": "21:00",
+    "airstamp": "2023-10-02T01:00:00+00:00",
+    "runtime": 49,
+    "rating": {
+      "average": 8.4
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/479/1198328.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/479/1198328.jpg"
+    },
+    "summary": "<p>Daryl and Isabelle negotiate with the owner of the Demimonde club.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2636734"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  },
+  {
+    "id": 2637341,
+    "url": "https://www.tvmaze.com/episodes/2637341/the-walking-dead-daryl-dixon-1x05-deux-amours",
+    "name": "Deux Amours",
+    "season": 1,
+    "number": 5,
+    "type": "regular",
+    "airdate": "2023-10-08",
+    "airtime": "21:00",
+    "airstamp": "2023-10-09T01:00:00+00:00",
+    "runtime": 58,
+    "rating": {
+      "average": 8.6
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/480/1200440.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/480/1200440.jpg"
+    },
+    "summary": "<p>Daryl and Laurent travel to the Nest as Isabelle considers her options. Genet enacts her plan.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2637341"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  },
+  {
+    "id": 2637342,
+    "url": "https://www.tvmaze.com/episodes/2637342/the-walking-dead-daryl-dixon-1x06-coming-home",
+    "name": "Coming Home",
+    "season": 1,
+    "number": 6,
+    "type": "regular",
+    "airdate": "2023-10-15",
+    "airtime": "21:00",
+    "airstamp": "2023-10-16T01:00:00+00:00",
+    "runtime": 54,
+    "rating": {
+      "average": 8.9
+    },
+    "image": {
+      "medium": "https://static.tvmaze.com/uploads/images/medium_landscape/481/1203005.jpg",
+      "original": "https://static.tvmaze.com/uploads/images/original_untouched/481/1203005.jpg"
+    },
+    "summary": "<p>Genet solidifies her base of power; Daryl has a job to do before he can return to America.</p>",
+    "_links": {
+      "self": {
+        "href": "https://api.tvmaze.com/episodes/2637342"
+      },
+      "show": {
+        "href": "https://api.tvmaze.com/shows/64501"
+      }
+    }
+  }
+]
