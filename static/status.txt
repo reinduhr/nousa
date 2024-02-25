@@ -10,132 +10,6 @@ That '90s Show - 58225 - Running
 The Bear - 54198 - Running
 The Grand Tour - 17078 - Running
 The Last of Us - 46562 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
-The Walking Dead: Daryl Dixon - 64501 - Running
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Fargo - 32 - To Be Determined
-Clarkson's Farm - 55352 - Running
-Ferry: de serie - 65892 - To Be Determined
-Shoresy - 59872 - To Be Determined
-Shrinking - 58323 - Running
-Silo - 38052 - Running
-That '90s Show - 58225 - Running
-The Bear - 54198 - Running
-The Grand Tour - 17078 - Running
-The Last of Us - 46562 - Running
 The Walking Dead: Daryl Dixon - 64501 - Running
 Young Sheldon - 26020 - Running
 Masters of the Air - 44388 - Running
@@ -145,6 +19,7 @@ True Detective - 5 - Running
 The Walking Dead: The Ones Who Live - 64504 - In Development
 Yellowstone - 27848 - Running
 Babylon Berlin - 25245 - Running
+Loki - 41007 - To Be Determined
 Fargo - 32 - To Be Determined
 Clarkson's Farm - 55352 - Running
 Ferry: de serie - 65892 - To Be Determined
@@ -165,48 +40,4 @@ The Walking Dead: The Ones Who Live - 64504 - In Development
 Yellowstone - 27848 - Running
 Babylon Berlin - 25245 - Running
 Loki - 41007 - To Be Determined
-Loki - 41007 - To Be Determined
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
-Young Sheldon - 26020 - Running
-Masters of the Air - 44388 - Running
-Party Down - 1137 - To Be Determined
-Fallout - 49041 - In Development
-True Detective - 5 - Running
-The Walking Dead: The Ones Who Live - 64504 - In Development
-Yellowstone - 27848 - Running
-Babylon Berlin - 25245 - Running
-Loki - 41007 - To Be Determined
+Avatar: The Last Airbender - 38753 - To Be Determined

@@ -1,15 +1,14 @@
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
+from starlette.responses import PlainTextResponse
+from starlette.responses import HTMLResponse
 from starlette.routing import Route
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
-
+from myCal_dictionary import myCal_dictionary
 
 async def homepage(request):
-    return JSONResponse({'hoi': 'wereld'})
-
-async def static(request):
-    return JSONResponse({'hoi': 'static'})
+    return JSONResponse(content=myCal_dictionary)
 
 routes = [
     Route("/", endpoint=homepage),
