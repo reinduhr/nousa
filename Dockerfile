@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y cron
 COPY ./nousa-crontab /etc/cron.d/nousa-crontab
 RUN chmod 0644 /etc/cron.d/nousa-crontab && crontab /etc/cron.d/nousa-crontab
 
+RUN apt install -y sqlite3
+
 COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 

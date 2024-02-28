@@ -5,10 +5,12 @@ from starlette.responses import HTMLResponse
 from starlette.routing import Route
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
-from myCal_dictionary import myCal_dictionary
+from starlette.templating import Jinja2Templates
+           
+templates = Jinja2Templates(directory = "templates")
 
 async def homepage(request):
-    return JSONResponse(content=myCal_dictionary)
+    return templates.TemplateResponse(request, 'index.html')
 
 routes = [
     Route("/", endpoint=homepage),
