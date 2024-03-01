@@ -3,3 +3,4 @@ uvicorn
 starlette
 jinja2
 sqlalchemy
+python-multipart
