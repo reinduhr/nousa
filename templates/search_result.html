@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
+    <title>myCal - Search Results</title>
 </head>
 <body>
+    {% include 'header.html' %}
     <h1>Search Results</h1>
     {% for entry in data %}
         {% set show = entry['show'] %}

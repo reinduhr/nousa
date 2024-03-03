@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Series Search</title>
+    <title>myCal</title>
 </head>
 <body>
+    <p>{{ message }}</p>
+    {% include 'header.html' %}
     <h1>TV Series Search</h1>
     <form action="/search" method="post">
         <label for="seriesName">Enter TV Series Name:</label>
