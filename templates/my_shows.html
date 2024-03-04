@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>myCal - My Shows</title>
-</head>
 <body>
     {% include 'header.html' %}
     <h1>myCal - My Shows</h1>
     <ul>
         {% for show in myshows %}
-        <li>{{ show.series_name }} - {{ show.series_status }} - <form action="/delete_show" method="post"><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button type="submit">delete</button></form></li>
+        <li>{{ show.series_name }} - {{ show.series_status }} - <form action="/delete_show" method="post"><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button type="submit">Delete</button></form></li>
         {% endfor %}
     </ul>
 </body>

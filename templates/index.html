@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>myCal</title>
-</head>
 <body>
     <p>{{ message }}</p>
     {% include 'header.html' %}
-    <h1>TV Series Search</h1>
+    <h1>Search show</h1>
     <form action="/search" method="post">
-        <label for="seriesName">Enter TV Series Name:</label>
+        <label for="seriesName">Which show do you want to add?</label>
         <input type="text" id="seriesName" name="seriesName">
         <button type="submit">Search</button>
     </form>

@@ -1,0 +1,10 @@
+<body>
+    {% include 'header.html' %}
+    <h1>myCal - My Archive</h1>
+    <ul>
+        {% for show in myarchive %}
+        <li>{{ show.series_name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

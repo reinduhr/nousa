@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>myCal - Search Results</title>
-</head>
 <body>
     {% include 'header.html' %}
     <h1>Search Results</h1>
@@ -12,10 +5,10 @@
         {% set show = entry['show'] %}
         <div>
             <h2>{{ show.name }}</h2>
-            <p>{{ show.url }}</p>
-            <form action="/add_to_database" method="post">
+            <p>{{ show.summary }}</p>
+            <form action="/add_show" method="post">
                 <input type="hidden" name="seriesId" value="{{ show.id }}">
-                <button type="submit">Add to Database</button>
+                <button type="submit">Add to my shows</button>
             </form>
         </div>
     {% endfor %}
