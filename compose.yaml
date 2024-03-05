@@ -8,7 +8,7 @@ services:
     ports:
       - "32123:32123"  # Map container port 32123 to host port 32123
     volumes:
-      - ./code:/code
+      - .:/code
     environment:
       PYTHONPATH: /code/src
 

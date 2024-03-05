@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y sqlite3
 COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./src ./src
+COPY . .
+#COPY ./src ./src
 RUN chmod +x ./src/*.py
 
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "32123", "--reload"]
@@ -22,7 +23,7 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "32123", "--reloa
 #RUN /etc/init.d/cron start
 
 ENV PYTHONPATH /code/src
-
+EXPOSE 32123
 #RUN chsh -s /usr/sbin/nologin root
 
 #ENV HOME /home/mycal
