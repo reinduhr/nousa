@@ -1,5 +1,5 @@
 from starlette.applications import Starlette
-from starlette.responses import RedirectResponse, PlainTextResponse
+from starlette.responses import RedirectResponse, PlainTextResponse, FileResponse
 from starlette.requests import Request
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
@@ -15,6 +15,7 @@ from apscheduler.triggers.cron import CronTrigger
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncio
+from pathlib import Path
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
@@ -58,9 +59,9 @@ async def add_to_database(request: Request):
             date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
             episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
             session.add(episodes)
-            await session.commit()
-            await session.close()
-            await ical_output() #create a new calendar after adding a show
+            session.commit()
+            session.close()
+            ical_output() #create a new calendar after adding a show
         return RedirectResponse(url="/")
     except:
         return RedirectResponse(url="/")
@@ -79,7 +80,7 @@ async def my_shows(request: Request):
 async def delete_series(series_id):
     session.query(Series).filter_by(series_id=series_id).delete()
     session.query(Episodes).filter_by(ep_series_id=series_id).delete()
-    await session.commit()
+    session.commit()
 async def archive_show(request):
     form_data = await request.form()
     series_id = form_data['show.series_id'] #input id of serie to be deleted
@@ -91,10 +92,11 @@ async def archive_show(request):
         pass
     else:
         session.add(dest_show)
-        await session.commit()
-    delete_series(series_id)
-    await session.commit()
-    await session.close()
+        session.commit()
+    await delete_series(series_id)
+    session.commit()
+    session.close()
+    ical_output()
     return RedirectResponse(url="/series")
 
 #update_database refreshes series and episodes data. scheduler automates it.
@@ -172,11 +174,11 @@ def ical_output():
                 season_nr = '{:02d}'.format(int(episode.ep_season))
                 
                 myCal_event = (
-                    "$BEGIN:VEVENT\n"
-                    f"$DTSTART;VALUE=DATE:{start_convert}\n"
-                    f"$DTEND;VALUE=DATE:{end_convert}\n"
-                    f"$DESCRIPTION:{episode.ep_name}\n"
-                    f"$SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
+                    "BEGIN:VEVENT\n"
+                    f"DTSTART;VALUE=DATE:{start_convert}\n"
+                    f"DTEND;VALUE=DATE:{end_convert}\n"
+                    f"DESCRIPTION:{episode.ep_name}\n"
+                    f"SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
                     f"UID:{episode.ep_id}\n"
                     "BEGIN:VALARM\n"
                     f"UID:{episode.ep_id}A\n"
@@ -198,12 +200,19 @@ def ical_output():
     myCal = open("/code/static/calendar.ics", "at", encoding='utf-8')
     myCal.write("END:VCALENDAR")
     myCal.close()
-    #return PlainTextResponse("Success!")
+    #return PlainTextResponse(request, "Success!")
 
 async def my_archive(request):
     myarchive = session.query(SeriesArchive).all()
     session.close()
     return templates.TemplateResponse("my_archive.html", {"request": request, "myarchive": myarchive})
+
+async def download(request):
+    file_path = Path("/code/static/calendar.ics")
+    if file_path.is_file():
+        return FileResponse(file_path, filename="calendar.ics", media_type="text/calendar")
+    else:
+        return PlainTextResponse("File not found", status_code=404)
 
 scheduler = AsyncIOScheduler()#WORKS!
 scheduler.add_job(
@@ -226,7 +235,8 @@ routes = [
     Route("/series", endpoint=my_shows, methods=["GET", "POST"]),
     Route("/delete_show", endpoint=archive_show, methods=["POST"]),
     Route("/archive", endpoint=my_archive, methods=["GET"]),
-    #Route("/update", endpoint=test, methods=["GET", "POST", "PATCH"])
+    Route("/subscribe", endpoint=download),
+    Route("/update", endpoint=ical_output, methods=["GET", "POST", "PATCH"])
 ]
 
 app = Starlette(debug=True, routes=routes)

@@ -6,12 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "32123:32123"  # Map container port 32123 to host port 32123
+      - "5000:5000"  # Map container port 32123 to host port 32123
     volumes:
-      - .:/code
-    environment:
-      PYTHONPATH: /code/src
+      - db-data:/code/data
+    #environment:
+    #  PYTHONPATH: /code/src
 
-  #db:
-    #volumes:
-     # - ./code/src:/code/src
+volumes:
+  db-data:
