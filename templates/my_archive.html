@@ -1,6 +1,8 @@
+{% include 'head.html' %}
 <body>
     {% include 'header.html' %}
-    <h1>myCal - My Archive</h1>
+    <h1>My Archive</h1>
+    <p>Welcome to the graveyard!</p>
     <ul>
         {% for show in myarchive %}
         <li>{{ show.series_name }}</li>

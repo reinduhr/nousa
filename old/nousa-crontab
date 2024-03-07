@@ -1,2 +1,0 @@
-0 0 * * 0 /usr/local/bin/python /code/src/myCal_input.py
-0 * * * * /usr/local/bin/python /code/src/myCal_output.py

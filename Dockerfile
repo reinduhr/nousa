@@ -1,20 +1,18 @@
 FROM python:3.12.0-slim
-
 #RUN groupadd -r mycal && useradd -s /bin/bash -m -r -g mycal mycal
-
 WORKDIR /code
 
-#APScheduler has built-in cron scheduler. Remove these lines if APScheduler works.
-#RUN apt-get update && apt-get install -y cron
-#COPY ./nousa-crontab /etc/cron.d/nousa-crontab
-#RUN chmod 0644 /etc/cron.d/nousa-crontab && crontab /etc/cron.d/nousa-crontab
-
 RUN apt-get update && apt-get install -y sqlite3
-COPY . .
-#COPY ./requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+#COPY . .
 
-#COPY ./src ./src
+COPY ./src ./src
+COPY ./static ./static
+COPY ./templates ./templates
+COPY ./compose.yaml .
+COPY ./Dockerfile .
+COPY ./README.md .
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 RUN chmod +x ./src/*.py
 
 #RUN /etc/init.d/cron start

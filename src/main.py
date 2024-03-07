@@ -16,16 +16,25 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncio
 from pathlib import Path
+import logging
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
 session = Session()
 
 templates = Jinja2Templates(directory="templates")
+logging.basicConfig(filename='/code/data/nousa.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%H:%M:%S %d-%b-%Y')
+# Create a FileHandler to log messages to a file
+file_handler = logging.FileHandler('/code/data/nousa.log')
+# Create a Formatter to specify the log message format
+formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%H:%M:%S %d-%b-%Y')
+# Set the Formatter for the FileHandler
+file_handler.setFormatter(formatter)
+# Add the FileHandler to the root logger
+logging.root.addHandler(file_handler)
 
 async def homepage(request):
-    message = ""
-    return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    return templates.TemplateResponse("index.html", {"request": request})
 
 async def search(request: Request):
     form = await request.form()
@@ -61,10 +70,13 @@ async def add_to_database(request: Request):
             session.add(episodes)
             session.commit()
             session.close()
-            ical_output() #create a new calendar after adding a show
-        return RedirectResponse(url="/")
-    except:
-        return RedirectResponse(url="/")
+        ical_output() #create a new calendar after adding a show
+        logging.info('add_to_database success')
+        message = f"{series_name} has been added"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    except Exception as err:
+        logging.error("add_to_database error", err)
+        return templates.TemplateResponse("index.html", {"request": request, "message": err})
 
 async def my_shows(request: Request):
     try:
@@ -84,20 +96,26 @@ async def delete_series(series_id):
 async def archive_show(request):
     form_data = await request.form()
     series_id = form_data['show.series_id'] #input id of serie to be deleted
-    
     source_show = session.query(Series).filter_by(series_id=series_id).first()
+    info_message = source_show.series_name
     dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name)
     existing_series = session.query(SeriesArchive).get(series_id)#checks if series is already in archive
-    if existing_series:
-        pass
-    else:
-        session.add(dest_show)
+    try:
+        if existing_series:
+            pass
+        else:
+            session.add(dest_show)
+            session.commit()
+        await delete_series(series_id)
         session.commit()
-    await delete_series(series_id)
-    session.commit()
-    session.close()
-    ical_output()
-    return RedirectResponse(url="/series")
+        session.close()
+        logging.info("archive_show success")
+        ical_output()
+        message = f"{info_message} has been put into the archive"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    except Exception as err:
+        logging.error("archive_show error", err)
+        return templates.TemplateResponse("index.html", {"request": request, "message": err})
 
 #update_database refreshes series and episodes data. scheduler automates it.
 def update_database():
@@ -109,12 +127,14 @@ def update_database():
         response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
         sdata = response_series.json()
         sdata_status = sdata['status']
-        session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status})#WORKS!
-        session.commit()
+        try:
+            session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status})#WORKS!
+            session.commit()
+        except Exception as err:
+            logging.error("error in first for loop of update_database", err)
         #Episodes
         response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
         edata = response_episodes.json()
-        #session.query(Episodes)
         # Add episodes
         try:
             for element in edata:
@@ -124,34 +144,29 @@ def update_database():
                 ep_number = element.get("number")
                 ep_airdate = element.get("airdate")
                 date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
-                #return PlainTextResponse(str(ep_id))
-                #episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
-                #session.add(episodes)
-                #session.commit()
-
+                #get specific episode from db
                 existing_episode = session.query(Episodes).get(ep_id)
-                #return PlainTextResponse(str(existing_episode))
+                #if episode already exists, overwrite old data with new data
                 if existing_episode:
                     existing_episode.ep_name = ep_name
-                    
                     existing_episode.ep_season = ep_season
                     existing_episode.ep_number = ep_number
-                    existing_episode.ep_airdate = date_time_obj
-                    #return PlainTextResponse(date_time_obj)
+                    existing_episode.ep_airdate = date_time_obj                    
                     session.merge(existing_episode)
                     session.commit()
-                    return PlainTextResponse(existing_episode.ep_name)
+                #if episode doesn't exist, create new
                 else:
                     new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
                     session.add(new_episode)
                     session.commit()
                 time.sleep(30)
-        except:
+        except Exception as err:
+            logging.error("update_database second for loop error", err)
             continue
     session.commit()
     session.close()
-    #return PlainTextResponse("success")
-    #return templates.TemplateResponse("index.html", {'request': request})
+    logging.info("update_database second for loop success")
+
 #create ics file and put it in static folder
 def ical_output():
     myCal = open("/code/static/calendar.ics", "wt", encoding='utf-8')
@@ -188,19 +203,17 @@ def ical_output():
                     "END:VALARM\n"
                     "END:VEVENT\n"
                 )
-                
                 try:
                     myCal = open("/code/static/calendar.ics", "at", encoding='utf-8')
                     myCal.write(myCal_event)
                     myCal.close()
-                except:
+                except Exception as err:
+                    logging.error("ical_output error", err)
                     continue
-                    #return PlainTextResponse(str("Error"))
-    
     myCal = open("/code/static/calendar.ics", "at", encoding='utf-8')
     myCal.write("END:VCALENDAR")
     myCal.close()
-    #return PlainTextResponse(request, "Success!")
+    logging.info("ical_output success")
 
 async def my_archive(request):
     myarchive = session.query(SeriesArchive).all()
@@ -208,35 +221,36 @@ async def my_archive(request):
     return templates.TemplateResponse("my_archive.html", {"request": request, "myarchive": myarchive})
 
 async def download(request):
-    file_path = Path("/code/static/calendar.ics")
+    file_path = Path("/code/data/calendar.ics")
     if file_path.is_file():
         return FileResponse(file_path, filename="calendar.ics", media_type="text/calendar")
     else:
-        return PlainTextResponse("File not found", status_code=404)
+        message = "404; Not Found"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message})
 
 scheduler = AsyncIOScheduler()#WORKS!
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='sun', hour=2, minute=50),
+    trigger=CronTrigger(day_of_week='sun', hour=1, minute=11),
     id='update_database'
 )
 scheduler.add_job(
     ical_output,
-    trigger=CronTrigger(day_of_week='sun', hour=4, minute=55),
+    trigger=CronTrigger(day_of_week='sun', hour=5, minute=55),
     id='ical_output'
 )
 scheduler.start()
 
 routes = [
     Route("/", endpoint=homepage, methods=["GET", "POST"]),
-    Mount("/calendar", app=StaticFiles(directory="static"), name="static"),
+    Mount("/nousa", app=StaticFiles(directory="static"), name="static"),
     Route("/search", endpoint=search, methods=["GET", "POST"]),
     Route("/add_show", endpoint=add_to_database, methods=["GET", "POST"]),
     Route("/series", endpoint=my_shows, methods=["GET", "POST"]),
-    Route("/delete_show", endpoint=archive_show, methods=["POST"]),
-    Route("/archive", endpoint=my_archive, methods=["GET"]),
+    Route("/delete_show", endpoint=archive_show, methods=["GET", "POST"]),
+    Route("/archive", endpoint=my_archive, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download),
-    Route("/update", endpoint=ical_output, methods=["GET", "POST", "PATCH"])
+    Route("/update", endpoint=ical_output)#, methods=["GET", "POST", "PATCH"])
 ]
 
 app = Starlette(debug=True, routes=routes)
