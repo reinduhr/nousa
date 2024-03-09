@@ -21,9 +21,9 @@ import logging
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
 session = Session()
-
+calendar_file = "/code/data/calendar.ics"
 templates = Jinja2Templates(directory="templates")
-logging.basicConfig(filename='/code/data/nousa.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%H:%M:%S %d-%b-%Y')
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 # Create a FileHandler to log messages to a file
 file_handler = logging.FileHandler('/code/data/nousa.log')
 # Create a Formatter to specify the log message format
@@ -169,7 +169,7 @@ def update_database():
 
 #create ics file and put it in static folder
 def ical_output():
-    myCal = open("/code/static/calendar.ics", "wt", encoding='utf-8')
+    myCal = open(calendar_file, "wt", encoding='utf-8')
     myCal.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:myCal\nCALSCALE:GREGORIAN\n")
     myCal.close()
     #filter episodes so only one year old episodes and episodes one year into the future get into the calendar
@@ -204,13 +204,13 @@ def ical_output():
                     "END:VEVENT\n"
                 )
                 try:
-                    myCal = open("/code/static/calendar.ics", "at", encoding='utf-8')
+                    myCal = open(calendar_file, "at", encoding='utf-8')
                     myCal.write(myCal_event)
                     myCal.close()
                 except Exception as err:
                     logging.error("ical_output error", err)
                     continue
-    myCal = open("/code/static/calendar.ics", "at", encoding='utf-8')
+    myCal = open(calendar_file, "at", encoding='utf-8')
     myCal.write("END:VCALENDAR")
     myCal.close()
     logging.info("ical_output success")
@@ -221,7 +221,7 @@ async def my_archive(request):
     return templates.TemplateResponse("my_archive.html", {"request": request, "myarchive": myarchive})
 
 async def download(request):
-    file_path = Path("/code/data/calendar.ics")
+    file_path = Path(calendar_file)
     if file_path.is_file():
         return FileResponse(file_path, filename="calendar.ics", media_type="text/calendar")
     else:
@@ -231,7 +231,7 @@ async def download(request):
 scheduler = AsyncIOScheduler()#WORKS!
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='sun', hour=1, minute=11),
+    trigger=CronTrigger(day_of_week='sat', hour=5, minute=55),
     id='update_database'
 )
 scheduler.add_job(

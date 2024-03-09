@@ -1,5 +1,7 @@
 <header>
-    <p class="info_message">{{ message }}</p>
+    {% if message %}
+        <p class="info_message">{{ message }}</p>
+    {% endif %}
     <nav>
         <ul>
             <li><a href="/">Home</a></li>

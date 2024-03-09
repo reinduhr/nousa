@@ -1,3 +1,8 @@
 .info_message {
     background-color: #fffb38;
+    padding: 6px;
+}
+
+.show_list_item {
+    padding-bottom: 5px;
 }
