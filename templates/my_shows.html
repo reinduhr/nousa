@@ -1,11 +1,15 @@
 {% include 'head.html' %}
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     {% include 'header.html' %}
-    <h1>My Shows</h1>
-    <ul>
-        {% for show in myshows %}
-            <li class="show_list_item"><form action="/delete_show" method="post"><label>{{ show.series_name }} - {{ show.series_status }} - </label><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button type="submit">Delete</button></form></li>
-        {% endfor %}
-    </ul>
+    <div class="nousa_content">
+        <h1>My Shows</h1>
+        <p>A list of all your series with status and a delete button to put it into the archive</p>
+        <ul>
+            {% for show in myshows %}
+                <li class="show_list_item"><form action="/delete_show" method="post"><label class="form_list_margin">{{ show.series_name }} - {{ show.series_status }}</label><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button type="submit" class="btn btn-primary">Delete</button></form></li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

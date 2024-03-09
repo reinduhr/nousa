@@ -112,10 +112,10 @@ async def archive_show(request):
         logging.info("archive_show success")
         ical_output()
         message = f"{info_message} has been put into the archive"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message})
     except Exception as err:
         logging.error("archive_show error", err)
-        return templates.TemplateResponse("index.html", {"request": request, "message": err})
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": err})
 
 #update_database refreshes series and episodes data. scheduler automates it.
 def update_database():

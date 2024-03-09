@@ -4,5 +4,13 @@
 }
 
 .show_list_item {
-    padding-bottom: 5px;
+    padding-bottom: 15px;
+}
+
+.nousa_content {
+    margin: 8px;
+}
+
+.form_list_margin {
+    margin-right: 10px;
 }

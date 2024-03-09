@@ -1,17 +1,20 @@
 {% include 'head.html' %}
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     {% include 'header.html' %}
-    <h1>Search Results</h1>
-    {% for entry in data %}
-        {% set show = entry['show'] %}
-        <div>
-            <h2>{{ show.name }}</h2>
-            <p>{{ show.summary }}</p>
-            <form action="/add_show" method="post">
-                <input type="hidden" name="seriesId" value="{{ show.id }}">
-                <button type="submit">Add to my shows</button>
-            </form>
-        </div>
-    {% endfor %}
+    <div class="nousa_content">
+        <h1>Search Results</h1>
+        {% for entry in data %}
+            {% set show = entry['show'] %}
+            <div>
+                <h2>{{ show.name }}</h2>
+                <form action="/add_show" method="post">
+                    <input type="hidden" name="seriesId" value="{{ show.id }}">
+                    <button type="submit" class="btn btn-primary">Add to my shows</button>
+                </form>
+                <p>{{ show.summary }}</p>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>
