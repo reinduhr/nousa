@@ -5,3 +5,4 @@ jinja2
 sqlalchemy
 python-multipart
 apscheduler
+itsdangerous

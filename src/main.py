@@ -4,19 +4,18 @@ from starlette.requests import Request
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 import requests
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from models import engine, Series, Episodes, SeriesArchive
 from datetime import datetime, timedelta
-from apscheduler.schedulers.background import BackgroundScheduler
-import threading
 from apscheduler.triggers.cron import CronTrigger
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import asyncio
 from pathlib import Path
 import logging
+import secrets
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
@@ -24,6 +23,7 @@ session = Session()
 calendar_file = "/code/data/calendar.ics"
 templates = Jinja2Templates(directory="templates")
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 # Create a FileHandler to log messages to a file
 file_handler = logging.FileHandler('/code/data/nousa.log')
 # Create a Formatter to specify the log message format
@@ -69,20 +69,23 @@ async def add_to_database(request: Request):
             episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
             session.add(episodes)
             session.commit()
-            session.close()
+        session.close()
         ical_output() #create a new calendar after adding a show
         logging.info('add_to_database success')
         message = f"{series_name} has been added"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        #return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    except IntegrityError:
+        message = f"{series_name} already in My shows"
     except Exception as err:
         logging.error("add_to_database error", err)
         return templates.TemplateResponse("index.html", {"request": request, "message": err})
+    return templates.TemplateResponse("index.html", {"request": request, "message": message})
 
 async def my_shows(request: Request):
     try:
         myshows = session.query(Series).all()
         session.close()
-        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': archive_show})
+        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': archive_show})#, cache_headers=False)
     except IntegrityError:
         return RedirectResponse(url="/series")
     except PendingRollbackError:
@@ -96,26 +99,30 @@ async def delete_series(series_id):
 async def archive_show(request):
     form_data = await request.form()
     series_id = form_data['show.series_id'] #input id of serie to be deleted
-    source_show = session.query(Series).filter_by(series_id=series_id).first()
+    source_show = session.query(Series).get(series_id)
     info_message = source_show.series_name
+    request.session["message"] = f"{info_message} was already in the archive"
     dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name)
     existing_series = session.query(SeriesArchive).get(series_id)#checks if series is already in archive
     try:
-        if existing_series:
-            pass
-        else:
+        if not existing_series:
             session.add(dest_show)
             session.commit()
+            request.session["message"] = f"{info_message} has been added to the archive"
         await delete_series(series_id)
         session.commit()
         session.close()
         logging.info("archive_show success")
         ical_output()
-        message = f"{info_message} has been put into the archive"
-        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message})
+        #message = f"{info_message} has been put into the archive"
+        message = request.session.get("message")
+        myshows = session.query(Series).all() #query all shows to later display on my_shows.html
+        session.close()
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})#, cache_headers=False)
+        #return RedirectResponse(url=f"/series?request={request}&message={message}&myshows={myshows}")
     except Exception as err:
         logging.error("archive_show error", err)
-        return templates.TemplateResponse("my_shows.html", {"request": request, "message": err})
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": err, 'myshows': myshows})
 
 #update_database refreshes series and episodes data. scheduler automates it.
 def update_database():
@@ -159,13 +166,14 @@ def update_database():
                     new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
                     session.add(new_episode)
                     session.commit()
-                time.sleep(30)
         except Exception as err:
             logging.error("update_database second for loop error", err)
             continue
+        time.sleep(30)
     session.commit()
     session.close()
-    logging.info("update_database second for loop success")
+    logging.info("update_database success")
+    ical_output()
 
 #create ics file and put it in static folder
 def ical_output():
@@ -234,11 +242,13 @@ scheduler.add_job(
     trigger=CronTrigger(day_of_week='sat', hour=5, minute=55),
     id='update_database'
 )
+"""
 scheduler.add_job(
     ical_output,
     trigger=CronTrigger(day_of_week='sun', hour=5, minute=55),
     id='ical_output'
 )
+"""
 scheduler.start()
 
 routes = [
@@ -250,7 +260,10 @@ routes = [
     Route("/delete_show", endpoint=archive_show, methods=["GET", "POST"]),
     Route("/archive", endpoint=my_archive, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download),
-    Route("/update", endpoint=ical_output)#, methods=["GET", "POST", "PATCH"])
+    #Route("/update", endpoint=ical_output)#, methods=["GET", "POST", "PATCH"])
 ]
 
 app = Starlette(debug=True, routes=routes)
+
+sess_key = secrets.token_hex()
+app.add_middleware(SessionMiddleware, secret_key=sess_key, max_age=3600)
