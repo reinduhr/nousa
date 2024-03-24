@@ -142,6 +142,8 @@ def update_database():
         #Episodes
         response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
         edata = response_episodes.json()
+        #Delete episodes in db before adding new. This instead of updating db records is because TVmaze sometimes deletes and adds records.
+        session.query(Episodes).filter_by(ep_series_id=series_id).delete()
         # Add episodes
         try:
             for element in edata:
@@ -151,6 +153,12 @@ def update_database():
                 ep_number = element.get("number")
                 ep_airdate = element.get("airdate")
                 date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
+                
+                new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
+                session.add(new_episode)
+                session.commit()
+
+                """     THIS CODE UPDATES RECORDS
                 #get specific episode from db
                 existing_episode = session.query(Episodes).get(ep_id)
                 #if episode already exists, overwrite old data with new data
@@ -166,6 +174,10 @@ def update_database():
                     new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
                     session.add(new_episode)
                     session.commit()
+                THIS CODE UPDATES RECORDS     """
+
+
+
         except Exception as err:
             logging.error("update_database second for loop error", err)
             continue
@@ -239,16 +251,10 @@ async def download(request):
 scheduler = AsyncIOScheduler()#WORKS!
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='sat', hour=5, minute=55),
+    trigger=CronTrigger(day_of_week='sun', hour=11, minute=11),
     id='update_database'
 )
-"""
-scheduler.add_job(
-    ical_output,
-    trigger=CronTrigger(day_of_week='sun', hour=5, minute=55),
-    id='ical_output'
-)
-"""
+
 scheduler.start()
 
 routes = [
@@ -260,7 +266,7 @@ routes = [
     Route("/delete_show", endpoint=archive_show, methods=["GET", "POST"]),
     Route("/archive", endpoint=my_archive, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download),
-    #Route("/update", endpoint=ical_output)#, methods=["GET", "POST", "PATCH"])
+    #Route("/update", endpoint=update_database, methods=["GET", "POST", "PATCH"]),
 ]
 
 app = Starlette(debug=True, routes=routes)

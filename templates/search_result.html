@@ -6,14 +6,16 @@
         <h1>Search Results</h1>
         {% for entry in data %}
             {% set show = entry['show'] %}
-            <div>
-                <h2>{{ show.name }}</h2>
+            <div class="show_info">
+                <h2 style="margin-right: 10px">{{ show.name }}</h2>
                 <form action="/add_show" method="post">
                     <input type="hidden" name="seriesId" value="{{ show.id }}">
                     <button type="submit" class="btn btn-primary">Add to my shows</button>
                 </form>
-                <p>{{ show.summary }}</p>
             </div>
+                {% if show.summary %}
+                    {{ show.summary | safe }}
+                {% endif %}
         {% endfor %}
     </div>
 </body>

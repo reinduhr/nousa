@@ -14,3 +14,7 @@
 .form_list_margin {
     margin-right: 10px;
 }
+
+.show_info {
+    display: flex;
+}

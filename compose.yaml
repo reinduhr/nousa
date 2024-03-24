@@ -9,9 +9,9 @@ services:
       - "5000:5000"  # Map container port to host port
     volumes:
       - db-data:/code/data
-      - type: bind #use for dev container
-        source: .
-        target: /code
+    #  - type: bind #use for dev container
+    #    source: .
+    #    target: /code
     environment:
       - TZ=Europe/Amsterdam
     #  PYTHONPATH: /code/src
