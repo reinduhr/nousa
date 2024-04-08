@@ -26,5 +26,6 @@ class SeriesArchive(Base):
 
     series_id = Column(Integer, primary_key=True)
     series_name = Column(String)
+    series_status = Column(String)
 
 Base.metadata.create_all(engine)

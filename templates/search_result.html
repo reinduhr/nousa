@@ -5,17 +5,30 @@
     <div class="nousa_content">
         <h1>Search Results</h1>
         {% for entry in data %}
+        <div class="search_result_container">
             {% set show = entry['show'] %}
-            <div class="show_info">
-                <h2 style="margin-right: 10px">{{ show.name }}</h2>
-                <form action="/add_show" method="post">
-                    <input type="hidden" name="seriesId" value="{{ show.id }}">
-                    <button type="submit" class="btn btn-primary">Add to my shows</button>
-                </form>
-            </div>
-                {% if show.summary %}
-                    {{ show.summary | safe }}
-                {% endif %}
+            {% set image = show['image'] %}
+                
+
+                    <div class="search_result_image">
+                        <img src="{{ image.medium }}">
+                    </div>
+                    <div>
+                        <div class="search_result_title_button">
+                        <h2 style="margin-right: 10px">{{ show.name }}</h2>
+                        <form action="/add_show" method="post">
+                        <input type="hidden" name="seriesId" value="{{ show.id }}">
+                        <button type="submit" class="btn btn-primary">Add to my shows</button></form>
+                        </div>
+                        <!--</div>
+                    <div>-->
+                        {% if show.summary %}
+                        {{ show.summary | safe }}
+                        {% endif %}
+                    </div>
+
+
+        </div>
         {% endfor %}
     </div>
 </body>

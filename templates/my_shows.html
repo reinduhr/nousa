@@ -5,11 +5,35 @@
     <div class="nousa_content">
         <h1>My Shows</h1>
         <p>A list of all your series with status and a delete button to put it into the archive</p>
-        <ul>
+        <!--<ul>  OLD UNORDERED LIST!!!
             {% for show in myshows %}
-                <li class="show_list_item"><form action="/delete_show" method="post"><label class="form_list_margin">{{ show.series_name }} - {{ show.series_status }}</label><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button onclick="return confirmDelete('{{ show.series_name }}')" type="submit" class="btn btn-primary">Delete</button></form></li>
+                <li class="show_list_item"><form action="/delete_show" method="post">
+                    <label class="form_list_margin">{{ show.series_name }} - {{ show.series_status }}</label>
+                    <input type="hidden" name="show.series_id" value="{{ show.series_id }}">
+                    <button onclick="return confirmDelete('{{ show.series_name }}')" type="submit" class="btn btn-primary">Delete</button>
+                </form></li>
             {% endfor %}
-        </ul>
+        </ul>-->
+        <table class="table">
+            <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Drop it!</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for show in myshows %}
+                <tr>
+                    <form action="/delete_show" method="post">
+                    <td>{{ show.series_name }}</td>
+                    <td>{{ show.series_status }}</td>
+                    <td><input type="hidden" name="show.series_id" value="{{ show.series_id }}"><button onclick="return confirmDelete('{{ show.series_name }}')" type="submit" class="btn btn-primary">Delete</button></td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

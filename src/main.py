@@ -102,7 +102,7 @@ async def archive_show(request):
     source_show = session.query(Series).get(series_id)
     info_message = source_show.series_name
     request.session["message"] = f"{info_message} was already in the archive"
-    dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name)
+    dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name, series_status=source_show.series_status)
     existing_series = session.query(SeriesArchive).get(series_id)#checks if series is already in archive
     try:
         if not existing_series:
@@ -187,6 +187,24 @@ def update_database():
     logging.info("update_database success")
     ical_output()
 
+def update_archive():
+    series_list = session.query(SeriesArchive.series_id).all()
+    for series_tuple in series_list:
+        series_id = series_tuple[0]
+        response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
+        sdata = response_series.json()
+        series_status = sdata['status']
+        try:
+            session.query(SeriesArchive).filter(SeriesArchive.series_id == series_id).update({SeriesArchive.series_status: series_status})#WORKS!
+            session.commit()
+        except Exception as err:
+            logging.error("error in update_archive", err)
+        time.sleep(61)
+    session.commit()
+    session.close()
+    logging.info("update_archive success")
+
+
 #create ics file and put it in static folder
 def ical_output():
     myCal = open(calendar_file, "wt", encoding='utf-8')
@@ -253,6 +271,11 @@ scheduler.add_job(
     update_database,
     trigger=CronTrigger(day_of_week='sun', hour=11, minute=11),
     id='update_database'
+)
+scheduler.add_job(
+        update_archive,
+    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', minute=20, second=0),
+    id='update_archive'
 )
 
 scheduler.start()

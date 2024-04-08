@@ -14,7 +14,23 @@
 .form_list_margin {
     margin-right: 10px;
 }
-
+/*
 .show_info {
+}*/
+
+.search_result_container {
+    border-top: lightgrey;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.search_result_image {
+    height: auto;
+    width: auto;
+    margin-right: 10px;
+}
+
+.search_result_title_button {
     display: flex;
 }

@@ -5,11 +5,34 @@
     <div class="nousa_content">
         <h1>My Archive</h1>
         <p>Welcome to the graveyard!</p>
+        <!--
         <ul>
             {% for show in myarchive %}
                 <li class="show_list_item">{{ show.series_name }}</li>
             {% endfor %}
         </ul>
+        -->
+        <table class="table">
+            <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">EMPTY</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for show in myarchive %}
+                <tr>
+                    <form action="/delete_show" method="post">
+                    <td>{{ show.series_name }}</td>
+                    <td>{{ show.series_status }}</td>
+                    <td></td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     </div>
 </body>
 </html>

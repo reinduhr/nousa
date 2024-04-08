@@ -5,6 +5,9 @@ WORKDIR /code
 RUN apt-get update && apt-get install -y sqlite3
 #COPY . .
 
+COPY ./alembic ./alembic
+RUN chmod +x ./alembic/versions/*.py
+COPY ./alembic.ini .
 COPY ./src ./src
 COPY ./static ./static
 COPY ./templates ./templates
@@ -24,4 +27,8 @@ EXPOSE 5000
 #ENV HOME /home/mycal
 #RUN chmod -R 777 /home/mycal
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+#RUN alembic upgrade head
+#CMD ["alembic", "upgrade", "head"]
+#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+#RUN alembic upgrade head
+CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
