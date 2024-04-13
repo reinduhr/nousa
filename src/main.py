@@ -5,6 +5,7 @@ from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.background import BackgroundTask
 import requests
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
@@ -16,22 +17,23 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pathlib import Path
 import logging
 import secrets
+import aiohttp
+import asyncio
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
 session = Session()
+# Assign calendar file to variable
 calendar_file = "/code/data/calendar.ics"
+# Instantiating the web templates
 templates = Jinja2Templates(directory="templates")
+# Logging
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-# Create a FileHandler to log messages to a file
-file_handler = logging.FileHandler('/code/data/nousa.log')
-# Create a Formatter to specify the log message format
-formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%H:%M:%S %d-%b-%Y')
-# Set the Formatter for the FileHandler
-file_handler.setFormatter(formatter)
-# Add the FileHandler to the root logger
-logging.root.addHandler(file_handler)
+file_handler = logging.FileHandler('/code/data/nousa.log') # Create a FileHandler to log messages to a file
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d %(message)s', datefmt='%d-%b-%Y %H:%M:%S') # Create a formatter to specify the log message format
+file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
+logging.root.addHandler(file_handler) # Add the FileHandler to the root logger
 
 async def homepage(request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -43,22 +45,34 @@ async def search(request: Request):
     data = response.json()
     return templates.TemplateResponse('search_result.html', {'request': request, 'data': data})
 
+async def fetch_data(url): #asynchronous api calls. fetch multiple GET simultaneously
+    async with aiohttp.ClientSession() as aiosession:
+	    async with aiosession.get(url) as aioresponse:
+                return await aioresponse.json()
+
 async def add_to_database(request: Request):
     form = await request.form()
     series_id = form.get("seriesId")#"seriesId" is taken from search_result.html input name value
-    get_response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
-    get_response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
-    series_data = get_response_series.json()
-    episodes_data = get_response_episodes.json()
+    series_url = f"https://api.tvmaze.com/shows/{series_id}"
+    episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
+    # Create tasks for fetching data from two URLs concurrently
+    task1 = asyncio.create_task(fetch_data(series_url))
+    task2 = asyncio.create_task(fetch_data(episode_url))
+    # Wait for both tasks to complete
+    series_data = await task1
+    episodes_data = await task2
+    # OLD REQUESTS WAY. now using aiohttp and asyncio
+    #get_response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
+    #get_response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
+    #series_data = get_response_series.json()
+    #episodes_data = get_response_episodes.json()
     # Add series variables
     series_name = series_data.get("name")
     series_status = series_data.get("status")
     # Add TV show to database
     series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status)
-    try:
-        session.add(series)
-        session.commit()
-        # Add episodes
+
+    async def add_episodes(episodes_data): #asynchronous function which is called as a BackgroundTask
         for element in episodes_data:
             ep_id = element.get("id")
             ep_name = element.get("name")
@@ -69,8 +83,13 @@ async def add_to_database(request: Request):
             episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
             session.add(episodes)
             session.commit()
-        session.close()
         ical_output() #create a new calendar after adding a show
+
+    try:
+        session.add(series)
+        session.commit()
+        episode_task = BackgroundTask(add_episodes, episodes_data=episodes_data)
+        session.close()
         logging.info('add_to_database success')
         message = f"{series_name} has been added"
         #return templates.TemplateResponse("index.html", {"request": request, "message": message})
@@ -79,7 +98,7 @@ async def add_to_database(request: Request):
     except Exception as err:
         logging.error("add_to_database error", err)
         return templates.TemplateResponse("index.html", {"request": request, "message": err})
-    return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    return templates.TemplateResponse("index.html", {"request": request, "message": message}, background=episode_task)
 
 async def my_shows(request: Request):
     try:
@@ -96,6 +115,7 @@ async def delete_series(series_id):
     session.query(Series).filter_by(series_id=series_id).delete()
     session.query(Episodes).filter_by(ep_series_id=series_id).delete()
     session.commit()
+
 async def archive_show(request):
     form_data = await request.form()
     series_id = form_data['show.series_id'] #input id of serie to be deleted
@@ -108,7 +128,7 @@ async def archive_show(request):
         if not existing_series:
             session.add(dest_show)
             session.commit()
-            request.session["message"] = f"{info_message} has been added to the archive"
+            request.session["message"] = f"{info_message} has been put into the archive"
         await delete_series(series_id)
         session.commit()
         session.close()
@@ -158,7 +178,7 @@ def update_database():
                 session.add(new_episode)
                 session.commit()
 
-                """     THIS CODE UPDATES RECORDS
+                """     THIS OLD CODE UPDATES RECORDS. I'M NOW USING DELETE EVERYTHING AND FETCH NEW
                 #get specific episode from db
                 existing_episode = session.query(Episodes).get(ep_id)
                 #if episode already exists, overwrite old data with new data
@@ -273,7 +293,7 @@ scheduler.add_job(
     id='update_database'
 )
 scheduler.add_job(
-        update_archive,
+    update_archive,
     trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', minute=20, second=0),
     id='update_archive'
 )
@@ -281,7 +301,7 @@ scheduler.add_job(
 scheduler.start()
 
 routes = [
-    Route("/", endpoint=homepage, methods=["GET", "POST"]),
+    Route("/", endpoint=homepage, methods=["GET"]),
     Mount("/nousa", app=StaticFiles(directory="static"), name="static"),
     Route("/search", endpoint=search, methods=["GET", "POST"]),
     Route("/add_show", endpoint=add_to_database, methods=["GET", "POST"]),
