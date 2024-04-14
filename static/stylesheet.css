@@ -1,4 +1,6 @@
 .info_message {
+    color: #212529;
+    text-align: center;
     background-color: #fffb38;
     padding: 6px;
 }
@@ -20,17 +22,21 @@
 
 .search_result_container {
     border-top: lightgrey;
-    padding: 10px;
+    /*padding: 10px;*/
     margin-bottom: 10px;
     display: flex;
 }
 
 .search_result_image {
     height: auto;
-    width: auto;
+    max-width: 25%;
     margin-right: 10px;
 }
 
 .search_result_title_button {
     display: flex;
+}
+
+.search-box {
+    margin-top: 20px;
 }

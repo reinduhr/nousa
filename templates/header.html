@@ -1,3 +1,6 @@
+{% include 'head.html' %}
+<body>
+  <div class="container-md">
 <header>
     {% if request.query_params %}
       <p class="info_message">{{ request.query_params.message }}</p>

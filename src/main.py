@@ -19,6 +19,7 @@ import logging
 import secrets
 import aiohttp
 import asyncio
+from ui_data import popular_tv_shows
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
@@ -36,7 +37,7 @@ file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
 logging.root.addHandler(file_handler) # Add the FileHandler to the root logger
 
 async def homepage(request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
 
 async def search(request: Request):
     form = await request.form()
@@ -52,54 +53,61 @@ async def fetch_data(url): #asynchronous api calls. fetch multiple GET simultane
 
 async def add_to_database(request: Request):
     form = await request.form()
-    series_id = form.get("seriesId")#"seriesId" is taken from search_result.html input name value
-    series_url = f"https://api.tvmaze.com/shows/{series_id}"
-    episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
-    # Create tasks for fetching data from two URLs concurrently
-    task1 = asyncio.create_task(fetch_data(series_url))
-    task2 = asyncio.create_task(fetch_data(episode_url))
-    # Wait for both tasks to complete
-    series_data = await task1
-    episodes_data = await task2
-    # OLD REQUESTS WAY. now using aiohttp and asyncio
-    #get_response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
-    #get_response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
-    #series_data = get_response_series.json()
-    #episodes_data = get_response_episodes.json()
-    # Add series variables
-    series_name = series_data.get("name")
-    series_status = series_data.get("status")
-    # Add TV show to database
-    series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status)
+    series_id = form.get("series-id")#"series-id" is taken from search_result.html input name value
+    show_exist = session.query(Series).get(series_id)
+    if show_exist:
+        message = "Show exists already"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    else:
+        series_url = f"https://api.tvmaze.com/shows/{series_id}"
+        episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
+        # Create tasks for fetching data from two URLs concurrently
+        task1 = asyncio.create_task(fetch_data(series_url))
+        task2 = asyncio.create_task(fetch_data(episode_url))
+        # Wait for both tasks to complete
+        series_data = await task1
+        episodes_data = await task2
+        # OLD REQUESTS WAY. now using aiohttp and asyncio
+        #get_response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
+        #get_response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes")
+        #series_data = get_response_series.json()
+        #episodes_data = get_response_episodes.json()
+        # Add series variables
+        series_name = series_data.get("name")
+        series_status = series_data.get("status")
+        series_ext_thetvdb = series_data["externals"].get("thetvdb")
+        series_ext_imdb = series_data["externals"].get("imdb")
+        # Add TV show to database
+        series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb)
 
-    async def add_episodes(episodes_data): #asynchronous function which is called as a BackgroundTask
-        for element in episodes_data:
-            ep_id = element.get("id")
-            ep_name = element.get("name")
-            ep_season = element.get("season")
-            ep_number = element.get("number")
-            ep_airdate = element.get("airdate")
-            date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
-            episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
-            session.add(episodes)
+        async def add_episodes(episodes_data): #asynchronous function which is called by BackgroundTask
+            for element in episodes_data:
+                ep_id = element.get("id")
+                ep_name = element.get("name")
+                ep_season = element.get("season")
+                ep_number = element.get("number")
+                ep_airdate = element.get("airdate")
+                date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
+                episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
+                session.add(episodes)
+                session.commit()
+            ical_output() #create a new calendar after adding a show
+
+        try:
+            session.add(series)
             session.commit()
-        ical_output() #create a new calendar after adding a show
-
-    try:
-        session.add(series)
-        session.commit()
-        episode_task = BackgroundTask(add_episodes, episodes_data=episodes_data)
-        session.close()
-        logging.info('add_to_database success')
-        message = f"{series_name} has been added"
-        #return templates.TemplateResponse("index.html", {"request": request, "message": message})
-    except IntegrityError:
-        message = f"{series_name} already in My shows"
-    except Exception as err:
-        logging.error("add_to_database error", err)
-        return templates.TemplateResponse("index.html", {"request": request, "message": err})
-    return templates.TemplateResponse("index.html", {"request": request, "message": message}, background=episode_task)
-
+            episode_task = BackgroundTask(add_episodes, episodes_data=episodes_data)
+            session.close()
+            logging.info('add_to_database success')
+            message = f"{series_name} has been added"
+            #return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        except IntegrityError:
+            message = f"{series_name} already in My shows"
+        except Exception as err:
+            logging.error("add_to_database error", err)
+            return templates.TemplateResponse("index.html", {"request": request, "message": err})
+        return templates.TemplateResponse("index.html", {"request": request, "message": message}, background=episode_task)
+        
 async def my_shows(request: Request):
     try:
         myshows = session.query(Series).all()
@@ -138,8 +146,7 @@ async def archive_show(request):
         message = request.session.get("message")
         myshows = session.query(Series).all() #query all shows to later display on my_shows.html
         session.close()
-        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})#, cache_headers=False)
-        #return RedirectResponse(url=f"/series?request={request}&message={message}&myshows={myshows}")
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})
     except Exception as err:
         logging.error("archive_show error", err)
         return templates.TemplateResponse("my_shows.html", {"request": request, "message": err, 'myshows': myshows})
@@ -154,8 +161,10 @@ def update_database():
         response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}")
         sdata = response_series.json()
         sdata_status = sdata['status']
+        sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
+        sdata_ext_imdb = sdata['externals'].get('imdb')
         try:
-            session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status})#WORKS!
+            session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb})#WORKS!
             session.commit()
         except Exception as err:
             logging.error("error in first for loop of update_database", err)
@@ -177,27 +186,6 @@ def update_database():
                 new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
                 session.add(new_episode)
                 session.commit()
-
-                """     THIS OLD CODE UPDATES RECORDS. I'M NOW USING DELETE EVERYTHING AND FETCH NEW
-                #get specific episode from db
-                existing_episode = session.query(Episodes).get(ep_id)
-                #if episode already exists, overwrite old data with new data
-                if existing_episode:
-                    existing_episode.ep_name = ep_name
-                    existing_episode.ep_season = ep_season
-                    existing_episode.ep_number = ep_number
-                    existing_episode.ep_airdate = date_time_obj                    
-                    session.merge(existing_episode)
-                    session.commit()
-                #if episode doesn't exist, create new
-                else:
-                    new_episode = Episodes(ep_series_id=int(series_id), ep_id=int(ep_id), ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
-                    session.add(new_episode)
-                    session.commit()
-                THIS CODE UPDATES RECORDS     """
-
-
-
         except Exception as err:
             logging.error("update_database second for loop error", err)
             continue
@@ -223,7 +211,6 @@ def update_archive():
     session.commit()
     session.close()
     logging.info("update_archive success")
-
 
 #create ics file and put it in static folder
 def ical_output():

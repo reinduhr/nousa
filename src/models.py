@@ -10,6 +10,8 @@ class Series(Base):
     series_id = Column(Integer, primary_key=True)
     series_name = Column(String)
     series_status = Column(String)
+    series_ext_thetvdb = Column(Integer)
+    series_ext_imdb = Column(String)
 
 class Episodes(Base):
     __tablename__ = "Episodes"
