@@ -4,7 +4,7 @@ Add your favorite tv shows and nousa will create an ical feed for your local net
 # this project is using: 
 
  - api: api.**tvmaze**.com
- - image: **Python** 3.12.0-slim 
+ - image: **Python** 3.12.3-slim 
  - server: **Uvicorn** (ASGI web server)
  - web framework: **Starlette** (lightweight ASGI framework/toolkit)    
  - database: **SQLite**    
