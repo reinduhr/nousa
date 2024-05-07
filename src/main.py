@@ -100,7 +100,6 @@ async def add_to_database(request: Request):
             session.close()
             logging.info('add_to_database success')
             message = f"{series_name} has been added"
-            #return templates.TemplateResponse("index.html", {"request": request, "message": message})
         except IntegrityError:
             message = f"{series_name} already in My shows"
         except Exception as err:
@@ -110,9 +109,9 @@ async def add_to_database(request: Request):
         
 async def my_shows(request: Request):
     try:
-        myshows = session.query(Series).all()
+        myshows = session.query(Series).order_by(Series.series_status.desc()).all()
         session.close()
-        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': archive_show})#, cache_headers=False)
+        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': archive_show})
     except IntegrityError:
         return RedirectResponse(url="/series")
     except PendingRollbackError:
@@ -194,6 +193,7 @@ def update_database():
     session.close()
     logging.info("update_database success")
     ical_output()
+    #return RedirectResponse(url="/")
 
 def update_archive():
     series_list = session.query(SeriesArchive.series_id).all()
@@ -220,12 +220,13 @@ def ical_output():
     #filter episodes so only one year old episodes and episodes one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
     one_year_future = datetime.now() + timedelta(days=365)
+    today: datetime = datetime.now()
     myepisodes = session.query(Episodes).filter(Episodes.ep_airdate >= one_year_ago, Episodes.ep_airdate <= one_year_future).all()   
     myshows = session.query(Series).all()
     for show in myshows:
         for episode in myepisodes:
             if episode.ep_series_id == show.series_id:
-                ep_date = episode.ep_airdate #
+                ep_date = episode.ep_airdate
                 ep_start = ep_date + timedelta(days=1) #add one day for proper calendar event start date
                 ep_end = ep_date + timedelta(days=2) #add two days for event end
                 start_convert = datetime.strftime(ep_start,'%Y%m%d') #convert datetime object to string
@@ -235,6 +236,7 @@ def ical_output():
                 
                 myCal_event = (
                     "BEGIN:VEVENT\n"
+                    f"DTSTAMP:{today:%Y%m%d}T{today:%H%M%S}Z\n"
                     f"DTSTART;VALUE=DATE:{start_convert}\n"
                     f"DTEND;VALUE=DATE:{end_convert}\n"
                     f"DESCRIPTION:{episode.ep_name}\n"
@@ -260,8 +262,9 @@ def ical_output():
     myCal.close()
     logging.info("ical_output success")
 
+
 async def my_archive(request):
-    myarchive = session.query(SeriesArchive).all()
+    myarchive = session.query(SeriesArchive).order_by(SeriesArchive.series_status.desc()).all()
     session.close()
     return templates.TemplateResponse("my_archive.html", {"request": request, "myarchive": myarchive})
 
@@ -274,11 +277,13 @@ async def download(request):
         return templates.TemplateResponse("index.html", {"request": request, "message": message})
 
 scheduler = AsyncIOScheduler()#WORKS!
+
 scheduler.add_job(
     update_database,
     trigger=CronTrigger(day_of_week='sun', hour=11, minute=11),
     id='update_database'
 )
+
 scheduler.add_job(
     update_archive,
     trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', minute=20, second=0),
@@ -296,7 +301,6 @@ routes = [
     Route("/delete_show", endpoint=archive_show, methods=["GET", "POST"]),
     Route("/archive", endpoint=my_archive, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download),
-    #Route("/update", endpoint=update_database, methods=["GET", "POST", "PATCH"]),
 ]
 
 app = Starlette(debug=True, routes=routes)
