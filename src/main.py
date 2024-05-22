@@ -53,11 +53,16 @@ async def fetch_data(url): #asynchronous api calls. fetch multiple GET simultane
 
 async def add_to_database(request: Request):
     form = await request.form()
-    series_id = form.get("series-id")#"series-id" is taken from search_result.html input name value
+    series_id_form = form.get("series-id")#"series-id" is taken from search_result.html input name value
+    try:
+        series_id = int(series_id_form) #validate
+    except:
+        message = "Error: Invalid input. Try again, but no tricks this time"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
     show_exist = session.query(Series).get(series_id)
     if show_exist:
         message = "Show exists already"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
     else:
         series_url = f"https://api.tvmaze.com/shows/{series_id}"
         episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
@@ -104,8 +109,8 @@ async def add_to_database(request: Request):
             message = f"{series_name} already in My shows"
         except Exception as err:
             logging.error("add_to_database error", err)
-            return templates.TemplateResponse("index.html", {"request": request, "message": err})
-        return templates.TemplateResponse("index.html", {"request": request, "message": message}, background=episode_task)
+            return templates.TemplateResponse("index.html", {"request": request, "message": err, "popular_tv_shows": popular_tv_shows})
+        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
         
 async def my_shows(request: Request):
     try:
@@ -124,8 +129,15 @@ async def delete_series(series_id):
     session.commit()
 
 async def archive_show(request):
+    myshows = session.query(Series).all() #query all shows to later display on my_shows.html
+    session.close()
     form_data = await request.form()
-    series_id = form_data['show.series_id'] #input id of serie to be deleted
+    series_id_form = form_data['show.series_id'] #input id of serie to be deleted
+    try:
+        series_id = int(series_id_form)
+    except:
+        message = "Error: Invalid input. Try again, but no tricks this time"
+        return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})
     source_show = session.query(Series).get(series_id)
     info_message = source_show.series_name
     request.session["message"] = f"{info_message} was already in the archive"
@@ -141,13 +153,13 @@ async def archive_show(request):
         session.close()
         logging.info("archive_show success")
         ical_output()
-        #message = f"{info_message} has been put into the archive"
         message = request.session.get("message")
         myshows = session.query(Series).all() #query all shows to later display on my_shows.html
         session.close()
         return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})
     except Exception as err:
         logging.error("archive_show error", err)
+        session.close()
         return templates.TemplateResponse("my_shows.html", {"request": request, "message": err, 'myshows': myshows})
 
 #update_database refreshes series and episodes data. scheduler automates it.
@@ -274,7 +286,7 @@ async def download(request):
         return FileResponse(file_path, filename="calendar.ics", media_type="text/calendar")
     else:
         message = "404; Not Found"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
 
 scheduler = AsyncIOScheduler()#WORKS!
 
