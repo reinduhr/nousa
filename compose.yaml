@@ -10,9 +10,10 @@ services:
       # how to set time to localtime instead of default UTC? I do NOT know! 
       #- /etc/localtime:/etc/localtime
       #- /etc/timezone:/etc/timezone
-      - type: bind #use for dev container
-        source: .
-        target: /code
+      
+      #- type: bind #use for dev container
+      #  source: .
+      #  target: /code
 
 volumes:
   db-data:
