@@ -29,7 +29,13 @@
 
 .search_result_image {
     height: auto;
-    max-width: 25%;
+    max-width: 48%;
+    margin-right: 10px;
+}
+
+.search_result_text {
+    height: auto;
+    max-width: 48%;
     margin-right: 10px;
 }
 

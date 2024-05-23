@@ -25,7 +25,7 @@ from ui_data import popular_tv_shows
 Session = sessionmaker(bind=engine)
 session = Session()
 # Assign calendar file to variable
-calendar_file = "/code/data/calendar.ics"
+calendar_file = "/code/data/nousa.ics"
 # Instantiating the web templates
 templates = Jinja2Templates(directory="templates")
 # Logging
@@ -34,7 +34,7 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 file_handler = logging.FileHandler('/code/data/nousa.log') # Create a FileHandler to log messages to a file
 formatter = logging.Formatter('%(asctime)s.%(msecs)03d %(message)s', datefmt='%d-%b-%Y %H:%M:%S') # Create a formatter to specify the log message format
 file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
-logging.root.addHandler(file_handler) # Add the FileHandler to the root logger
+logging.root.addHandler(file_handler) # Add the FileHandler to the root logger. root logger has most permissions
 
 async def homepage(request):
     return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
@@ -227,7 +227,7 @@ def update_archive():
 #create ics file and put it in static folder
 def ical_output():
     myCal = open(calendar_file, "wt", encoding='utf-8')
-    myCal.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:myCal\nCALSCALE:GREGORIAN\n")
+    myCal.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
     myCal.close()
     #filter episodes so only one year old episodes and episodes one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
@@ -283,22 +283,22 @@ async def my_archive(request):
 async def download(request):
     file_path = Path(calendar_file)
     if file_path.is_file():
-        return FileResponse(file_path, filename="calendar.ics", media_type="text/calendar")
+        return FileResponse(file_path, filename="nousa.ics", media_type="text/calendar")
     else:
-        message = "404; Not Found"
+        message = "404 Not Found"
         return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
 
 scheduler = AsyncIOScheduler()#WORKS!
 
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='sun', hour=11, minute=11),
+    trigger=CronTrigger(day_of_week='sun', hour=11, jitter=600),
     id='update_database'
 )
 
 scheduler.add_job(
     update_archive,
-    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', minute=20, second=0),
+    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', jitter=600),
     id='update_archive'
 )
 

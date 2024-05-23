@@ -1,4 +1,3 @@
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     {% include 'header.html' %}
     <div class="nousa_content">
         <h1>search results</h1>
@@ -9,13 +8,14 @@
                     <div class="search_result_image">
                         <img src="{{ image.medium }}">
                     </div>
-                    <div>
+                    <div class="search_result_text">
                         <div class="search_result_title_button">
                         <h2 style="margin-right: 10px">{{ show.name }}</h2>
                         <form action="/add_show" method="post">
                         <input type="hidden" name="series-id" value="{{ show.id }}">
                         <button type="submit" class="btn btn-primary">Add to my shows</button></form>
                         </div>
+                        <h5 style="margin-right: 10px">{{ show.premiered[:4] }} - {% if show.ended %}{{ show.ended[:4] }}{% endif %}</h5>
                         {% if show.summary %}
                         {{ show.summary | safe }}
                         {% endif %}
@@ -28,3 +28,4 @@
             </div>
         {% endfor %}
     </div>
+    {% include 'footer.html' %}
