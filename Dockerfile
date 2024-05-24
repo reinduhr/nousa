@@ -18,7 +18,7 @@ ENV PYTHONPATH /code/src
 EXPOSE 5000
 
 COPY ./alembic ./alembic
-RUN chmod +x ./alembic/versions/*.py
+#RUN chmod +x ./alembic/versions/*.py
 COPY ./alembic.ini .
 
 #RUN alembic upgrade head
