@@ -1,21 +1,22 @@
     {% include 'header.html' %}
-    <div class="nousa_content">
+    <div class="nousa-content">
         <h1>search results</h1>
         {% for entry in data %}
-            <div class="search_result_container">
+            <div class="search-result-container">
                 {% set show = entry['show'] %}
                 {% set image = show['image'] %}
-                    <div class="search_result_image">
+                    <div class="search-result-image">
                         <img src="{{ image.medium }}">
                     </div>
-                    <div class="search_result_text">
-                        <div class="search_result_title_button">
+                    <div class="search-result-text">
+                        <div class="search-result-title-button">
                         <h2 style="margin-right: 10px">{{ show.name }}</h2>
                         <form action="/add_show" method="post">
                         <input type="hidden" name="series-id" value="{{ show.id }}">
                         <button type="submit" class="btn btn-primary">Add to my shows</button></form>
                         </div>
-                        <h5 style="margin-right: 10px">{{ show.premiered[:4] }} - {% if show.ended %}{{ show.ended[:4] }}{% endif %}</h5>
+                        <h4 style="margin-right: 10px">{% if show.premiered %}{% if show.ended %}{% if show.premiered != show.ended %}{{ show.premiered[:4] }}-{{ show.ended[:4] }}{% else %}{{ show.premiered[:4] }}{% endif %}{% else %}{{ show.premiered[:4] }}-{% endif %}{% endif %}</h4>
+                        <h5 style="margin-right: 10px">Status: {% if show.status %}{{ show.status }}{% endif %}</h5>
                         {% if show.summary %}
                         {{ show.summary | safe }}
                         {% endif %}

@@ -1,45 +1,34 @@
-.info_message {
+.info-message {
     color: #212529;
     text-align: center;
     background-color: #fffb38;
     padding: 6px;
 }
 
-.show_list_item {
-    padding-bottom: 15px;
-}
-
-.nousa_content {
+.nousa-content {
     margin: 8px;
 }
 
-.form_list_margin {
-    margin-right: 10px;
-}
-/*
-.show_info {
-}*/
-
-.search_result_container {
+.search-result-container {
     border-top: lightgrey;
     /*padding: 10px;*/
     margin-bottom: 10px;
     display: flex;
 }
 
-.search_result_image {
+.search-result-image {
     height: auto;
     max-width: 48%;
     margin-right: 10px;
 }
 
-.search_result_text {
+.search-result-text {
     height: auto;
     max-width: 48%;
     margin-right: 10px;
 }
 
-.search_result_title_button {
+.search-result-title-button {
     display: flex;
 }
 

@@ -10,6 +10,7 @@ I know the code could be prettier, but it works! Now that it works I kinda don't
 Container exposes port 5000.
 Mount path to data for calendar, database and logs is: /code/data.
 
+docker pull reinduhr/nousa:latest
 
 # this project is using: 
  - show data: api.**tvmaze**.com

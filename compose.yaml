@@ -11,9 +11,9 @@ services:
       #- /etc/localtime:/etc/localtime
       #- /etc/timezone:/etc/timezone
       
-      #- type: bind #use for dev container
-      #  source: .
-      #  target: /code
+      - type: bind # use for dev container
+        source: .
+        target: /code
 
 volumes:
   db-data:

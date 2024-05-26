@@ -3,10 +3,10 @@
   <div class="container-md">
 <header>
     {% if request.query_params %}
-      <p class="info_message">{{ request.query_params.message }}</p>
+      <p class="info-message">{{ request.query_params.message }}</p>
     {% endif %}
     {% if message %}
-        <p class="info_message">{{ message }}</p>
+        <p class="info-message">{{ message }}</p>
     {% endif %}
     <nav class="navbar navbar-expand-xxl bg-body-tertiary">
         <div class="container-fluid">
@@ -17,10 +17,18 @@
           <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
               <li class="nav-item">
-                <a class="nav-link" href="/series">shows</a>
+                {% if selected_series %}
+                <a class="nav-link active" href="/series">series</a>
+                {% else %}
+                <a class="nav-link" href="/series">series</a>
+                {% endif %}
               </li>
               <li class="nav-item">
+                {% if selected_archive %}
+                <a class="nav-link active" href="/archive">archive</a>
+                {% else %}
                 <a class="nav-link" href="/archive">archive</a>
+                {% endif %}
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/subscribe">ical feed</a>
