@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from .models import engine, Series, Episodes, SeriesArchive
 from datetime import datetime, timedelta
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pathlib import Path
@@ -71,7 +72,6 @@ async def search(request: Request):
     except Exception as err:
         return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows, "message": err})
     data = response.json()
-    logging.info(data)
     return templates.TemplateResponse('search_result.html', {'request': request, 'data': data})
 
 async def fetch_data(url): # asynchronous api calls used in add_to_database()
@@ -117,7 +117,7 @@ def try_request_episodes(series_id, max_retries=30, delay=60):
         time.sleep(delay)
     return None
 
-async def add_episodes(series_id, edata):
+def add_episodes(series_id, edata):
     for element in edata:
         ep_id = element.get("id")
         ep_name = element.get("name")
@@ -160,18 +160,20 @@ async def add_to_database(request: Request):
         try:
             session.add(series)
             session.commit()
-            add_ep_ical_output = BackgroundTasks()
-            add_ep_ical_output.add_task(add_episodes, series_id=series_id, edata=edata)
-            add_ep_ical_output.add_task(ical_output)
-            #episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
-            #ical_output_task = BackgroundTask(ical_output)
+            episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
             session.close()
-            logging.info('add_to_database success')
+            logging.info(f"{series_name} has been added")
             message = f"{series_name} has been added"
+            # run ical output job 2 minutes from moment of adding show to make sure it runs AFTER BackgroundTask
+            scheduler.add_job(
+                ical_output,
+                trigger=DateTrigger(run_date=datetime.now() + timedelta(minutes=2)),
+                id='ical_output'
+            )
         except Exception as err:
-            logging.error("add_to_database error", err)
+            logging.error("add_to_database error:", err)
             return templates.TemplateResponse("index.html", {"request": request, "message": err, "popular_tv_shows": popular_tv_shows})
-        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=add_ep_ical_output)
+        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
 
 async def delete_series(series_id):
     session.query(Series).filter_by(series_id=series_id).delete()
@@ -218,6 +220,8 @@ def update_database():
     for series_tuple in series_list:
         series_id = series_tuple[0]
         sdata = try_request_series(series_id)
+        edata = try_request_episodes(series_id)
+        #logging.error(edata)
         if sdata is not None:
             sdata_status = sdata['status']
             sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
@@ -225,12 +229,13 @@ def update_database():
             session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb})#WORKS!
             session.commit()
         # Episodes
-        edata = try_request_episodes(series_id)
         if edata is not None:
             # Delete old episode data
             session.query(Episodes).filter_by(ep_series_id=series_id).delete()
+            session.commit()
             # Add new episode data
             add_episodes(series_id, edata)
+            session.commit()
         time.sleep(30)
     session.commit()
     session.close()
@@ -300,13 +305,14 @@ scheduler = AsyncIOScheduler()
 
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='sun', hour=11, jitter=600),
+    trigger=CronTrigger(day_of_week='thu', hour=19, minute=9),
+    #trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600),
     id='update_database'
 )
 
 scheduler.add_job(
     update_archive,
-    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='4', jitter=600),
+    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='3', jitter=600),
     id='update_archive'
 )
 
