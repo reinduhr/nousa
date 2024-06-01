@@ -1,5 +1,7 @@
 FROM python:3.12.3-slim
 WORKDIR /code
+RUN addgroup --gid 3333 nousa
+RUN adduser --uid 3333 --gid 3333 --disabled-login --no-create-home nousa
 
 # DEPENDENCIES
 RUN apt-get update && apt-get install -y sqlite3
@@ -24,6 +26,10 @@ EXPOSE 5000
 COPY ./alembic ./alembic
 #RUN chmod +x ./alembic/versions/*.py
 COPY ./alembic.ini .
+
+# USER (COMMENT USER OUT FOR DEV CONTAINER!) NEEDS MORE TESTING/EXPERIMENTING
+#RUN chown -R 3333:3333 /code/
+#USER nousa
 
 # LAUNCH!
 CMD uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload && alembic upgrade head

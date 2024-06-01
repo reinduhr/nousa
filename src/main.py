@@ -305,8 +305,7 @@ scheduler = AsyncIOScheduler()
 
 scheduler.add_job(
     update_database,
-    trigger=CronTrigger(day_of_week='thu', hour=19, minute=9),
-    #trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600),
+    trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600),
     id='update_database'
 )
 
