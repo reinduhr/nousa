@@ -8,7 +8,7 @@ I'm a beginning programmer. I used to use episodecalendar.com to keep me informe
 I know the code could be prettier, but it works! Now that it works I kinda don't wanna touch it anymore, and that's why I release it to the public. What's better for a newbie than to get critized by strangers on the internet, am I right?
 
 Container exposes port 5000.
-Mount path to data for calendar, database and logs is: /code/data.
+Mount path to data for calendar, database and logs is: /code/data (uid:gid = 3333:3333). 
 
 docker pull reinduhr/nousa:latest
 
