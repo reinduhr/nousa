@@ -282,7 +282,7 @@ def ical_output():
                     f"DTSTAMP:{today:%Y%m%d}T{today:%H%M%S}Z\n"
                     f"DTSTART;VALUE=DATE:{start_convert}\n"
                     f"DTEND;VALUE=DATE:{end_convert}\n"
-                    f"DESCRIPTION:{episode.ep_name}\n"
+                    f"DESCRIPTION:Name: {episode.ep_name}\\nLast updated: {today:%c}\n"
                     f"SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
                     f"UID:{episode.ep_id}\n"
                     "BEGIN:VALARM\n"
