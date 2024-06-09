@@ -80,14 +80,14 @@ async def fetch_data(url): # asynchronous api calls used in add_to_database()
                 return await aioresponse.json()
 
 def request_series(series_id):
-            try:
-                response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}", timeout=10)
-                response_series.raise_for_status()
-                return response_series.json()
-            except:
-                return None
+    try:
+        response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}", timeout=10)
+        response_series.raise_for_status()
+        return response_series.json()
+    except:
+        return None
 
-def try_request_series(series_id, max_retries=30, delay=60):
+def try_request_series(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_series(series_id)
@@ -96,17 +96,22 @@ def try_request_series(series_id, max_retries=30, delay=60):
         retries += 1
         logging.error(f'update_database series retry {retries}')
         time.sleep(delay)
+    scheduler.add_job(
+            update_database,
+            trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+            id='update_database_try_request_series'
+        )
     return None
 
 def request_episodes(series_id):
-        try:
-            response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes", timeout=10)
-            response_episodes.raise_for_status()
-            return response_episodes.json()
-        except:
-            return None
+    try:
+        response_episodes = requests.get(f"https://api.tvmaze.com/shows/{series_id}/episodes", timeout=10)
+        response_episodes.raise_for_status()
+        return response_episodes.json()
+    except:
+        return None
 
-def try_request_episodes(series_id, max_retries=30, delay=60):
+def try_request_episodes(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_episodes(series_id)
@@ -115,6 +120,11 @@ def try_request_episodes(series_id, max_retries=30, delay=60):
         retries += 1
         logging.error(f'update_database episodes retry {retries}')
         time.sleep(delay)
+    scheduler.add_job(
+            update_database,
+            trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+            id='update_database_try_request_episodes'
+        )
     return None
 
 def add_episodes(series_id, edata):
