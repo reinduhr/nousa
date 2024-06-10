@@ -5,6 +5,7 @@
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Status</th>
+                  <th scope="col">Last updated</th>
                   <th scope="col">TheTVDB</th>
                   <th scope="col">IMDb</th>
                   <th scope="col">Drop it</th>
@@ -16,6 +17,7 @@
                     <form action="/delete_show" method="post">
                     <td>{{ show.series_name }}</td>
                     <td>{{ show.series_status }}</td>
+                    <td>{{ show.series_last_updated }}</td>
                     <td>
                     {% if show.series_ext_thetvdb %}
                     <a href="http://thetvdb.com/search?query={{ show.series_ext_thetvdb }}" class="link-success">TheTVDB</a>

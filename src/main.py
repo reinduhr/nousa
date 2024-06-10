@@ -1,11 +1,11 @@
 from starlette.applications import Starlette
-from starlette.responses import RedirectResponse, PlainTextResponse, FileResponse
+from starlette.responses import RedirectResponse, FileResponse
 from starlette.requests import Request
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.background import BackgroundTask, BackgroundTasks
+from starlette.background import BackgroundTask
 import requests
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
@@ -13,14 +13,22 @@ from .models import engine, Series, Episodes, SeriesArchive
 from datetime import datetime, timedelta
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
-import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.jobstores.base import ConflictingIdError
 from pathlib import Path
+import time
 import logging
 import secrets
 import aiohttp
 import asyncio
 from .ui_data import popular_tv_shows
+import subprocess
+
+async def db_migrations():
+    result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
+    if result.returncode != 0:
+        logging.error(f"Alembic database migrations failed: {result.stderr}")
 
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
@@ -94,13 +102,22 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
         if result is not None:
             return result
         retries += 1
-        logging.error(f'update_database series retry {retries}')
+        logging.error(f'update_series series retry {retries}')
         time.sleep(delay)
-    scheduler.add_job(
-            update_database,
-            trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-            id='update_database_try_request_series'
-        )
+    try: # check if job already exists in order to avoid conflict when adding job to db
+        existing_job = scheduler.get_job(job_id='update_series_try_request_series')
+        if existing_job:
+            logging.info("update_series_try_request_series job already exists. not adding new job.")
+        else:
+            scheduler.add_job(
+                update_series,
+                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+                id='update_series_try_request_series',
+                misfire_grace_time=86400,
+                coalescing=True,
+            )
+    except ConflictingIdError as err:
+        logging.error(err)
     return None
 
 def request_episodes(series_id):
@@ -118,13 +135,22 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         if result is not None:
             return result
         retries += 1
-        logging.error(f'update_database episodes retry {retries}')
+        logging.error(f'update_series episodes retry {retries}')
         time.sleep(delay)
-    scheduler.add_job(
-            update_database,
-            trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-            id='update_database_try_request_episodes'
-        )
+    try: # check if job already exists in order to avoid conflict when adding job to db
+        existing_job = scheduler.get_job(job_id='update_series_try_request_episodes')
+        if existing_job:
+            logging.info("update_series_try_request_series job already exists. not adding new job.")
+        else:
+            scheduler.add_job(
+                update_series,
+                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+                id='update_series_try_request_episodes',
+                misfire_grace_time=86400,
+                coalescing=True,
+            )
+    except ConflictingIdError as err:
+        logging.error(err)
     return None
 
 def add_episodes(series_id, edata):
@@ -165,8 +191,9 @@ async def add_to_database(request: Request):
         series_status = sdata.get("status")
         series_ext_thetvdb = sdata["externals"].get("thetvdb")
         series_ext_imdb = sdata["externals"].get("imdb")
+        today = datetime.now()
         # Add TV show to database
-        series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb)
+        series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb, series_last_updated=today)
         try:
             session.add(series)
             session.commit()
@@ -175,11 +202,20 @@ async def add_to_database(request: Request):
             logging.info(f"{series_name} has been added")
             message = f"{series_name} has been added"
             # run ical output job 2 minutes from moment of adding show to make sure it runs AFTER BackgroundTask
-            scheduler.add_job(
-                ical_output,
-                trigger=DateTrigger(run_date=datetime.now() + timedelta(minutes=2)),
-                id='ical_output'
-            )
+            try: # check if job already exists in order to avoid conflict when adding job to db
+                existing_job = scheduler.get_job(job_id='ical_output')
+                if existing_job:
+                    logging.info("ical_output job already exists. not adding new job.")
+                else:
+                    scheduler.add_job(
+                        ical_output,
+                        trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=20)),
+                        id='ical_output',
+                        misfire_grace_time=600,
+                        coalescing=True,
+                    )
+            except ConflictingIdError as err:
+                logging.error(err)
         except Exception as err:
             logging.error("add_to_database error:", err)
             return templates.TemplateResponse("index.html", {"request": request, "message": err, "popular_tv_shows": popular_tv_shows})
@@ -203,7 +239,7 @@ async def archive_show(request):
     source_show = session.query(Series).get(series_id)
     info_message = source_show.series_name
     message = f"{info_message} was already in the archive"
-    dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name, series_status=source_show.series_status)
+    dest_show = SeriesArchive(series_id=source_show.series_id, series_name=source_show.series_name, series_status=source_show.series_status, series_last_updated=source_show.series_last_updated)
     existing_series = session.query(SeriesArchive).get(series_id) # checks if series is already in archive
     try:
         if not existing_series:
@@ -223,8 +259,8 @@ async def archive_show(request):
         session.close()
         return templates.TemplateResponse("my_shows.html", {"request": request, "message": err, 'myshows': myshows})
 
-# update_database refreshes series and episodes data. scheduler automates it.
-def update_database():
+# update_series refreshes series and episodes data. scheduler automates it.
+def update_series():
     series_list = session.query(Series.series_id).all()
     # Series
     for series_tuple in series_list:
@@ -236,7 +272,8 @@ def update_database():
             sdata_status = sdata['status']
             sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
             sdata_ext_imdb = sdata['externals'].get('imdb')
-            session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb})#WORKS!
+            today = datetime.now()
+            session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb, Series.series_last_updated: today})
             session.commit()
         # Episodes
         if edata is not None:
@@ -249,7 +286,7 @@ def update_database():
         time.sleep(30)
     session.commit()
     session.close()
-    logging.info("update_database success")
+    logging.info("update_series success")
     ical_output()
 
 def update_archive():
@@ -259,7 +296,8 @@ def update_archive():
         sdata = try_request_series(series_id)
         if sdata is not None:
             series_status = sdata['status']
-            session.query(SeriesArchive).filter(SeriesArchive.series_id == series_id).update({SeriesArchive.series_status: series_status})
+            today = datetime.now()
+            session.query(SeriesArchive).filter(SeriesArchive.series_id == series_id).update({SeriesArchive.series_status: series_status, SeriesArchive.series_last_updated: today})
             session.commit()
             time.sleep(61)
     session.close()
@@ -267,13 +305,13 @@ def update_archive():
 
 # create ics file and put it in static folder
 def ical_output():
-    myCal = open(calendar_file, "wt", encoding='utf-8')
-    myCal.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
-    myCal.close()
+    calendar = open(calendar_file, "wt", encoding='utf-8')
+    calendar.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
+    calendar.close()
     # filter episodes so only one year old episodes and episodes one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
     one_year_future = datetime.now() + timedelta(days=365)
-    today: datetime = datetime.now()
+    today = datetime.now()
     myepisodes = session.query(Episodes).filter(Episodes.ep_airdate >= one_year_ago, Episodes.ep_airdate <= one_year_future).all()   
     myshows = session.query(Series).all()
     for show in myshows:
@@ -287,12 +325,12 @@ def ical_output():
                 ep_nr = '{:02d}'.format(int(episode.ep_number))
                 season_nr = '{:02d}'.format(int(episode.ep_season))
                 
-                myCal_event = (
+                calendar_event = (
                     "BEGIN:VEVENT\n"
                     f"DTSTAMP:{today:%Y%m%d}T{today:%H%M%S}Z\n"
                     f"DTSTART;VALUE=DATE:{start_convert}\n"
                     f"DTEND;VALUE=DATE:{end_convert}\n"
-                    f"DESCRIPTION:Name: {episode.ep_name}\\nLast updated: {today:%c}\n"
+                    f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\n" if show.series_last_updated else f"DESCRIPTION:Episode name: {episode.ep_name}\n"
                     f"SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
                     f"UID:{episode.ep_id}\n"
                     "BEGIN:VALARM\n"
@@ -303,29 +341,51 @@ def ical_output():
                     "END:VALARM\n"
                     "END:VEVENT\n"
                 )
-                myCal = open(calendar_file, "at", encoding='utf-8')
-                myCal.write(myCal_event)
-                myCal.close()
-    myCal = open(calendar_file, "at", encoding='utf-8')
-    myCal.write("END:VCALENDAR")
-    myCal.close()
+                
+                calendar = open(calendar_file, "at", encoding='utf-8')
+                calendar.write(calendar_event)
+                calendar.close()
+    calendar = open(calendar_file, "at", encoding='utf-8')
+    calendar.write("END:VCALENDAR")
+    calendar.close()
     logging.info("ical_output success")
 
-scheduler = AsyncIOScheduler()
+jobstores = {
+    'default': SQLAlchemyJobStore(engine=engine)
+}
 
-scheduler.add_job(
-    update_database,
-    trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600),
-    id='update_database'
-)
-
-scheduler.add_job(
-    update_archive,
-    trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='3', jitter=600),
-    id='update_archive'
-)
-
+scheduler = AsyncIOScheduler(jobstores=jobstores)
 scheduler.start()
+
+try: # check if job already exists in order to avoid conflict when adding job to db
+    existing_job = scheduler.get_job(job_id='update_series')
+    if existing_job:
+        logging.info("update_series job already exists. not adding new job.")
+    else:
+        scheduler.add_job(
+            update_series,
+            trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600), # job runs every Sunday around 3AM
+            id='update_series',
+            misfire_grace_time=86400, # if job did not run, try again if 24 hours (86400 seconds) have passed
+            coalescing=True, # if multiple jobs did not run, discard all others and run only one job
+        )
+except ConflictingIdError as err:
+    logging.error(err)
+
+try: # check if job already exists in order to avoid conflict when adding job to db
+    existing_job = scheduler.get_job(job_id='update_archive')
+    if existing_job:
+        logging.info("update_series job already exists. not adding new job.")
+    else:
+        scheduler.add_job(
+            update_archive,
+            trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='3', jitter=600),
+            id='update_archive',
+            misfire_grace_time=86400,
+            coalescing=True,
+        )
+except ConflictingIdError as err:
+    logging.error(err)
 
 routes = [
     Route("/", endpoint=homepage, methods=["GET"]),
@@ -338,7 +398,7 @@ routes = [
     Route("/subscribe", endpoint=download),
 ]
 
-app = Starlette(debug=True, routes=routes)
+app = Starlette(debug=True, routes=routes, on_startup=[db_migrations])
 
 sess_key = secrets.token_hex()
 app.add_middleware(SessionMiddleware, secret_key=sess_key, max_age=3600)

@@ -13,9 +13,9 @@ COPY ./templates ./templates
 COPY ./compose.yaml .
 COPY ./Dockerfile .
 COPY ./requirements.txt .
-#--no-cache-dir (option for pip install)
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir
 RUN chmod +x ./src/*.py
+RUN chmod +x ./src/versions/*.py
 
 # ENVIRONMENT VARIABLES
 ENV TZ='Europe/Amsterdam'
@@ -23,7 +23,7 @@ ENV PYTHONPATH /code/src
 EXPOSE 5000
 
 # ALEMBIC DB MIGRATIONS
-COPY ./alembic ./alembic
+#COPY ./alembic ./alembic
 #RUN chmod +x ./alembic/versions/*.py
 COPY ./alembic.ini .
 
@@ -34,7 +34,9 @@ RUN chown -R 3333:3333 data
 
 # LAUNCH!
 # DEV
-CMD uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload && alembic upgrade head
+#RUN alembic upgrade head
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+#CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
 # PROD
 #CMD uvicorn src.main:app --host 0.0.0.0 --port 5000 && alembic upgrade head
 

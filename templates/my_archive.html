@@ -5,6 +5,7 @@
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Status</th>
+                  <th scope="col">Last updated</th>
                 </tr>
             </thead>
             <tbody>
@@ -13,6 +14,7 @@
                     <form action="/delete_show" method="post">
                     <td>{{ show.series_name }}</td>
                     <td>{{ show.series_status }}</td>
+                    <td>{{ show.series_last_updated }}</td>
                     </form>
                 </tr>
                 {% endfor %}

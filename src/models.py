@@ -12,6 +12,7 @@ class Series(Base):
     series_status = Column(String)
     series_ext_thetvdb = Column(Integer)
     series_ext_imdb = Column(String)
+    series_last_updated = Column(DateTime)
 
 class Episodes(Base):
     __tablename__ = "Episodes"
@@ -29,5 +30,6 @@ class SeriesArchive(Base):
     series_id = Column(Integer, primary_key=True)
     series_name = Column(String)
     series_status = Column(String)
+    series_last_updated = Column(DateTime)
 
 Base.metadata.create_all(engine)
