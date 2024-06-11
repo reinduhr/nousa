@@ -27,20 +27,20 @@ EXPOSE 5000
 #RUN chmod +x ./alembic/versions/*.py
 COPY ./alembic.ini .
 
-# USER (COMMENT USER OUT FOR PRODUCTION CONTAINER!)
+# USER (COMMENT USER OUT FOR DEV CONTAINER!)
 RUN mkdir -m 770 data
 RUN chown -R 3333:3333 data
 #USER nousa
 
 # LAUNCH!
 # DEV
-#RUN alembic upgrade head
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
-#CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
+
 # PROD
-#CMD uvicorn src.main:app --host 0.0.0.0 --port 5000 && alembic upgrade head
+#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]
 
 # NOT IN USE
+#CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
 #RUN alembic upgrade head
 #CMD ["alembic", "upgrade", "head"]
 #CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
