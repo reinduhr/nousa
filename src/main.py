@@ -19,6 +19,7 @@ from apscheduler.jobstores.base import ConflictingIdError
 from pathlib import Path
 import time
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import secrets
 import aiohttp
 import asyncio
@@ -39,11 +40,22 @@ calendar_file = "/code/data/nousa.ics"
 templates = Jinja2Templates(directory="templates")
 # Logging
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-file_handler = logging.FileHandler('/code/data/nousa.log') # Create a FileHandler to log messages to a file
-formatter = logging.Formatter('%(asctime)s.%(msecs)03d %(message)s', datefmt='%d-%b-%Y %H:%M:%S') # Create a formatter to specify the log message format
-file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
-logging.root.addHandler(file_handler) # Add the FileHandler to the root logger. root logger has most permissions
+logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+def open_log():
+    file_handler = TimedRotatingFileHandler('/code/data/log/nousa.log', when='midnight', interval=7, backupCount=12, encoding='utf-8') # Create a FileHandler to log messages to a file
+    formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %H:%M:%S') # Create a formatter to specify the log message format
+    file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
+    logging.root.addHandler(file_handler) # Add the FileHandler to the root logger. root logger has most permissions
+try:
+    open_log()
+except:
+    log_path = Path('/code/data/log')
+    log_path.mkdir(parents=True, mode=0o770, exist_ok=True)
+    open_log()
+    old_log_file = Path('/code/data/nousa.log')
+    if old_log_file.is_file():
+        old_log_file.unlink()
 
 async def homepage(request): # /
     return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
