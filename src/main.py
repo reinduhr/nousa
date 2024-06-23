@@ -38,11 +38,17 @@ session = Session()
 calendar_file = "/code/data/nousa.ics"
 # Instantiating the web templates
 templates = Jinja2Templates(directory="templates")
+# Delete old log file
+old_log_file = Path('/code/data/nousa.log')
+if old_log_file.is_file():
+    old_log_file.unlink()
 # Logging
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
 logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 def open_log():
+    log_path = Path('/code/data/log')
+    log_path.mkdir(parents=True, mode=0o770, exist_ok=True)
     file_handler = TimedRotatingFileHandler('/code/data/log/nousa.log', when='midnight', interval=7, backupCount=12, encoding='utf-8') # Create a FileHandler to log messages to a file
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %H:%M:%S') # Create a formatter to specify the log message format
     file_handler.setFormatter(formatter) # Set the Formatter for the FileHandler
@@ -50,12 +56,7 @@ def open_log():
 try:
     open_log()
 except:
-    log_path = Path('/code/data/log')
-    log_path.mkdir(parents=True, mode=0o770, exist_ok=True)
-    open_log()
-    old_log_file = Path('/code/data/nousa.log')
-    if old_log_file.is_file():
-        old_log_file.unlink()
+    logging.error("can't open log")
 # Audit Logging
 def setup_audit_logger():
     audit_logger = logging.getLogger('audit_logger')
