@@ -56,6 +56,17 @@ except:
     old_log_file = Path('/code/data/nousa.log')
     if old_log_file.is_file():
         old_log_file.unlink()
+# Audit Logging
+def setup_audit_logger():
+    audit_logger = logging.getLogger('audit_logger')
+    audit_logger.setLevel(logging.INFO)
+    audit_handler = logging.FileHandler('/code/data/log/audit.log')
+    audit_handler.setLevel(logging.INFO)
+    audit_formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%d-%b-%Y %H:%M:%S')
+    audit_handler.setFormatter(audit_formatter)
+    audit_logger.addHandler(audit_handler)
+    return audit_logger
+audit_logger = setup_audit_logger()
 
 async def homepage(request): # /
     return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
@@ -213,7 +224,7 @@ async def add_to_database(request: Request):
             session.close()
             logging.info(f"{series_name} has been added")
             message = f"{series_name} has been added"
-            # run ical output job 2 minutes from moment of adding show to make sure it runs AFTER BackgroundTask
+            # run ical output job 20 seconds from moment of adding show to make sure it runs AFTER BackgroundTask
             try: # check if job already exists in order to avoid conflict when adding job to db
                 existing_job = scheduler.get_job(job_id='ical_output')
                 if existing_job:
@@ -231,6 +242,7 @@ async def add_to_database(request: Request):
         except Exception as err:
             logging.error("add_to_database error:", err)
             return templates.TemplateResponse("index.html", {"request": request, "message": err, "popular_tv_shows": popular_tv_shows})
+        audit_logger.info(f"ADDED: {series_name} FROM IP: {request.client.host}")
         return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
 
 async def delete_series(series_id):
@@ -265,6 +277,7 @@ async def archive_show(request):
         ical_output()
         myshows = session.query(Series).all() # query all shows to later display on my_shows.html
         session.close()
+        audit_logger.info(f"DELETED: {info_message} FROM IP: {request.client.host}")
         return templates.TemplateResponse("my_shows.html", {"request": request, "message": message, 'myshows': myshows})
     except Exception as err:
         logging.error("archive_show error", err)
@@ -342,7 +355,7 @@ def ical_output():
                     f"DTSTAMP:{today:%Y%m%d}T{today:%H%M%S}Z\n"
                     f"DTSTART;VALUE=DATE:{start_convert}\n"
                     f"DTEND;VALUE=DATE:{end_convert}\n"
-                    f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\n" if show.series_last_updated else f"DESCRIPTION:Episode name: {episode.ep_name}\n"
+                    f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\n"
                     f"SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
                     f"UID:{episode.ep_id}\n"
                     "BEGIN:VALARM\n"

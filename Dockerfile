@@ -13,6 +13,7 @@ COPY ./templates ./templates
 COPY ./compose.yaml .
 COPY ./Dockerfile .
 COPY ./requirements.txt .
+COPY ./alembic.ini .
 RUN pip install -r requirements.txt --no-cache-dir
 RUN chmod +x ./src/*.py
 RUN chmod +x ./src/versions/*.py
@@ -22,22 +23,17 @@ ENV TZ='Europe/Amsterdam'
 ENV PYTHONPATH /code/src
 EXPOSE 5000
 
-# ALEMBIC DB MIGRATIONS
-#COPY ./alembic ./alembic
-#RUN chmod +x ./alembic/versions/*.py
-COPY ./alembic.ini .
-
 # USER (COMMENT USER OUT FOR DEV CONTAINER!)
 RUN mkdir -m 770 data
 RUN chown -R 3333:3333 data
-#USER nousa
+USER nousa
 
 # LAUNCH!
 # DEV
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
 
 # PROD
-#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]
 
 # NOT IN USE
 #CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
