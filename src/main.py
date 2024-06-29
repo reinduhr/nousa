@@ -405,7 +405,7 @@ try: # check if job already exists in order to avoid conflict when adding job to
     else:
         scheduler.add_job(
             update_archive,
-            trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='3', jitter=600),
+            trigger=CronTrigger(year='*', month='*', day=1, week='*', day_of_week='*', hour='9', jitter=600),
             id='update_archive',
             misfire_grace_time=86400,
             coalescing=True,

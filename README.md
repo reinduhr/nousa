@@ -15,7 +15,7 @@ docker pull reinduhr/nousa:latest
 
 # this project is using: 
  - show data: api.**tvmaze**.com
- - docker image: **Python** 3.12.3-slim 
+ - docker image: **Python** 3.12.4-slim 
  - server: **Uvicorn** (ASGI web server)
  - web framework: **Starlette** (lightweight ASGI framework/toolkit)    
  - database: **SQLite**, **SQLAlchemy**, **Alembic**
