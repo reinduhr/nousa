@@ -329,12 +329,12 @@ def update_archive():
     session.close()
     logging.info("update_archive success")
 
-# create ics file and put it in static folder
+# create ics file and put it in data folder
 def ical_output():
     calendar = open(calendar_file, "wt", encoding='utf-8')
     calendar.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
     calendar.close()
-    # filter episodes so only one year old episodes and episodes one year into the future get into the calendar
+    # filter episodes so only episodes between one year ago and one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
     one_year_future = datetime.now() + timedelta(days=365)
     today = datetime.now()

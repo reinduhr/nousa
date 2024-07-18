@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, BLOB, DateTime
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy.orm import declarative_base
 
 engine = create_engine("sqlite:///data/nousa.db")
 Base = declarative_base()

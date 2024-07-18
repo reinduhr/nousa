@@ -11,7 +11,7 @@ Container exposes port 5000\
 Mount path to data for calendar, database and logs is: /code/data\
 username is nousa (uid:gid = 3333:3333)
 
-docker pull reinduhr/nousa:latest
+docker.io/reinduhr/nousa:latest
 
 # this project is using: 
  - show data: api.**tvmaze**.com

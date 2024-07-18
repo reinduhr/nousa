@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     # COMMENT = DEV CONTAINER!
-    user: 3333:3333
+    #user: 3333:3333
     ports:
       - "5000:5000"  # host:container
     volumes:
@@ -14,9 +14,9 @@ services:
       #- /etc/timezone:/etc/timezone
       
       # COMMENT = PRODUCTION CONTAINER!
-      #- type: bind
-      #  source: .
-      #  target: /code
+      - type: bind
+        source: .
+        target: /code
 
 volumes:
   db-data:
