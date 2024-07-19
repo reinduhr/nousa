@@ -1,5 +1,5 @@
 from starlette.applications import Starlette
-from starlette.responses import RedirectResponse, FileResponse
+from starlette.responses import RedirectResponse, StreamingResponse
 from starlette.requests import Request
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
@@ -25,6 +25,7 @@ import aiohttp
 import asyncio
 from .ui_data import popular_tv_shows
 import subprocess
+import io
 
 async def db_migrations():
     result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
@@ -34,14 +35,15 @@ async def db_migrations():
 # Create SQLAlchemy session
 Session = sessionmaker(bind=engine)
 session = Session()
-# Assign calendar file to variable
-calendar_file = "/code/data/nousa.ics"
 # Instantiating the web templates
 templates = Jinja2Templates(directory="templates")
-# Delete old log file
+# Delete unused files
 old_log_file = Path('/code/data/nousa.log')
+old_calendar_file = Path('/code/data/nousa.ics')
 if old_log_file.is_file():
     old_log_file.unlink()
+if old_calendar_file.is_file():
+    old_calendar_file.unlink()
 # Logging
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
@@ -76,7 +78,7 @@ async def my_shows(request: Request): # /series
     try:
         myshows = session.query(Series).order_by(Series.series_status.desc()).all()
         session.close()
-        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': archive_show, 'selected_series': True})
+        return templates.TemplateResponse('my_shows.html', {'request': request, 'myshows': myshows, 'archive_show': add_to_archive, 'selected_series': True})
     except IntegrityError:
         return RedirectResponse(url="/series")
     except PendingRollbackError:
@@ -87,14 +89,6 @@ async def my_archive(request): # /archive
     myarchive = session.query(SeriesArchive).order_by(SeriesArchive.series_status.desc()).all()
     session.close()
     return templates.TemplateResponse("my_archive.html", {"request": request, "myarchive": myarchive, 'selected_archive': True})
-
-async def download(request): # /subscribe
-    file_path = Path(calendar_file)
-    if file_path.is_file():
-        return FileResponse(file_path, filename="nousa.ics", media_type="text/calendar")
-    else:
-        message = "404 Not Found"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
 
 async def search(request: Request):
     form = await request.form()
@@ -189,7 +183,7 @@ def add_episodes(series_id, edata):
         session.add(episodes)
         session.commit()
 
-async def add_to_database(request: Request):
+async def add_to_series(request: Request):
     form = await request.form()
     series_id_form = form.get("series-id") # "series-id" is taken from search_result.html input name value
     try:
@@ -225,21 +219,6 @@ async def add_to_database(request: Request):
             session.close()
             logging.info(f"{series_name} has been added")
             message = f"{series_name} has been added"
-            # run ical output job 20 seconds from moment of adding show to make sure it runs AFTER BackgroundTask
-            try: # check if job already exists in order to avoid conflict when adding job to db
-                existing_job = scheduler.get_job(job_id='ical_output')
-                if existing_job:
-                    logging.info("ical_output job already exists. not adding new job.")
-                else:
-                    scheduler.add_job(
-                        ical_output,
-                        trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=20)),
-                        id='ical_output',
-                        misfire_grace_time=600,
-                        coalescing=True,
-                    )
-            except ConflictingIdError as err:
-                logging.error(err)
         except Exception as err:
             logging.error("add_to_database error:", err)
             return templates.TemplateResponse("index.html", {"request": request, "message": err, "popular_tv_shows": popular_tv_shows})
@@ -251,7 +230,7 @@ async def delete_series(series_id):
     session.query(Episodes).filter_by(ep_series_id=series_id).delete()
     session.commit()
 
-async def archive_show(request):
+async def add_to_archive(request):
     myshows = session.query(Series).all() # query all shows to later display on my_shows.html
     session.close()
     form_data = await request.form()
@@ -275,7 +254,6 @@ async def archive_show(request):
         session.commit()
         session.close()
         logging.info("archive_show success")
-        ical_output()
         myshows = session.query(Series).all() # query all shows to later display on my_shows.html
         session.close()
         audit_logger.info(f"DELETED: {info_message} FROM IP: {request.client.host}")
@@ -313,7 +291,6 @@ def update_series():
     session.commit()
     session.close()
     logging.info("update_series success")
-    ical_output()
 
 def update_archive():
     series_list = session.query(SeriesArchive.series_id).all()
@@ -329,11 +306,9 @@ def update_archive():
     session.close()
     logging.info("update_archive success")
 
-# create ics file and put it in data folder
-def ical_output():
-    calendar = open(calendar_file, "wt", encoding='utf-8')
-    calendar.write("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
-    calendar.close()
+def download_calendar(request):
+    calendar_file_memory = io.BytesIO()
+    calendar_file_memory.write(b"BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
     # filter episodes so only episodes between one year ago and one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
     one_year_future = datetime.now() + timedelta(days=365)
@@ -368,13 +343,12 @@ def ical_output():
                     "END:VEVENT\n"
                 )
                 
-                calendar = open(calendar_file, "at", encoding='utf-8')
-                calendar.write(calendar_event)
-                calendar.close()
-    calendar = open(calendar_file, "at", encoding='utf-8')
-    calendar.write("END:VCALENDAR")
-    calendar.close()
-    logging.info("ical_output success")
+                calendar_file_memory.write(calendar_event.encode('utf-8'))
+    calendar_file_memory.write(b"END:VCALENDAR")
+    calendar_file_memory.seek(0)
+    logging.info("download_calendar success")
+    headers = {'Content-Disposition': 'attachment; filename="nousa.ics"'}
+    return StreamingResponse(calendar_file_memory, media_type="text/calendar", headers=headers)
 
 jobstores = {
     'default': SQLAlchemyJobStore(engine=engine)
@@ -417,11 +391,11 @@ routes = [
     Route("/", endpoint=homepage, methods=["GET"]),
     Mount("/nousa", app=StaticFiles(directory="static"), name="static"),
     Route("/search", endpoint=search, methods=["GET", "POST"]),
-    Route("/add_show", endpoint=add_to_database, methods=["GET", "POST"]),
+    Route("/add_show", endpoint=add_to_series, methods=["GET", "POST"]),
     Route("/series", endpoint=my_shows, methods=["GET", "POST"]),
-    Route("/delete_show", endpoint=archive_show, methods=["GET", "POST"]),
+    Route("/delete_show", endpoint=add_to_archive, methods=["GET", "POST"]),
     Route("/archive", endpoint=my_archive, methods=["GET", "POST"]),
-    Route("/subscribe", endpoint=download),
+    Route("/subscribe", endpoint=download_calendar, methods=["GET"]),
 ]
 
 app = Starlette(debug=True, routes=routes, on_startup=[db_migrations])
