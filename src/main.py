@@ -44,9 +44,11 @@ if old_log_file.is_file():
     old_log_file.unlink()
 if old_calendar_file.is_file():
     old_calendar_file.unlink()
+# Declare variables here which are used often
+today = datetime.now()
 # Logging
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 def open_log():
     log_path = Path('/code/data/log')
@@ -209,7 +211,6 @@ async def add_to_series(request: Request):
         series_status = sdata.get("status")
         series_ext_thetvdb = sdata["externals"].get("thetvdb")
         series_ext_imdb = sdata["externals"].get("imdb")
-        today = datetime.now()
         # Add TV show to database
         series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb, series_last_updated=today)
         try:
@@ -276,7 +277,6 @@ def update_series():
             sdata_status = sdata['status']
             sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
             sdata_ext_imdb = sdata['externals'].get('imdb')
-            today = datetime.now()
             session.query(Series).filter(Series.series_id == series_id).update({Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb, Series.series_last_updated: today})
             session.commit()
         # Episodes
@@ -299,7 +299,6 @@ def update_archive():
         sdata = try_request_series(series_id)
         if sdata is not None:
             series_status = sdata['status']
-            today = datetime.now()
             session.query(SeriesArchive).filter(SeriesArchive.series_id == series_id).update({SeriesArchive.series_status: series_status, SeriesArchive.series_last_updated: today})
             session.commit()
             time.sleep(61)
@@ -312,7 +311,6 @@ def download_calendar(request):
     # filter episodes so only episodes between one year ago and one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
     one_year_future = datetime.now() + timedelta(days=365)
-    today = datetime.now()
     myepisodes = session.query(Episodes).filter(Episodes.ep_airdate >= one_year_ago, Episodes.ep_airdate <= one_year_future).all()   
     myshows = session.query(Series).all()
     for show in myshows:
@@ -346,7 +344,7 @@ def download_calendar(request):
                 calendar_file_memory.write(calendar_event.encode('utf-8'))
     calendar_file_memory.write(b"END:VCALENDAR")
     calendar_file_memory.seek(0)
-    logging.info("download_calendar success")
+    logging.info(f"success! 'download_calendar' from ip: {request.client.host}")
     headers = {'Content-Disposition': 'attachment; filename="nousa.ics"'}
     return StreamingResponse(calendar_file_memory, media_type="text/calendar", headers=headers)
 

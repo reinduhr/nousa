@@ -23,15 +23,14 @@ ENV TZ='Europe/Amsterdam'
 ENV PYTHONPATH /code/src
 EXPOSE 5000
 
-# USER (COMMENT USER OUT FOR DEV CONTAINER!)
+#3 USER (COMMENT USER OUT FOR DEV CONTAINER!)
 RUN mkdir -m 770 data
 RUN chown -R 3333:3333 data
 #USER nousa
 
-# LAUNCH!
+#4 LAUNCH!
 # DEV
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
-
 # PROD
 #CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]
 
