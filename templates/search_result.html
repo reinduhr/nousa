@@ -13,6 +13,17 @@
                         <h2 style="margin-right: 10px">{{ show.name }}</h2>
                         <form action="/add_show" method="post">
                         <input type="hidden" name="series-id" value="{{ show.id }}">
+                        <input type="hidden" name="series-name" value="{{ show.name }}">
+                        <!-- Dropdown for selecting a list -->
+                        <div style="margin-bottom: 10px;">
+                            <label for="list-select">Choose a list:</label>
+                            <select id="list-select" name="list-id" class="form-control" required>
+                                {% for list in lists %}
+                                    <option value="{{ list.list_id }}">{{ list.list_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- End of dropdown-->
                         <button type="submit" class="btn btn-primary">Add to my shows</button></form>
                         </div>
                         <h4 style="margin-right: 10px">{% if show.premiered %}{% if show.ended %}{% if show.premiered[:4] != show.ended[:4] %}{{ show.premiered[:4] }}-{{ show.ended[:4] }}{% else %}{{ show.premiered[:4] }}{% endif %}{% else %}{{ show.premiered[:4] }}-{% endif %}{% endif %}</h4>

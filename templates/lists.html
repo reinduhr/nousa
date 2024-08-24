@@ -1,0 +1,29 @@
+{% include 'header.html' %}
+<div class="nousa-content">
+    <table class="table">
+        <div class="create-list-container">
+            <h5>Create List</h5>
+            <form action="/create_list" method="post">
+                <input type="text" id="create-list" name="create-list" placeholder="List name">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">ical feed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for list in lists %}
+            <tr>
+                <td><a href="/list/{{ list.list_id }}">{{ list.list_id }}</a></td>
+                <td>{{ list.list_name }}</td>
+                <td><a href="/subscribe/{{ list.list_id }}">Subscribe</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}

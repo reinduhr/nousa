@@ -17,21 +17,11 @@
           <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll">
               <li class="nav-item">
-                {% if selected_series %}
-                <a class="nav-link active" href="/series">series</a>
+                {% if selected_lists %}
+                <a class="nav-link active" href="/lists">lists</a>
                 {% else %}
-                <a class="nav-link" href="/series">series</a>
+                <a class="nav-link" href="/lists">lists</a>
                 {% endif %}
-              </li>
-              <li class="nav-item">
-                {% if selected_archive %}
-                <a class="nav-link active" href="/archive">archive</a>
-                {% else %}
-                <a class="nav-link" href="/archive">archive</a>
-                {% endif %}
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/subscribe">ical feed</a>
               </li>
             </ul>
           </div>

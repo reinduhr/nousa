@@ -32,4 +32,17 @@ class SeriesArchive(Base):
     series_status = Column(String)
     series_last_updated = Column(DateTime)
 
-Base.metadata.create_all(engine)
+class Lists(Base):
+    __tablename__ = "Lists"
+
+    list_id = Column(Integer, primary_key=True, autoincrement=True)
+    list_name = Column(String, unique=True, nullable=False)
+
+class ListEntries(Base):
+    __tablename__ = "ListEntries"
+
+    list_id = Column(Integer, primary_key=True)
+    series_id = Column(Integer, primary_key=True)
+    archive = Column(Integer, default=0)
+
+#Base.metadata.create_all(engine)

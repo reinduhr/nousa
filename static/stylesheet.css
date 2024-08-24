@@ -35,3 +35,24 @@
 .search-box {
     margin-top: 20px;
 }
+
+.list-container {
+    display: flex; /* Create a flex container for the list name and form */
+    justify-content: space-between; /* Push the list name to the left and form to the right */
+    align-items: center; /* Vertically center the content */
+    padding: 20px; /* Optional: Add padding around the container */
+}
+
+.list-name-container {
+    flex-grow: 1; /* Allow this div to take up the remaining space on the left */
+    margin-right: 20px; /* Optional: Add some space between the list name and form */
+    max-width: 70%;
+}
+
+.create-list-container {
+    display: flex;
+    flex-direction: column; /* Keeps the header and form stacked vertically */
+    align-items: flex-end; /* Align the content to the right */
+    max-width: 29%; /* Optional: Set a width to prevent the form from stretching too much */
+    margin-left: auto; /* Align the form container to the right side */
+}

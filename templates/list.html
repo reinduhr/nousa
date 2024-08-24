@@ -1,0 +1,81 @@
+{% include 'header.html' %}
+<div class="nousa-content">
+    <table class="table table-striped">
+        <div class="list-container">
+            <div class="list-name-container">
+                <h2>{{ list_object.list_name }}</h2>
+            </div>
+            <div class="create-list-container">
+                <h5>Rename List</h5>
+                <form action="/rename_list" method="post">
+                    <input type="text" id="rename-list" name="rename-list" placeholder="New list name">
+                    <input type="hidden" id="list-id" name="list-id" value="{{ list_id }}">
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+        <h4>Main</h4>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">Last updated</th>
+                <th scope="col">TheTVDB</th>
+                <th scope="col">IMDb</th>
+                <th scope="col">Move to Archive</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for show in series_list %}
+            <tr>
+                <form action="/delete_show" method="post">
+                <td>{{ show.series_name }}</td>
+                <td>{{ show.series_status }}</td>
+                <td>{{ show.series_last_updated.strftime('%d %b %Y %H:%M') }}</td>
+                <td>
+                {% if show.series_ext_thetvdb %}
+                <a href="http://thetvdb.com/search?query={{ show.series_ext_thetvdb }}" class="link-success">TheTVDB</a>
+                {% endif %}
+                </td>
+                <td>
+                {% if show.series_ext_imdb %}
+                <a href="http://imdb.com/title/{{ show.series_ext_imdb }}" class="link-warning">IMDb</a>
+                {% endif %}
+                </td>
+                <td><input type="hidden" name="series-id" value="{{ show.series_id }}"><input type="hidden" name="list-id" value="{{ list_id }}"><button onclick="return confirmDelete('{{ show.series_name }}')" type="submit" class="btn btn-primary">Move</button></td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+        <table class="table table-striped">
+        <h5>Archive</h5>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">Last updated</th>
+                <th scope="col">IMDb</th>
+                <th scope="col">Move to Main</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for show in archive_list %}
+            <tr>
+                <td>{{ show.series_name }}</td>
+                <td>{{ show.series_status }}</td>
+                <td>{{ show.series_last_updated.strftime('%d %b %Y %H:%M') }}</td>
+                <td>
+                    {% if show.series_ext_imdb %}
+                    <a href="http://imdb.com/title/{{ show.series_ext_imdb }}" class="link-warning">IMDb</a>
+                    {% endif %}
+                </td>
+                <form action="/add_show" method="post">
+                <td><input type="hidden" name="series-id" value="{{ show.series_id }}"><input type="hidden" name="list-id" value="{{ list_id }}"><button onclick="return confirmDelete('{{ show.series_name }}')" type="submit" class="btn btn-primary">Put it back</button></td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'footer.html' %}
