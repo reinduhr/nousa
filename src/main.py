@@ -45,8 +45,6 @@ if old_log_file.is_file():
     old_log_file.unlink()
 if old_calendar_file.is_file():
     old_calendar_file.unlink()
-# Declare variables here which are used often
-today = datetime.now()
 # Logging
 logging.basicConfig(encoding='utf-8', level=logging.INFO)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -207,6 +205,7 @@ async def add_to_series(request: Request):
             audit_logger.info(f"ADDED SHOW: {series_name_form} FROM IP: {request.client.host}")
             # Series logic
             if not series_series_id_exist:
+                today = datetime.now()
                 series_url = f"https://api.tvmaze.com/shows/{series_id}"
                 episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
                 # Create async tasks
@@ -273,6 +272,7 @@ def update_series():
         sdata = try_request_series(series_id)
         edata = try_request_episodes(series_id)
         if sdata is not None:
+            today = datetime.now()
             sdata_name = sdata['name']
             sdata_status = sdata['status']
             sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
@@ -308,6 +308,7 @@ def download_calendar(request):
     for show in myshows:
         for episode in myepisodes:
             if episode.ep_series_id == show.series_id:
+                today = datetime.now()
                 ep_date = episode.ep_airdate
                 ep_start = ep_date + timedelta(days=1) # add one day for proper calendar event start date
                 ep_end = ep_date + timedelta(days=2) # add two days for event end

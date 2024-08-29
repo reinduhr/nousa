@@ -14,9 +14,9 @@ services:
       #- /etc/timezone:/etc/timezone
       
       #2 COMMENT = PRODUCTION CONTAINER!
-    #  - type: bind
-    #    source: .
-    #    target: /code
+      #- type: bind
+      #  source: .
+      #  target: /code
 
 volumes:
   db-data:
