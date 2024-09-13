@@ -1,7 +1,7 @@
 # nousa
 Add your favorite 📺 shows and nousa will create an ical feed containing upcoming episodes!
 
-![nousa ui preview](https://github.com/reinduhr/nousa/nousa.gif)
+![nousa ui preview](https://github.com/reinduhr/nousa/blob/main/nousa.gif)
 
 This is a tool with an easy to use UI which you can access with your browser. There you can search for tv shows and add them to a list. All lists will be checked for new episodes once a week. nousa adds one day to an episode's official air date due to worldwide availability.
 
