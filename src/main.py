@@ -7,8 +7,10 @@ from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.background import BackgroundTask
 import requests
+from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
+from .init_models import Base
 from .models import engine, Series, Episodes, Lists, ListEntries
 from datetime import datetime, timedelta
 from apscheduler.triggers.cron import CronTrigger
@@ -27,6 +29,11 @@ from .ui_data import popular_tv_shows
 import subprocess
 import io
 import re # regular expression
+
+inspector = inspect(engine)
+existing_tables = inspector.get_table_names()
+if 'series' not in existing_tables:
+    Base.metadata.create_all(engine)
 
 async def db_migrations():
     result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
