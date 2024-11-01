@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 <div class="nousa-content">
-    <table class="table table-striped">
+    <table id="mainTable" class="table table-striped">
         <div class="list-container">
             <div class="list-name-container">
                 <h2>{{ list_object.list_name }}</h2>
@@ -14,12 +14,13 @@
                 </form>
             </div>
         </div>
+        {% if series_count %}
         <h4>Main</h4>
         <thead>
             <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Status</th>
-                <th scope="col">Last updated</th>
+                <th scope="col" onclick="sortTable(0, 'mainTable')" class="thClickable">Name<span class="sort-icon">⬍</span></th>
+                <th scope="col" onclick="sortTable(1, 'mainTable')" class="thClickable">Status<span class="sort-icon">⬍</span></th>
+                <th scope="col" onclick="sortTable(2, 'mainTable', true)" class="thClickable">Last updated<span class="sort-icon">⬍</span></th>
                 <th scope="col">TheTVDB</th>
                 <th scope="col">IMDb</th>
                 <th scope="col">Move to Archive</th>
@@ -47,14 +48,18 @@
             </tr>
             {% endfor %}
         </tbody>
+        {% else %}
+        <h3>Your main list is empty</h3>
+        {% endif %}
         </table>
-        <table class="table table-striped">
+        {% if archive_count %}
+        <table id="archiveTable" class="table table-striped">
         <h5>Archive</h5>
         <thead>
             <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Status</th>
-                <th scope="col">Last updated</th>
+                <th scope="col" onclick="sortTable(0, 'archiveTable')" class="thClickable">Name<span class="sort-icon">⬍</span></th>
+                <th scope="col" onclick="sortTable(1, 'archiveTable')" class="thClickable">Status<span class="sort-icon">⬍</span></th>
+                <th scope="col" onclick="sortTable(2, 'archiveTable', true)" class="thClickable">Last updated<span class="sort-icon">⬍</span></th>
                 <th scope="col">IMDb</th>
                 <th scope="col">Move to Main</th>
             </tr>
@@ -77,5 +82,6 @@
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 </div>
 {% include 'footer.html' %}

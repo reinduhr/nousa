@@ -17,11 +17,11 @@ COPY ./alembic.ini .
 RUN pip install -r requirements.txt --no-cache-dir
 RUN chmod +x ./src/*.py
 RUN chmod +x ./src/versions/*.py
+EXPOSE 5000
 
 # ENVIRONMENT VARIABLES
-ENV TZ=Europe/Amsterdam
+#ENV TZ=Europe/Amsterdam
 ENV PYTHONPATH="/code/src"
-EXPOSE 5000
 
 #3 USER (COMMENT USER OUT FOR DEV CONTAINER!)
 RUN mkdir -m 770 data
@@ -33,9 +33,3 @@ USER nousa
 #CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
 # PROD
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]
-
-# NOT IN USE
-#CMD alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
-#RUN alembic upgrade head
-#CMD ["alembic", "upgrade", "head"]
-#CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]

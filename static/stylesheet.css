@@ -56,3 +56,18 @@
     max-width: 29%; /* Optional: Set a width to prevent the form from stretching too much */
     margin-left: auto; /* Align the form container to the right side */
 }
+
+.thClickable {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.thClickable:hover {
+    color: #acacac;
+    text-decoration: none;
+}
+
+.sort-icon {
+    font-size: 1em; /* Smaller icon size */
+    margin-left: 5px; /* Space between text and icon */
+}

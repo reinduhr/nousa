@@ -4,7 +4,6 @@ from starlette.requests import Request
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
 from starlette.background import BackgroundTask
 import requests
 from sqlalchemy import inspect
@@ -22,40 +21,38 @@ from pathlib import Path
 import time
 import logging
 from logging.handlers import TimedRotatingFileHandler
-import secrets
 import aiohttp
 import asyncio
 from .ui_data import popular_tv_shows
 import subprocess
 import io
-import re # regular expression
+import re
 
+# create tables from init_models.py if tables do not exist
 inspector = inspect(engine)
 existing_tables = inspector.get_table_names()
 if 'series' not in existing_tables:
     Base.metadata.create_all(engine)
 
-async def db_migrations():
-    result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
-    if result.returncode != 0:
-        logging.error(f"Alembic database migrations failed: {result.stderr}")
-
-# Create SQLAlchemy session
+# create SQLAlchemy session
 Session = sessionmaker(bind=engine)
 session = Session()
-# Instantiating the web templates
+
+# instantiating the web templates
 templates = Jinja2Templates(directory="templates")
-# Delete unused files
+
+# delete unused files
 old_log_file = Path('/code/data/nousa.log')
 old_calendar_file = Path('/code/data/nousa.ics')
 if old_log_file.is_file():
     old_log_file.unlink()
 if old_calendar_file.is_file():
     old_calendar_file.unlink()
-# Logging
+
+# logging
 logging.basicConfig(encoding='utf-8', level=logging.INFO)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-logging.getLogger('apscheduler').setLevel(logging.INFO)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
+logging.getLogger('apscheduler').setLevel(logging.WARN)
 def open_log():
     log_path = Path('/code/data/log')
     log_path.mkdir(parents=True, mode=0o770, exist_ok=True)
@@ -67,7 +64,8 @@ try:
     open_log()
 except:
     logging.error("can't open log")
-# Audit Logging
+
+# audit logging
 def setup_audit_logger():
     audit_logger = logging.getLogger('audit_logger')
     audit_logger.setLevel(logging.INFO)
@@ -79,9 +77,11 @@ def setup_audit_logger():
     return audit_logger
 audit_logger = setup_audit_logger()
 
-async def homepage(request): # /
+# route for home page
+async def homepage(request):
     return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
 
+# route for search and search results
 async def search(request: Request):
     lists = session.query(Lists).all()
     form = await request.form()
@@ -93,11 +93,16 @@ async def search(request: Request):
     data = response.json()
     return templates.TemplateResponse('search_result.html', {'request': request, 'data': data, 'lists': lists})
 
-async def fetch_data(url): # asynchronous api calls used in add_to_database()
+# asynchronous api calls used in add_to_database()
+async def fetch_data(url):
     async with aiohttp.ClientSession() as aiosession:
 	    async with aiosession.get(url) as aioresponse:
                 return await aioresponse.json()
 
+# scheduler runs a weekly cronjob; 'update_series'
+# the function 'update_series' runs 'try_request_series'
+# the function 'try_request_series' runs 'request_series', and retries if it fails
+# After a successful run all TV show data has been refreshed
 def request_series(series_id):
     try:
         response_series = requests.get(f"https://api.tvmaze.com/shows/{series_id}", timeout=10)
@@ -164,6 +169,7 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         logging.error(err)
     return None
 
+# add episode data to Episodes table in db
 def add_episodes(series_id, edata):
     for element in edata:
         ep_id = element.get("id")
@@ -176,6 +182,7 @@ def add_episodes(series_id, edata):
         session.add(episodes)
         session.commit()
 
+# add TV show to ListEntries table and Series table
 async def add_to_series(request: Request):
     form = await request.form()
     series_id_form = form.get("series-id")  # "series-id" is taken from search_result.html input name value
@@ -202,7 +209,6 @@ async def add_to_series(request: Request):
                 message = f"{series_series.series_name} has been moved to main"
             else:
                 message = f"{series_name_form} is already in list {list_id}"
-            #return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
             redirect_url = f"/list/{list_id}"
             return RedirectResponse(url=redirect_url)
         elif le_exist == 0:
@@ -248,8 +254,8 @@ async def add_to_series(request: Request):
         session.close()
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
-    #return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
 
+# move TV show from Main to Archive
 async def add_to_archive(request):
     form_data = await request.form()
     series_id_form = form_data['series-id'] # input id of serie to be deleted
@@ -297,9 +303,11 @@ def update_series():
     session.close()
     logging.info("update_series success")
 
-def download_redirect(request): # redirect old to new link
+# a redirect to handle download link from before Lists were added
+def download_redirect(request):
     return RedirectResponse(url=f"/subscribe/1")
 
+# download calendar
 def download_calendar(request):
     list_id = request.path_params['list_id']
     calendar_file_memory = io.BytesIO()
@@ -348,11 +356,13 @@ def download_calendar(request):
     headers = {'Content-Disposition': 'attachment; filename="nousa.ics"'}
     return StreamingResponse(calendar_file_memory, media_type="text/calendar", headers=headers)
 
+#  route for /lists
 async def lists_page(request):
     lists = session.query(Lists).all()
     session.close()
     return templates.TemplateResponse('lists.html', {'request': request, 'lists': lists, 'selected_lists': True})
 
+# route e.g.: /list/1
 async def list_page(request):
     list_id_path = request.path_params['list_id']
     try:
@@ -371,8 +381,19 @@ async def list_page(request):
             archive_array.append(list_item.series_id)
     series_list = session.query(Series).filter(Series.series_id.in_(series_array)).order_by(Series.series_status.desc())
     archive_list = session.query(Series).filter(Series.series_id.in_(archive_array)).order_by(Series.series_status.desc())
+    archive_count = session.query(Series).filter(Series.series_id.in_(archive_array)).count()
+    series_count = session.query(Series).filter(Series.series_id.in_(series_array)).count()
     session.close()
-    return templates.TemplateResponse('list.html', {'request': request, 'listentries_list': listentries_list, 'series_list': series_list, 'archive_list': archive_list, 'list_id': list_id, 'list_object': list_object, 'lists': lists})
+    return templates.TemplateResponse('list.html', {'request': request, 
+                                                    'listentries_list': listentries_list, 
+                                                    'series_list': series_list, 
+                                                    'archive_list': archive_list, 
+                                                    'list_id': list_id, 
+                                                    'list_object': list_object, 
+                                                    'lists': lists,
+                                                    'archive_count': archive_count,
+                                                    'series_count': series_count
+                                                    })
 
 async def create_list(request):
     lists = session.query(Lists).all() # query data for response
@@ -423,14 +444,18 @@ async def rename_list(request):
     session.close()
     return RedirectResponse(url=f"/list/{list_id}")
 
-jobstores = {
-    'default': SQLAlchemyJobStore(engine=engine)
-}
+# Alembic database migrations
+async def db_migrations():
+    result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
+    if result.returncode != 0:
+        logging.error(f"Alembic database migrations failed: {result.stderr}")
 
+# scheduler
+jobstores = {'default': SQLAlchemyJobStore(engine=engine)}
 scheduler = AsyncIOScheduler(jobstores=jobstores)
 scheduler.start()
-
-try: # check if job already exists in order to avoid conflict when adding job to db
+# check if update_series job already exists in order to avoid conflict when adding job to db
+try:
     existing_job = scheduler.get_job(job_id='update_series')
     if existing_job:
         logging.info("update_series job already exists. not adding new job.")
@@ -459,7 +484,4 @@ routes = [
     Route("/subscribe/{list_id}", endpoint=download_calendar, methods=["GET"]),
 ]
 
-app = Starlette(debug=True, routes=routes, on_startup=[db_migrations, update_series])
-
-sess_key = secrets.token_hex()
-app.add_middleware(SessionMiddleware, secret_key=sess_key, max_age=3600)
+app = Starlette(debug=True, routes=routes, on_startup=[db_migrations])
