@@ -1,7 +1,7 @@
 FROM python:3.12.4-slim
 WORKDIR /code
 RUN addgroup --gid 3333 nousa
-RUN adduser --uid 3333 --gid 3333 --no-create-home nousa
+RUN adduser --uid 3333 --gid 3333 --no-create-home --disabled-password --shell /usr/sbin/nologin nousa
 
 # DEPENDENCIES
 RUN apt-get update && apt-get install -y sqlite3
@@ -20,7 +20,6 @@ RUN chmod +x ./src/versions/*.py
 EXPOSE 5000
 
 # ENVIRONMENT VARIABLES
-#ENV TZ=Europe/Amsterdam
 ENV PYTHONPATH="/code/src"
 
 #3 USER (COMMENT USER OUT FOR DEV CONTAINER!)

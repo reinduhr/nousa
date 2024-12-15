@@ -6,7 +6,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.background import BackgroundTask
 import requests
-from sqlalchemy import inspect
+from sqlalchemy import inspect, select, update, delete, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from .init_models import Base
@@ -14,6 +14,7 @@ from .models import engine, Series, Episodes, Lists, ListEntries
 from datetime import datetime, timedelta
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.jobstores.base import ConflictingIdError
@@ -83,7 +84,7 @@ async def homepage(request):
 
 # route for search and search results
 async def search(request: Request):
-    lists = session.query(Lists).all()
+    lists = session.scalars(select(Lists)).all()
     form = await request.form()
     series_name = form.get('series-name')
     try:
@@ -99,8 +100,8 @@ async def fetch_data(url):
 	    async with aiosession.get(url) as aioresponse:
                 return await aioresponse.json()
 
-# scheduler runs a weekly cronjob; 'update_series'
-# the function 'update_series' runs 'try_request_series'
+# scheduler runs a weekly cronjob; 'series_update'
+# the function 'series_update' runs 'try_request_series'
 # the function 'try_request_series' runs 'request_series', and retries if it fails
 # After a successful run all TV show data has been refreshed
 def request_series(series_id):
@@ -118,19 +119,18 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
         if result is not None:
             return result
         retries += 1
-        logging.error(f'update_series series retry {retries}')
+        logging.error(f'series_update series retry {retries}')
         time.sleep(delay)
     try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id='update_series_try_request_series')
+        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_series_{series_id}')
         if existing_job:
-            logging.info("update_series_try_request_series job already exists. not adding new job.")
+            logging.info("series_update_retry_request_series job already exists. not adding new job.")
         else:
             scheduler.add_job(
-                update_series,
+                func=series_update(series_id),
                 trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id='update_series_try_request_series',
-                misfire_grace_time=86400,
-                coalescing=True,
+                id=f'series_update_retry_request_series_{series_id}',
+                coalesce=True
             )
     except ConflictingIdError as err:
         logging.error(err)
@@ -151,19 +151,18 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         if result is not None:
             return result
         retries += 1
-        logging.error(f'update_series episodes retry {retries}')
+        logging.error(f'series_update episodes retry {retries}')
         time.sleep(delay)
     try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id='update_series_try_request_episodes')
+        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_episodes_{series_id}')
         if existing_job:
-            logging.info("update_series_try_request_series job already exists. not adding new job.")
+            logging.info("series_update_retry_request_series job already exists. not adding new job.")
         else:
             scheduler.add_job(
-                update_series,
+                func=series_update(series_id),
                 trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id='update_series_try_request_episodes',
-                misfire_grace_time=86400,
-                coalescing=True,
+                id=f'series_update_retry_request_episodes_{series_id}',
+                coalesce=True
             )
     except ConflictingIdError as err:
         logging.error(err)
@@ -196,28 +195,47 @@ async def add_to_series(request: Request):
         message = "Error: Invalid input. Try again, but no tricks this time ;)"
         return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
     try:
-        series_series_id_exist = session.query(Series).get(series_id)
-        series_series = session.query(Series).filter_by(series_id=int(series_id)).first()
-        le_exist = session.query(ListEntries).filter_by(list_id=int(list_id), series_id=int(series_id)).count()
-        le_exist_archive = session.query(ListEntries).filter_by(list_id=list_id, series_id=series_id, archive=1).count()
+        series_exist = session.get(Series, series_id)
+        
+        le_exist = session.scalars(select(ListEntries).where(
+                ListEntries.list_id == int(list_id),
+                ListEntries.series_id == int(series_id)
+            )
+        ).first()
+
+        le_exist_archive = session.scalars(select(ListEntries).where(
+                ListEntries.list_id == int(list_id),
+                ListEntries.series_id == int(series_id),
+                ListEntries.archive == 1
+            )
+        ).first()
+
         # ListEntries logic
-        if le_exist == 1:
-            if le_exist_archive == 1:
-                session.query(ListEntries).filter_by(list_id=int(list_id), series_id=int(series_id)).update({"archive": 0}, synchronize_session='fetch')
+        if le_exist is not None:
+            if le_exist_archive is not None:
+                
+                session.execute(update(ListEntries).where(
+                    ListEntries.list_id == int(list_id),
+                    ListEntries.series_id == int(series_id)
+                )
+                .values(archive=0)
+                .execution_options(synchronize_session="fetch"))
+                
                 session.commit()
-                audit_logger.info(f"MOVED SHOW FROM ARCHIVE TO MAIN: {series_series.series_name} FROM IP: {request.client.host}")
-                message = f"{series_series.series_name} has been moved to main"
+                audit_logger.info(f"MOVED SHOW FROM ARCHIVE TO MAIN: {series_exist.series_name} FROM IP: {request.client.host}")
+                message = f"{series_exist.series_name} has been moved to main"
             else:
                 message = f"{series_name_form} is already in list {list_id}"
             redirect_url = f"/list/{list_id}"
             return RedirectResponse(url=redirect_url)
-        elif le_exist == 0:
+        elif le_exist is None:
             add_series = ListEntries(list_id=int(list_id), series_id=int(series_id))
             session.add(add_series)
             session.commit()
             audit_logger.info(f"ADDED SHOW: {series_name_form} FROM IP: {request.client.host}")
+
             # Series logic
-            if not series_series_id_exist:
+            if not series_exist:
                 today = datetime.now()
                 series_url = f"https://api.tvmaze.com/shows/{series_id}"
                 episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
@@ -266,42 +284,110 @@ async def add_to_archive(request):
     except:
         message = "Error: Invalid input. Try again, but no tricks this time"
         return templates.TemplateResponse("index.html", {"request": request, "message": message})
-    show_exists = session.query(ListEntries).filter_by(series_id=series_id, list_id=list_id).count()
-    if show_exists > 0:
-        session.query(ListEntries).filter_by(list_id=int(list_id), series_id=int(series_id)).update({"archive": 1}, synchronize_session='fetch')
+    show_exists = session.scalars(select(ListEntries).where(
+            ListEntries.list_id == int(list_id),
+            ListEntries.series_id == int(series_id)
+        )
+    ).first()
+    if show_exists is not None:
+        session.execute(update(ListEntries).where(
+                    ListEntries.list_id == int(list_id),
+                    ListEntries.series_id == int(series_id)
+                )
+                .values(archive=1)
+                .execution_options(synchronize_session="fetch"))
         session.commit()
-    show_name = session.query(Series.series_name).filter_by(series_id=series_id).scalar()
+    show_name = session.scalar(
+        select(Series.series_name).where(Series.series_id == series_id)
+    )
     session.close()
     audit_logger.info(f"ARCHIVED SHOW: {show_name} FROM IP: {request.client.host}")
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
 
-# update_series refreshes series and episodes data. scheduler automates it.
-def update_series():
-    series_list = session.query(Series.series_id).all()
+# series_update refreshes series and episodes data. scheduler automates it.
+def schedule_series_update():
+    if scheduler.get_job(job_id='update_series'):
+        scheduler.remove_job(job_id='update_series')
+    
+    series_list = session.execute(select(Series.series_id)).scalars().all()
     # Series
-    for series_tuple in series_list:
-        series_id = series_tuple[0]
-        sdata = try_request_series(series_id)
-        edata = try_request_episodes(series_id)
-        if sdata is not None:
-            today = datetime.now()
-            sdata_name = sdata['name']
-            sdata_status = sdata['status']
-            sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
-            sdata_ext_imdb = sdata['externals'].get('imdb')
-            session.query(Series).filter(Series.series_id == series_id).update({Series.series_name: sdata_name, Series.series_status: sdata_status, Series.series_ext_thetvdb: sdata_ext_thetvdb, Series.series_ext_imdb: sdata_ext_imdb, Series.series_last_updated: today})
-        # Episodes
-        if edata is not None:
-            # Delete old episode data
-            session.query(Episodes).filter_by(ep_series_id=series_id).delete()
-            session.commit()
-            # Add new episode data
-            add_episodes(series_id, edata)
+    for index, series_id in enumerate(series_list):
+        now = datetime.now()
+        job_run_time = now + timedelta(minutes=(5 * index))
+        logging.info(f"job run time: {job_run_time}")
+
+        try:
+            existing_job = scheduler.get_job(job_id=f'series_update_{series_id}')
+            if existing_job:
+                logging.info(f"series_update_{series_id} job already exists. not adding new job.")
+            else:
+                scheduler.add_job(
+                    func=series_update,
+                    args=[series_id],
+                    trigger=DateTrigger(run_date=job_run_time),
+                    id=f'series_update_{series_id}',
+                    name=f'series_update_{series_id}',
+                    coalesce=True, # if multiple jobs did not run, discard all others and run only one job.
+                    jobstore='single_show_updates'
+                )
+        except ConflictingIdError as err:
+            logging.error(err)
+
+def reschedule_series_update_missed_jobs():
+    now = datetime.now()
+    missed_jobs = []
+
+    job_exists = scheduler.get_job(job_id='series_update', jobstore='default')
+    if job_exists and job_exists.next_run_time.replace(tzinfo=None) < now:
+        scheduler.remove_all_jobs(jobstore='single_show_updates')
+        return
+
+    for job in scheduler.get_jobs():
+        next_run = job.next_run_time.replace(tzinfo=None)
+        if next_run and next_run < now:
+            missed_jobs.append(job)
+
+    for index, job in enumerate(missed_jobs):
+        rescheduled_run_time = now + timedelta(minutes=(5 * index))
+        logging.info(f"debug reschedule missed job: {job}")
+        scheduler.reschedule_job(
+            job_id=job.id,
+            trigger=DateTrigger(run_date=rescheduled_run_time)
+        )
+
+def series_update(series_id):
+    sdata = try_request_series(series_id)
+    edata = try_request_episodes(series_id)
+    if sdata is not None:
+        today = datetime.now()
+        sdata_name = sdata['name']
+        sdata_status = sdata['status']
+        sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
+        sdata_ext_imdb = sdata['externals'].get('imdb')
+
+        session.execute(
+            update(Series)
+            .where(Series.series_id == series_id)
+            .values(
+                series_name=sdata_name,
+                series_status=sdata_status,
+                series_ext_thetvdb=sdata_ext_thetvdb,
+                series_ext_imdb=sdata_ext_imdb,
+                series_last_updated=today,
+            )
+        )
+
+    # Episodes
+    if edata is not None:
+        # Delete old episode data
+        session.execute(delete(Episodes).where(Episodes.ep_series_id == series_id))
         session.commit()
-        time.sleep(45) # one should not put too much pressure on a public api
+        # Add new episode data
+        add_episodes(series_id, edata)
+    session.commit()
     session.close()
-    logging.info("update_series success")
+    logging.info("series_update success. series_id: %s", series_id)
 
 # a redirect to handle download link from before Lists were added
 def download_redirect(request):
@@ -314,12 +400,23 @@ def download_calendar(request):
     calendar_file_memory.write(b"BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
     # filter episodes so only episodes between one year ago and one year into the future get into the calendar
     one_year_ago = datetime.now() - timedelta(days=365)
-    one_year_future = datetime.now() + timedelta(days=365)
-    myshows = session.query(Series).join(ListEntries, Series.series_id == ListEntries.series_id).filter(ListEntries.list_id == list_id).all()
-    myepisodes = session.query(Episodes).\
-        join(ListEntries, Episodes.ep_series_id == ListEntries.series_id).\
-        filter(ListEntries.list_id == list_id, ListEntries.archive == 0, Episodes.ep_airdate >= one_year_ago, Episodes.ep_airdate <= one_year_future).all()
+    one_year_future = datetime.now() + timedelta(days=365)    
+    myshows = session.execute(select(Series)
+        .join(ListEntries, Series.series_id == ListEntries.series_id)
+        .where(ListEntries.list_id == list_id)
+    ).scalars().all()
+
+    myepisodes = session.execute(select(Episodes)
+        .join(ListEntries, Episodes.ep_series_id == ListEntries.series_id)
+        .where(
+            ListEntries.list_id == list_id,
+            ListEntries.archive == 0,
+            Episodes.ep_airdate >= one_year_ago,
+            Episodes.ep_airdate <= one_year_future
+        )
+    ).scalars().all()
     session.close()
+
     for show in myshows:
         for episode in myepisodes:
             if episode.ep_series_id == show.series_id:
@@ -358,7 +455,7 @@ def download_calendar(request):
 
 #  route for /lists
 async def lists_page(request):
-    lists = session.query(Lists).all()
+    lists = session.execute(select(Lists)).scalars().all()
     session.close()
     return templates.TemplateResponse('lists.html', {'request': request, 'lists': lists, 'selected_lists': True})
 
@@ -369,9 +466,11 @@ async def list_page(request):
         list_id = int(list_id_path)
     except:
         return RedirectResponse(url="/")
-    listentries_list = session.query(ListEntries).filter_by(list_id=list_id).all()
-    lists = session.query(Lists).all()
-    list_object = session.query(Lists).filter(Lists.list_id == list_id).first()
+
+    listentries_list = session.execute(select(ListEntries).where(ListEntries.list_id == list_id)).scalars().all()
+    lists = session.execute(select(Lists)).scalars().all()
+    list_object = session.execute(select(Lists).where(Lists.list_id == list_id)).scalars().first()
+
     series_array = []
     archive_array = []
     for list_item in listentries_list:
@@ -379,11 +478,13 @@ async def list_page(request):
             series_array.append(list_item.series_id)
         elif list_item.archive == 1:
             archive_array.append(list_item.series_id)
-    series_list = session.query(Series).filter(Series.series_id.in_(series_array)).order_by(Series.series_status.desc())
-    archive_list = session.query(Series).filter(Series.series_id.in_(archive_array)).order_by(Series.series_status.desc())
-    archive_count = session.query(Series).filter(Series.series_id.in_(archive_array)).count()
-    series_count = session.query(Series).filter(Series.series_id.in_(series_array)).count()
+
+    series_list = session.execute(select(Series).where(Series.series_id.in_(series_array)).order_by(Series.series_status.desc())).scalars().all()
+    archive_list = session.execute(select(Series).where(Series.series_id.in_(archive_array)).order_by(Series.series_status.desc())).scalars().all()
+    archive_count = session.execute(select(func.count()).where(Series.series_id.in_(archive_array))).scalar_one()
+    series_count = session.execute(select(func.count()).where(Series.series_id.in_(series_array))).scalar_one()
     session.close()
+
     return templates.TemplateResponse('list.html', {'request': request, 
                                                     'listentries_list': listentries_list, 
                                                     'series_list': series_list, 
@@ -393,13 +494,13 @@ async def list_page(request):
                                                     'lists': lists,
                                                     'archive_count': archive_count,
                                                     'series_count': series_count
-                                                    })
+                                                })
 
 async def create_list(request):
-    lists = session.query(Lists).all() # query data for response
+    lists = session.execute(select(Lists)).scalars().all()
     form_data = await request.form()
     user_input = form_data.get('create-list')
-    name_check = session.query(Lists).filter(Lists.list_name == user_input).first()
+    name_check = session.execute(select(Lists).where(Lists.list_name == user_input)).scalars().first()
     session.close()
     # validate to only accept letters and numbers
     pattern = r'^[a-zA-Z0-9]+$'
@@ -411,7 +512,7 @@ async def create_list(request):
             new_list = Lists(list_name=user_input)
             session.add(new_list)
             session.commit()
-            lists = session.query(Lists).all() # query data for response
+            lists = session.execute(select(Lists)).scalars().all()
             session.close()
             message = f"{user_input} has been created"
             audit_logger.info(f"CREATED LIST: {user_input} FROM IP: {request.client.host}")
@@ -434,12 +535,16 @@ async def rename_list(request):
     if not re.match(pattern, user_input):
         message = "Only letters and numbers are accepted"
         return templates.TemplateResponse('index.html', {'request': request, 'message': message})
-    name_check = session.query(Lists).filter(Lists.list_name == user_input).count()
+    name_check = session.execute(select(func.count()).where(Lists.list_name == user_input)).scalar_one()
     if name_check > 0:
         message = "A list with that name exists already"
         return templates.TemplateResponse('index.html', {'request': request, 'message': message})
     else:
-        session.query(Lists).filter_by(list_id=int(list_id)).update({"list_name": user_input}, synchronize_session='fetch')
+        session.execute(update(Lists)
+            .where(Lists.list_id == int(list_id))
+            .values(list_name=user_input)
+            .execution_options(synchronize_session='fetch')
+        )
         session.commit()
     session.close()
     return RedirectResponse(url=f"/list/{list_id}")
@@ -451,21 +556,26 @@ async def db_migrations():
         logging.error(f"Alembic database migrations failed: {result.stderr}")
 
 # scheduler
-jobstores = {'default': SQLAlchemyJobStore(engine=engine)}
+jobstores = {
+    'default': SQLAlchemyJobStore(engine=engine), 
+    'single_show_updates': SQLAlchemyJobStore(engine=engine)
+}
 scheduler = AsyncIOScheduler(jobstores=jobstores)
-scheduler.start()
-# check if update_series job already exists in order to avoid conflict when adding job to db
+scheduler.start(paused=True)
+reschedule_series_update_missed_jobs()
+scheduler.resume()
+# check if series_update job already exists in order to avoid conflict when adding job to db
 try:
-    existing_job = scheduler.get_job(job_id='update_series')
+    existing_job = scheduler.get_job(job_id='series_update')
     if existing_job:
-        logging.info("update_series job already exists. not adding new job.")
+        logging.info("series_update job already exists. not adding new job.")
     else:
         scheduler.add_job(
-            update_series,
-            trigger=CronTrigger(day_of_week='sun', hour=3, jitter=600), # job runs every Sunday around 3AM
-            id='update_series',
-            misfire_grace_time=86400, # if job did not run, try again if 24 hours (86400 seconds) have passed
-            coalescing=True, # if multiple jobs did not run, discard all others and run only one job
+            func=schedule_series_update,
+            trigger=CronTrigger(day_of_week='sun', hour=1, jitter=600), # job runs every Sunday around 1AM
+            id='series_update',
+            coalesce=True, # if multiple jobs did not run, discard all others and run only one job
+            jobstore='default'
         )
 except ConflictingIdError as err:
     logging.error(err)

@@ -9,10 +9,6 @@ services:
       - "5000:5000"  # host:container
     volumes:
       - db-data:/code/data
-      # how to set time to localtime instead of default UTC? I do NOT know! 
-      #- /etc/localtime:/etc/localtime
-      #- /etc/timezone:/etc/timezone
-      
       #2 COMMENT = PRODUCTION CONTAINER!
       #- type: bind
       #  source: .
