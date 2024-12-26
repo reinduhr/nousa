@@ -127,7 +127,8 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
             logging.info("series_update_retry_request_series job already exists. not adding new job.")
         else:
             scheduler.add_job(
-                func=series_update(series_id),
+                func=series_update,
+                args=[series_id],
                 trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
                 id=f'series_update_retry_request_series_{series_id}',
                 coalesce=True
@@ -159,7 +160,8 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
             logging.info("series_update_retry_request_series job already exists. not adding new job.")
         else:
             scheduler.add_job(
-                func=series_update(series_id),
+                func=series_update,
+                args=[series_id],
                 trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
                 id=f'series_update_retry_request_episodes_{series_id}',
                 coalesce=True
