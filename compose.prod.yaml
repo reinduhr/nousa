@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: nousa
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    user: 3333:3333
+    ports:
+      - "5000:5000" # host:container
+    volumes:
+      - db-data:/code/data
+
+volumes:
+  db-data:

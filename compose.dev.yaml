@@ -1,0 +1,16 @@
+services:
+  app:
+    container_name: nousa_dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000" # host:container
+    volumes:
+      - db-data:/code/data
+      - type: bind
+        source: .
+        target: /code
+
+volumes:
+  db-data:
