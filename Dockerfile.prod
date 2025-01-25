@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y sqlite3
 COPY ./src ./src
 COPY ./static ./static
 COPY ./templates ./templates
-COPY ./compose.yaml .
-COPY ./Dockerfile .
 COPY ./requirements.txt .
 COPY ./alembic.ini .
 RUN pip install -r requirements.txt --no-cache-dir
@@ -22,10 +20,22 @@ EXPOSE 5000
 # ENVIRONMENT VARIABLES
 ENV PYTHONPATH="/code/src"
 
+#
+# ENV TZ="Europe/Berlin"
+#
+# ENV SENDER_EMAIL="send@example.com"
+# ENV SENDER_PASSWORD="supersecretpassword"
+#
+# ENV RECEIVER_EMAIL="receive@example.com"
+#
+# ENV SMTP_SERVER="smtp.example.com"
+# ENV SMTP_PORT=587
+#
+
 #3 USER
 RUN mkdir -m 770 data
-RUN chown -R 3333:3333 data
-USER nousa
+RUN chown -R nousa /code
+#USER nousa
 
 #4 LAUNCH!
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]

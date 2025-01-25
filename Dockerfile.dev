@@ -20,9 +20,21 @@ EXPOSE 5000
 # ENVIRONMENT VARIABLES
 ENV PYTHONPATH="/code/src"
 
-#3 USER
+#
+# ENV TZ="Europe/Berlin"
+#
+# ENV SENDER_EMAIL="send@example.com"
+# ENV SENDER_PASSWORD="supersecretpassword"
+#
+# ENV RECEIVER_EMAIL="receive@example.com"
+#
+# ENV SMTP_SERVER="smtp.example.com"
+# ENV SMTP_PORT=587
+#
+
+# USER
 RUN mkdir -m 770 data
 RUN chown -R 3333:3333 data
 
-#4 LAUNCH!
+# LAUNCH!
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]

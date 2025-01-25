@@ -1,6 +1,8 @@
 services:
   app:
     container_name: nousa_dev
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: Dockerfile.dev

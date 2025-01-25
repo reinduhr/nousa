@@ -5,29 +5,34 @@ from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.background import BackgroundTask
+
 import requests
+import aiohttp
+import asyncio
+
 from sqlalchemy import inspect, select, update, delete, func
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError, PendingRollbackError
+from sqlalchemy.exc import PendingRollbackError
+
 from .init_models import Base
+from .ui_data import popular_tv_shows
+from .mail import create_mail
 from .models import engine, Series, Episodes, Lists, ListEntries
-from datetime import datetime, timedelta
+
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.jobstores.base import ConflictingIdError
+
+import subprocess
+import io
+import re
+from datetime import datetime, timedelta
 from pathlib import Path
 import time
 import logging
 from logging.handlers import TimedRotatingFileHandler
-import aiohttp
-import asyncio
-from .ui_data import popular_tv_shows
-import subprocess
-import io
-import re
 
 # create tables from init_models.py if tables do not exist
 inspector = inspect(engine)
@@ -63,8 +68,8 @@ def open_log():
     logging.root.addHandler(file_handler) # Add the FileHandler to the root logger. root logger has most permissions
 try:
     open_log()
-except:
-    logging.error("can't open log")
+except Exception as err:
+    logging.error(f"can't open log: {err}")
 
 # audit logging
 def setup_audit_logger():
@@ -172,24 +177,29 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
 
 # add episode data to Episodes table in db
 def add_episodes(series_id, edata):
-    for element in edata:
-        ep_id = element.get("id")
-        ep_name = element.get("name")
-        ep_season = element.get("season")
-        ep_number = element.get("number")
-        ep_airdate = element.get("airdate")
-        date_time_obj = datetime.strptime(ep_airdate, "%Y-%m-%d")
-        episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=date_time_obj)
-        session.add(episodes)
-        session.commit()
+    for episode in edata:
+        ep_id = episode.get("id")
+        ep_name = episode.get("name")
+        ep_season = episode.get("season")
+        ep_number = episode.get("number")
+        ep_airdate_str = episode.get("airdate")
+        ep_airdate = datetime.strptime(ep_airdate_str, "%Y-%m-%d")
+        # filter episodes so only episodes between one year ago and one year into the future get into the calendar
+        one_year_ago = datetime.now() - timedelta(days=365)
+        one_year_future = datetime.now() + timedelta(days=365)
+        if ep_airdate >= one_year_ago and ep_airdate <= one_year_future:
+            
+            episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=ep_airdate)
+            session.add(episodes)
+            session.commit()
 
 # add TV show to ListEntries table and Series table
 async def add_to_series(request: Request):
     form = await request.form()
     series_id_form = form.get("series-id")  # "series-id" is taken from search_result.html input name value
     list_id_form = form.get('list-id')
-    series_name_form = form.get("series-name")
-    message = f"{series_name_form} has been added"
+    series_name = form.get("series-name")
+    message = f"{series_name} has been added"
     try:  # validate input
         series_id = int(series_id_form) 
         list_id = int(list_id_form)
@@ -227,14 +237,14 @@ async def add_to_series(request: Request):
                 audit_logger.info(f"MOVED SHOW FROM ARCHIVE TO MAIN: {series_exist.series_name} FROM IP: {request.client.host}")
                 message = f"{series_exist.series_name} has been moved to main"
             else:
-                message = f"{series_name_form} is already in list {list_id}"
+                message = f"{series_name} is already in list {list_id}"
             redirect_url = f"/list/{list_id}"
             return RedirectResponse(url=redirect_url)
         elif le_exist is None:
             add_series = ListEntries(list_id=int(list_id), series_id=int(series_id))
             session.add(add_series)
             session.commit()
-            audit_logger.info(f"ADDED SHOW: {series_name_form} FROM IP: {request.client.host}")
+            audit_logger.info(f"ADDED SHOW: {series_name} FROM IP: {request.client.host}")
 
             # Series logic
             if not series_exist:
@@ -248,7 +258,6 @@ async def add_to_series(request: Request):
                 sdata = await task1
                 edata = await task2
                 # Assign series variables
-                series_name = sdata.get("name")
                 series_status = sdata.get("status")
                 series_ext_thetvdb = sdata["externals"].get("thetvdb")
                 series_ext_imdb = sdata["externals"].get("imdb")
@@ -259,6 +268,7 @@ async def add_to_series(request: Request):
                 episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
                 logging.info(f"{series_name} has been added")
                 audit_logger.info(f"ADDED SHOW: {series_name} FROM IP: {request.client.host}")
+
                 return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
     except PendingRollbackError:
         session.rollback()
@@ -272,14 +282,26 @@ async def add_to_series(request: Request):
         return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
     finally:
         session.close()
+
+        # email notification
+        mtype = "add"
+        mail = create_mail(
+            mtype=mtype,
+            series_name=series_name,
+            list_id=list_id,
+            request=request
+        )
+        schedule_mail_job(mail)
+        
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
 
 # move TV show from Main to Archive
-async def add_to_archive(request):
+async def add_to_archive(request: Request):
     form_data = await request.form()
     series_id_form = form_data['series-id'] # input id of serie to be deleted
     list_id_form = form_data['list-id']
+    series_name = form_data['series-name']
     try:
         series_id = int(series_id_form) # validate input
         list_id = int(list_id_form)
@@ -299,11 +321,58 @@ async def add_to_archive(request):
                 .values(archive=1)
                 .execution_options(synchronize_session="fetch"))
         session.commit()
-    show_name = session.scalar(
-        select(Series.series_name).where(Series.series_id == series_id)
-    )
     session.close()
-    audit_logger.info(f"ARCHIVED SHOW: {show_name} FROM IP: {request.client.host}")
+    audit_logger.info(f"ARCHIVED SHOW: {series_name} FROM IP: {request.client.host}")
+
+    # email notification
+    mtype = "archive"
+    mail = create_mail(
+        mtype=mtype,
+        series_name=series_name,
+        list_id=list_id,
+        request=request
+    )
+    schedule_mail_job(mail)
+    
+    redirect_url = f"/list/{list_id}"
+    return RedirectResponse(url=redirect_url)
+
+# Delete series from list. If series is not on any other list: delete all series data
+async def del_series(request: Request):
+    form_data = await request.form()
+    series_id_form = form_data['series-id'] # input id of serie to be deleted
+    list_id_form = form_data['list-id']
+    series_name = form_data['series-name']
+    try:
+        series_id = int(series_id_form) # validate input
+        list_id = int(list_id_form)
+    except:
+        message = "Error: Invalid input. Try again, but no tricks this time"
+        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+    le_count = session.execute(select(func.count()).where(ListEntries.series_id == series_id)).scalar_one()
+    if le_count > 1: # if series is on more than 1 list: delete entry from ListEntries
+        session.execute(delete(ListEntries).where(
+            (ListEntries.series_id == series_id) & (ListEntries.list_id == list_id)
+        ))
+        session.commit()
+    if le_count <= 1: # if series is on 1 or less lists: delete everything
+        session.execute(delete(Episodes).where(Episodes.ep_series_id == series_id))
+        session.execute(delete(ListEntries).where(ListEntries.series_id == series_id))
+        session.execute(delete(Series).where(Series.series_id == series_id))
+        session.commit()
+    session.close()
+    audit_logger.info(f"DELETED SHOW: {series_name} FROM IP: {request.client.host}")
+
+    # email notification
+    mtype = "delete"
+    mail = create_mail(
+        mtype=mtype,
+        series_name=series_name,
+        list_id=list_id,
+        request=request
+    )
+    schedule_mail_job(mail)
+    
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
 
@@ -400,49 +469,42 @@ def download_calendar(request):
     list_id = request.path_params['list_id']
     calendar_file_memory = io.BytesIO()
     calendar_file_memory.write(b"BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:nousa\nCALSCALE:GREGORIAN\n")
-    # filter episodes so only episodes between one year ago and one year into the future get into the calendar
-    one_year_ago = datetime.now() - timedelta(days=365)
-    one_year_future = datetime.now() + timedelta(days=365)    
-    myshows = session.execute(select(Series)
+
+    shows = session.execute(select(Series)
         .join(ListEntries, Series.series_id == ListEntries.series_id)
         .where(ListEntries.list_id == list_id)
     ).scalars().all()
 
-    myepisodes = session.execute(select(Episodes)
+    episodes = session.execute(select(Episodes)
         .join(ListEntries, Episodes.ep_series_id == ListEntries.series_id)
         .where(
             ListEntries.list_id == list_id,
-            ListEntries.archive == 0,
-            Episodes.ep_airdate >= one_year_ago,
-            Episodes.ep_airdate <= one_year_future
+            ListEntries.archive == 0
         )
     ).scalars().all()
     session.close()
 
-    for show in myshows:
-        for episode in myepisodes:
+    for show in shows:
+        for episode in episodes:
             if episode.ep_series_id == show.series_id:
-                today = datetime.now()
-                ep_date = episode.ep_airdate
-                ep_start = ep_date + timedelta(days=1) # add one day for proper calendar event start date
-                ep_end = ep_date + timedelta(days=2) # add two days for event end
+                now = datetime.now()
+                ep_start = episode.ep_airdate + timedelta(days=1) # add one day for proper calendar event start date
+                ep_end = episode.ep_airdate + timedelta(days=2) # add two days for event end
                 start_convert = datetime.strftime(ep_start,'%Y%m%d') # convert datetime object to string
                 end_convert = datetime.strftime(ep_end,'%Y%m%d') # convert datetime object to string
-                ep_nr = '{:02d}'.format(int(episode.ep_number))
-                season_nr = '{:02d}'.format(int(episode.ep_season))
                 
                 calendar_event = (
                     "BEGIN:VEVENT\n"
-                    f"DTSTAMP:{today:%Y%m%d}T{today:%H%M%S}Z\n"
+                    f"DTSTAMP:{now:%Y%m%d}T{now:%H%M%S}Z\n"
                     f"DTSTART;VALUE=DATE:{start_convert}\n"
                     f"DTEND;VALUE=DATE:{end_convert}\n"
-                    f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\n"
-                    f"SUMMARY:{show.series_name} S{season_nr}E{ep_nr}\n"
+                    f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\\nIMDb ID: {show.series_ext_imdb}\n"
+                    f"SUMMARY:{show.series_name} S{int(episode.ep_season):02d}E{int(episode.ep_number):02d}\n"
                     f"UID:{episode.ep_id}\n"
                     "BEGIN:VALARM\n"
                     f"UID:{episode.ep_id}A\n"
                     "ACTION:DISPLAY\n"
-                    f"TRIGGER;VALUE=DATE-TIME:{start_convert}T160000Z\n"
+                    f"TRIGGER;VALUE=DATE-TIME:{start_convert}T170000Z\n"
                     f"DESCRIPTION:{show.series_name} is on tv today!\n"
                     "END:VALARM\n"
                     "END:VEVENT\n"
@@ -451,7 +513,7 @@ def download_calendar(request):
                 calendar_file_memory.write(calendar_event.encode('utf-8'))
     calendar_file_memory.write(b"END:VCALENDAR")
     calendar_file_memory.seek(0)
-    logging.info(f"success! 'download_calendar' from ip: {request.client.host}")
+    logging.info(f"Calendar from {list_id} was downloaded from IP: {request.client.host}")
     headers = {'Content-Disposition': 'attachment; filename="nousa.ics"'}
     return StreamingResponse(calendar_file_memory, media_type="text/calendar", headers=headers)
 
@@ -518,6 +580,18 @@ async def create_list(request):
             session.close()
             message = f"{user_input} has been created"
             audit_logger.info(f"CREATED LIST: {user_input} FROM IP: {request.client.host}")
+            list_id = new_list.list_id
+
+            # email notification
+            mtype = "create"
+            mail = create_mail(
+                mtype=mtype,
+                list_id=list_id,
+                list_name=user_input,
+                request=request
+            )
+            schedule_mail_job(mail)
+            
             return templates.TemplateResponse('lists.html', {'request': request, 'message': message, 'lists': lists})
         else:
             message = "A list with that name exists already"
@@ -527,6 +601,8 @@ async def rename_list(request):
     form_data = await request.form()
     list_id_form = form_data.get('list-id')
     user_input = form_data.get("rename-list")
+    prev = session.execute(select(Lists).where(Lists.list_id == list_id_form)).scalar_one()
+    prev_list_name = prev.list_name
     try: # validate input
         list_id = int(list_id_form)
     except:
@@ -538,6 +614,7 @@ async def rename_list(request):
         message = "Only letters and numbers are accepted"
         return templates.TemplateResponse('index.html', {'request': request, 'message': message})
     name_check = session.execute(select(func.count()).where(Lists.list_name == user_input)).scalar_one()
+
     if name_check > 0:
         message = "A list with that name exists already"
         return templates.TemplateResponse('index.html', {'request': request, 'message': message})
@@ -548,6 +625,18 @@ async def rename_list(request):
             .execution_options(synchronize_session='fetch')
         )
         session.commit()
+
+        # email notification
+        mtype = "rename"
+        mail = create_mail(
+            mtype=mtype,
+            list_id=list_id_form,
+            list_name=user_input,
+            prev_list_name=prev_list_name,
+            request=request
+        )
+        schedule_mail_job(mail)
+        
     session.close()
     return RedirectResponse(url=f"/list/{list_id}")
 
@@ -582,12 +671,24 @@ try:
 except ConflictingIdError as err:
     logging.error(err)
 
+def schedule_mail_job(mail):
+    run_time = datetime.now() + timedelta(seconds=10)
+    scheduler.add_job(
+        func=mail.send,
+        trigger=DateTrigger(run_time),
+        id=f"mail_{run_time.strftime("%d-%m-%H-%M")}_{mail.subject}",
+        name=f"mail_{run_time.strftime("%d-%m-%H-%M")}_{mail.subject}",
+        coalesce=True,
+        jobstore='default'
+    )
+
 routes = [
     Route("/", endpoint=homepage, methods=["GET"]),
     Mount("/nousa", app=StaticFiles(directory="static"), name="static"),
     Route("/search", endpoint=search, methods=["GET", "POST"]),
     Route("/add_show", endpoint=add_to_series, methods=["GET", "POST"]),
-    Route("/delete_show", endpoint=add_to_archive, methods=["GET", "POST"]),
+    Route("/archive_show", endpoint=add_to_archive, methods=["GET", "POST"]),
+    Route("/delete_show", endpoint=del_series, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download_redirect, methods=["GET"]),
     Route("/create_list", endpoint=create_list, methods=["GET", "POST"]),
     Route("/rename_list", endpoint=rename_list, methods=["GET", "POST"]),
