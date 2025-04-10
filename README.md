@@ -1,11 +1,11 @@
 # nousa
-Add your favorite 📺 shows and nousa will create an ical feed containing upcoming episodes!
+Add your favorite 📺 shows and nousa will create an ical feed keeping you informed on upcoming episodes!
 
 ![nousa ui preview](https://github.com/reinduhr/nousa/blob/main/static/nousa.gif)
 
-This is a tool with an easy to use UI which you can access with your browser. You can search for tv shows and add them to a list. All lists will be checked for new episodes once a week. nousa adds one day to an episode's official air date due to worldwide availability.
+This is a tool with an easy to use UI which is accessible by a browser. You can search for tv shows and add them to a list. Episode data is updated once a week. nousa adds one day to an episode's official air date due to worldwide availability.
 
-See Dockerfile.dev or Dockerfile.prod for environment variables
+See Dockerfile.dev or Dockerfile.prod for environment variables\
 Container exposes port 5000\
 Mount path to data for calendar, database and logs is: /code/data\
 username:group = nousa:nousa, uid:gid = 3333:3333\
