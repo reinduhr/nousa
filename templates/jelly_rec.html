@@ -1,0 +1,60 @@
+{% include 'header.html' %}
+<div class="nousa-content">
+    <h1>Recommended Shows</h1>
+    <ul>
+        {% for recommendation in recommendations %}
+        <!-- <li>
+            <img src="{{ recommendation.url_img_medium }}" alt="cover">
+            <strong>{{ recommendation.series_name }}</strong> ({{ recommendation.year_start }} - {{
+            recommendation.year_end or "?" }})<br>
+            Status: {{ recommendation.status }}<br>
+            {{ recommendation.description|safe }}<br>
+
+            <form action="/add_show" method="post">
+                <input type="hidden" name="series-id" value="{{ recommendation.series_id }}">
+                <input type="hidden" name="series-name" value="{{ recommendation.series_name }}">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <label for="list-select" style="margin: 0;min-width:100px;">Choose a list:</label>
+                    <select id="list-select" name="list-id" class="form-control" required>
+                        {% for list in lists %}
+                        <option value="{{ list.list_id }}">{{ list.list_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Add to my shows</button>
+                </div>
+            </form>
+        </li> -->
+
+        <li class="jelly-li">
+            <!-- Left side: image -->
+            <img src="{{ recommendation.url_img_medium }}" alt="cover" style="width: 150px; height: auto; border-radius: 8px;">
+
+            <!-- Right side: content -->
+            <div>
+                <strong>{{ recommendation.series_name }}</strong>
+                ({{ recommendation.year_start }} - {{ recommendation.year_end or "" }})<br>
+                <strong>Status:</strong> {{ recommendation.status }}<br>
+                {{ recommendation.description|safe }}<br>
+
+                <form action="/add_show" method="post" style="margin-top: 10px;">
+                    <input type="hidden" name="series-id" value="{{ recommendation.series_id }}">
+                    <input type="hidden" name="series-name" value="{{ recommendation.series_name }}">
+
+                    <!-- Dropdown and button -->
+                    <div class="jelly-dropdown">
+                        <label for="list-select-{{ recommendation.series_id }}" style="margin: 0; min-width: 100px;">Choose a list:</label>
+                        <select id="list-select-{{ recommendation.series_id }}" name="list-id" class="form-control" required>
+                            {% for list in lists %}
+                            <option value="{{ list.list_id }}">{{ list.list_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary">Add to my shows</button>
+                    </div>
+                </form>
+            </div>
+        </li>
+
+        {% endfor %}
+    </ul>
+</div>
+{% include 'footer.html' %}

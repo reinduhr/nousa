@@ -32,10 +32,10 @@ ENV PYTHONPATH="/code/src"
 # ENV SMTP_PORT=587
 #
 
-#3 USER
+# USER
 RUN mkdir -m 770 data
 RUN chown -R nousa /code
 #USER nousa
 
-#4 LAUNCH!
+# LAUNCH!
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "5000"]

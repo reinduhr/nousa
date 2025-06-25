@@ -23,6 +23,15 @@
                 <a class="nav-link" href="/lists">lists</a>
                 {% endif %}
               </li>
+              {% if recommendations %}
+              <li class="nav-item">
+                {% if selected_recs %}
+                <a class="nav-link active" href="/recommendations">recommendations</a>
+                {% else %}
+                <a class="nav-link" href="/recommendations">recommendations</a>
+                {% endif %}
+              </li>
+              {% endif %}
             </ul>
           </div>
         </div>

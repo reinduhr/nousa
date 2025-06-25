@@ -3,9 +3,13 @@ import smtplib
 from email.message import EmailMessage
 import logging
 from datetime import datetime
+from sqlalchemy import select
+
+from .db import SessionLocal
+from .models import AuditLogEntry
 
 class Mailer:
-    def __init__(self, subject, body):
+    def __init__(self, body=None):
 
         self.sender_email = os.getenv("SENDER_EMAIL", None)
         self.sender_password = os.getenv("SENDER_PASSWORD", None)
@@ -15,11 +19,13 @@ class Mailer:
         self.smtp_server = os.getenv("SMTP_SERVER", None)
         self.smtp_port = os.getenv("SMTP_PORT", None)
 
-        self.subject = subject
-        self.body = body
+        self.subject = "📅 nousa 📺 tv calendar notification"
+        self.body = body or self.create_weekly_notification_email()
 
     def send(self):
-        
+            if not self.body:
+                return
+            
             # Create message container
             msg = EmailMessage()
             msg['From'] = f"nousa <{self.sender_email}>"
@@ -36,38 +42,63 @@ class Mailer:
                     server.sendmail(self.sender_email, self.receiver_email, msg.as_string())
                     logging.info(f"Mail sent successfully; {self.subject}")
             except Exception as e:
-                logging.error(f"An error occurred: {e} while trying to send mail with subject: {self.subject}")
- 
-def create_mail(mtype, series_name=None, list_id=None, request=None, list_name=None, prev_list_name=None):
-    now = datetime.now()
-
-    if mtype == "add":
-        subject = f"📅 nousa 📺 | {series_name} has been added to list {list_id}"
-        body = f"nousa self-hosted tv calendar\n\nSeries: {series_name}\nList ID: {list_id}\nTime: {now:%c}\nIP: {request.client.host}\n"
+                logging.error(f"An error occurred: {e}")
     
-    if mtype == "archive":
-        subject = f"📅 nousa 📺 | {series_name} has been archived on list {list_id}"
-        body = f"nousa self-hosted tv calendar\n\nSeries: {series_name}\nList ID: {list_id}\nTime: {now:%c}\nIP: {request.client.host}\n"
-    
-    if mtype == "delete":
-        subject = f"📅 nousa 📺 | {series_name} has been deleted from list {list_id}"
-        body = f"nousa self-hosted tv calendar\n\nSeries: {series_name}\nList ID: {list_id}\nTime: {now:%c}\nIP: {request.client.host}\n"
-    
-    if mtype == "create":
-        subject = f"📅 nousa 📺 | List {list_id} has been created with the name: {list_name}"
-        body = f"nousa self-hosted tv calendar\n\nList name: {list_name}\nList ID: {list_id}\nTime: {now:%c}\nIP: {request.client.host}\n"
+    def create_weekly_notification_email(self):
+        with SessionLocal() as session:
+            body = []
 
-    if mtype == "rename":
-        subject = f"📅 nousa 📺 | List {list_id} has been renamed from {prev_list_name} to {list_name}"
-        body = f"nousa self-hosted tv calendar\n\nPrevious list name: {prev_list_name}\nNew list name: {list_name}\nList ID: {list_id}\nTime: {now:%c}\nIP: {request.client.host}\n"
+            log_entries = session.execute(select(AuditLogEntry)
+                .where(AuditLogEntry.mail_sent == 0)
+            ).scalars().all()
 
-    mail = Mailer(
-        subject = subject,
-        body = body
-    )
+            for entry in log_entries:
+                text = self.add_entry(entry)
+                body.append(text)
+                entry.mail_sent = 1
 
-    if mail.sender_email and mail.sender_password and mail.receiver_email and mail.smtp_server and mail.smtp_port:
-        return mail
+            session.commit()
+            return ''.join(body)
+
+    def add_entry(self, entry):
+
+        # series_add
+        if entry.msg_type_id == 1:
+            text = (
+                f"{entry.created_at.strftime("%A %-d %B %Y %H:%M:%S")} - {entry.msg_type_name} - {entry.ip}\n"
+                f"Series {entry.series_name} has been added to List: {entry.list_id}.\n\n"
+            )
+
+        # series_archive
+        elif entry.msg_type_id == 2:
+            text = (
+                f"{entry.created_at.strftime("%A %-d %B %Y %H:%M:%S")} - {entry.msg_type_name} - {entry.ip}\n"
+                f"Series {entry.series_name} has been added to the Archive of List: {entry.list_id}.\n\n"
+            )
+            
+        # series_delete
+        elif entry.msg_type_id == 3:
+            text = (
+                f"{entry.created_at.strftime("%A %-d %B %Y %H:%M:%S")} - {entry.msg_type_name} - {entry.ip}\n"
+                f"Series {entry.series_name} has been deleted from List: {entry.list_id}.\n\n"
+            )
+
+        # list_create
+        elif entry.msg_type_id == 4:
+            text = (
+                f"{entry.created_at.strftime("%A %-d %B %Y %H:%M:%S")} - {entry.msg_type_name} - {entry.ip}\n"
+                f"List {entry.list_id}: {entry.list_name} has been created.\n\n"
+            )
+
+        # list_rename
+        elif entry.msg_type_id == 5:
+            text = (
+                f"{entry.created_at.strftime("%A %-d %B %Y %H:%M:%S")} - {entry.msg_type_name} - {entry.ip}\n"
+                f"List {entry.list_id} {entry.prev_list_name} has been renamed to: {entry.list_name}.\n\n"
+            )
+        
+        return text
     
-    else:
-        logging.info("No mail was sent due to Mailer lacking login credentials")
+def send_weekly_notification_email():
+    mailer = Mailer()
+    mailer.send()
