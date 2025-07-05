@@ -47,9 +47,9 @@ if old_calendar_file.is_file():
     old_calendar_file.unlink()
 
 # logging
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
-logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+logging.basicConfig(encoding='utf-8', level=logging.WARN)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
+logging.getLogger('apscheduler').setLevel(logging.WARN)
 def open_log():
     log_path = Path('/code/data/log')
     log_path.mkdir(parents=True, mode=0o770, exist_ok=True)
@@ -64,7 +64,9 @@ except Exception as err:
 
 # route for home page
 async def homepage(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
+    with SessionLocal() as session:
+        recommendations = session.scalars(select(JellyfinRecommendation)).all()
+        return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows, "recommendations": recommendations})
 
 # route for search and search results
 async def search(request: Request):
@@ -84,7 +86,10 @@ async def jelly_rec(request: Request):
     with SessionLocal() as session:
         recommendations = session.scalars(select(JellyfinRecommendation)).all()
         lists = session.scalars(select(Lists)).all()
-        return templates.TemplateResponse('jelly_rec.html', {'request': request, 'lists': lists, 'recommendations': recommendations, 'selected_recs': True})
+        list_entries = session.scalars(select(ListEntries)).all()
+        # check if recommendation is already in list
+        existing_pairs = {(entry.list_id, str(entry.series_id)) for entry in list_entries}
+        return templates.TemplateResponse('jelly_rec.html', {'request': request, 'lists': lists, 'recommendations': recommendations, "existing_pairs": existing_pairs, 'selected_recs': True})
 
 # asynchronous api calls used in add_to_database()
 async def fetch_data(url):
@@ -688,18 +693,17 @@ except ConflictingIdError as err:
 
 try:
     job_exists = scheduler.get_job(job_id="jellyfin_recommendation_refresh", jobstore="default")
-    if job_exists != None:
-        logging.info("jellyfin recommendation refresh job detected and removed")
-        scheduler.remove_job(job_id="jellyfin_recommendation_refresh")
-    scheduler.add_job(
-        func=update_recommendations,
-        trigger=CronTrigger(day=1, hour=23, jitter=600),
-        #trigger=DateTrigger(run_date=datetime.now()+timedelta(seconds=10)),
-        id="jellyfin_recommendation_refresh",
-        name="jellyfin_recommendation_refresh",
-        coalesce=True,
-        jobstore="default"
-    )
+    if not job_exists:
+        scheduler.add_job(
+            func=update_recommendations,
+            trigger=CronTrigger(day=1, hour=23, jitter=600),
+            id="jellyfin_recommendation_refresh",
+            name="jellyfin_recommendation_refresh",
+            coalesce=True,
+            jobstore="default"
+        )
+except ConflictingIdError as err:
+    logging.error(err)
 except Exception as err:
     logging.error("Failed to update Jellyfin recommendations:", err)
 
