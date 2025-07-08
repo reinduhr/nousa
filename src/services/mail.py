@@ -5,8 +5,10 @@ import logging
 from datetime import datetime
 from sqlalchemy import select
 
-from .db import SessionLocal
-from .models import AuditLogEntry
+from src.db import SessionLocal
+from src.models import AuditLogEntry
+
+logger = logging.getLogger(__name__)
 
 class Mailer:
     def __init__(self, body=None):
@@ -40,9 +42,9 @@ class Mailer:
                     server.login(self.sender_email, self.sender_password)  # Login to the email server
                     # Send email
                     server.sendmail(self.sender_email, self.receiver_email, msg.as_string())
-                    logging.info(f"Mail sent successfully; {self.subject}")
+                    logger.info(f"Mail sent successfully; {self.subject}")
             except Exception as e:
-                logging.error(f"An error occurred: {e}")
+                logger.error(f"An error occurred: {e}")
     
     def create_weekly_notification_email(self):
         with SessionLocal() as session:

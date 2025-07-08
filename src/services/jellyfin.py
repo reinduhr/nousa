@@ -6,8 +6,8 @@ from sqlalchemy import select, delete
 from sqlalchemy.exc import IntegrityError
 from urllib.parse import urljoin
 
-from .db import SessionLocal
-from .models import JellyfinRecommendation
+from src.db import SessionLocal
+from src.models import JellyfinRecommendation
 
 logger = logging.getLogger(__name__)
 

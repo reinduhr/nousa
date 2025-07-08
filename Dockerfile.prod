@@ -13,24 +13,11 @@ COPY ./templates ./templates
 COPY ./requirements.txt .
 COPY ./alembic.ini .
 RUN pip install -r requirements.txt --no-cache-dir
-RUN chmod +x ./src/*.py
-RUN chmod +x ./src/versions/*.py
+RUN find ./src -type f -name "*.py" -exec chmod +x {} \;
 EXPOSE 5000
 
 # ENVIRONMENT VARIABLES
 ENV PYTHONPATH="/code/src"
-
-#
-# ENV TZ="Europe/Berlin"
-#
-# ENV SENDER_EMAIL="send@example.com"
-# ENV SENDER_PASSWORD="supersecretpassword"
-#
-# ENV RECEIVER_EMAIL="receive@example.com"
-#
-# ENV SMTP_SERVER="smtp.example.com"
-# ENV SMTP_PORT=587
-#
 
 # USER
 RUN mkdir -m 770 data
