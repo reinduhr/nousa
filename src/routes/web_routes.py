@@ -7,6 +7,9 @@ from src.db import SessionLocal
 from src.models import JellyfinRecommendation, Lists, ListEntries, Series
 from src.services.templates import templates
 from src.routes.template_data import popular_tv_shows
+import logging
+
+logger = logging.getLogger(__name__)
 
 # a redirect to handle download link from before Lists were added
 def download_redirect(request: Request):
