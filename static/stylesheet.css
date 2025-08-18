@@ -1,4 +1,11 @@
-.info-message {
+.info {
+    color: #212529;
+    text-align: center;
+    background-color: #fffb38;
+    padding: 6px;
+}
+
+.message {
     color: #212529;
     text-align: center;
     background-color: #fffb38;

@@ -1,8 +1,8 @@
         {% include 'header.html' %}
         <div class="container-sm">
-            <form class="search-box" action="/search" method="post">
+            <form class="search-box" action="/search" method="get">
                 <div class="input-group input-group-lg">            
-                    <input type="text" id="series-name" name="series-name" class="form-control" placeholder="Search for.. {{ popular_tv_shows | random }}?" aria-describedby="button-addon2">
+                    <input type="text" id="series-name" name="q" class="form-control" placeholder="Search for.. {{ popular_tv_shows | random }}?" aria-describedby="button-addon2">
                     <button class="btn btn-outline-secondary" type="submit" id="button-addon2">search</button>        
                 </div>
             </form>

@@ -2,11 +2,11 @@
 <body>
   <div class="container-md">
 <header>
-    {% if request.query_params %}
-      <p class="info-message">{{ request.query_params.message }}</p>
+    {% if request.query_params.message %}
+      <p class="info">{{ request.query_params.message }}</p>
     {% endif %}
     {% if message %}
-        <p class="info-message">{{ message }}</p>
+        <p class="message">{{ message }}</p>
     {% endif %}
     <nav class="navbar navbar-expand-xxl bg-body-tertiary">
         <div class="container-fluid">

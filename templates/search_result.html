@@ -1,43 +1,64 @@
-    {% include 'header.html' %}
-    <div class="nousa-content">
-        <h1>search results</h1>
-        {% for entry in data %}
-            <div class="search-result-container">
-                {% set show = entry['show'] %}
-                {% set image = show['image'] %}
-                <div class="search-result-image">
-                    <img src="{{ image.medium }}">
-                </div>
-                <div class="search-result-text">
-                    <div class="search-result-title-button">
-                        <h2 style="margin-right: 10px">{{ show.name }}</h2>
-                        <form action="/add_show" method="post">
+{% include 'header.html' %}
+<div class="nousa-content">
+    <h1>search results</h1>
+
+    {% for entry in data %}
+        {% set show = entry['show'] %}
+        {% set image = show['image'] if show.get('image') else None %}
+
+        <div class="search-result-container">
+            <div class="search-result-image">
+                {% if image %}
+                    <img src="{{ image.medium }}" alt="{{ show.name }}">
+                {% endif %}
+            </div>
+
+            <div class="search-result-text">
+                <div class="search-result-title-button">
+                    <h2 style="margin-right: 10px">{{ show.name }}</h2>
+
+                    <form action="/add_show" method="post">
                         <input type="hidden" name="series-id" value="{{ show.id }}">
                         <input type="hidden" name="series-name" value="{{ show.name }}">
-                        <!-- Dropdown for selecting a list -->
+
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <label for="list-select" style="margin: 0;min-width:100px;">Choose a list:</label>
-                            <select id="list-select" name="list-id" class="form-control" required>
-                                {% for list in lists %}
+                            <label for="list-select-{{ show.id }}" style="margin: 0; min-width:100px;">Choose a list:</label>
+                            <select id="list-select-{{ show.id }}" name="list-id" class="form-control" required>
+                                {% for list in available_lists_for_show(show.id) %}
                                     <option value="{{ list.list_id }}">{{ list.list_name }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-primary">Add to my shows</button></form>
+                            <button type="submit" class="btn btn-primary">Add to my shows</button>
                         </div>
-                    </div>
-                    <!-- End of dropdown-->
-                    <h4 style="margin-right: 10px">{% if show.premiered %}{% if show.ended %}{% if show.premiered[:4] != show.ended[:4] %}{{ show.premiered[:4] }}-{{ show.ended[:4] }}{% else %}{{ show.premiered[:4] }}{% endif %}{% else %}{{ show.premiered[:4] }}-{% endif %}{% endif %}</h4>
-                    <h5 style="margin-right: 10px">Status: {% if show.status %}{{ show.status }}{% endif %}</h5>
-                    {% if show.summary %}
-                    {{ show.summary | safe }}
+                    </form>
+                </div>
+
+                <h4 style="margin-right: 10px">
+                    {% if show.premiered %}
+                        {% if show.ended %}
+                            {% if show.premiered[:4] != show.ended[:4] %}
+                                {{ show.premiered[:4] }}-{{ show.ended[:4] }}
+                            {% else %}
+                                {{ show.premiered[:4] }}
+                            {% endif %}
+                        {% else %}
+                            {{ show.premiered[:4] }}-
+                        {% endif %}
                     {% endif %}
+                </h4>
+
+                <h5 style="margin-right: 10px">Status: {{ show.status or '' }}</h5>
+                
+                {% if show.summary %}
+                    {{ show.summary | safe }}
+                {% endif %}
             </div>
-    </div>
-        {% else %}
-            <div>
-                <h3>no results</h3>
-                <a href="/">go to homepage</a>
-            </div>
-        {% endfor %}
-    </div>
-    {% include 'footer.html' %}
+        </div>
+    {% else %}
+        <div>
+            <h3>No results</h3>
+            <a href="/">Go to homepage</a>
+        </div>
+    {% endfor %}
+</div>
+{% include 'footer.html' %}

@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 from src.models import Series
 from src.db import engine, SessionLocal
 from src.services.mail import send_weekly_notification_email
-from src.services.jellyfin import update_recommendations
 from src.cal_logic.update import series_update
 
 logger = logging.getLogger(__name__)
@@ -60,24 +59,6 @@ def start_scheduler():
             )
     except ConflictingIdError as err:
         logger.error(err)
-
-    try:
-        job_exists = scheduler.get_job(job_id="jellyfin_recommendation_refresh", jobstore="default")
-        if not job_exists:
-            scheduler.add_job(
-                func=update_recommendations,
-                #trigger=DateTrigger(datetime.now() + timedelta(seconds=10)),
-                trigger=CronTrigger(day=1, hour=23, jitter=600),
-                id="jellyfin_recommendation_refresh",
-                name="jellyfin_recommendation_refresh",
-                misfire_grace_time=1209600, # 14 days
-                coalesce=True,
-                jobstore="default"
-            )
-    except ConflictingIdError as err:
-        logger.error(err)
-    except Exception as err:
-        logger.error("Failed to update Jellyfin recommendations:", err)
 
 # series_update refreshes series and episodes data. scheduler automates it.
 def schedule_series_update():

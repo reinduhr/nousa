@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import PendingRollbackError
 import asyncio
 import logging
+from collections import defaultdict
 
 from src.services.templates import templates
 from src.models import Episodes, Series, ListEntries, AuditLogEntry
@@ -179,3 +180,15 @@ async def add_to_archive(request: Request):
     
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
+
+# helper function to filter search results against series in lists
+def build_available_lists(lists, list_entries):
+    entries_map = defaultdict(set)
+    for entry in list_entries:
+        entries_map[entry.series_id].add(entry.list_id)
+
+    def get_available_lists(show_id):
+        existing = entries_map.get(show_id, set())
+        return [lst for lst in lists if lst.list_id not in existing]
+
+    return get_available_lists

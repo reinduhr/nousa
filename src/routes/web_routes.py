@@ -1,13 +1,15 @@
+import aiohttp
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
-import requests
+from starlette.responses import RedirectResponse, JSONResponse, HTMLResponse
 from sqlalchemy import select
+import logging
 
 from src.db import SessionLocal
-from src.models import JellyfinRecommendation, Lists, ListEntries, Series
+from src.models import Lists, ListEntries, Series
 from src.services.templates import templates
+from src.services.jellyfin import is_jellyfin_api_key_valid, check_jellyfin_env_vars, get_jelly_recs
 from src.routes.template_data import popular_tv_shows
-import logging
+from src.cal_logic.input import build_available_lists
 
 logger = logging.getLogger(__name__)
 
@@ -17,32 +19,90 @@ def download_redirect(request: Request):
 
 # route for home page
 async def homepage(request: Request):
-    with SessionLocal() as session:
-        recommendations = session.scalars(select(JellyfinRecommendation)).all()
-        return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows, "recommendations": recommendations})
+    return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
+
+""" # route for jellyfin recommendations (sync)
+async def jellyrec(request: Request):
+    check_env_vars_ok, check_env_vars_msg = check_jellyfin_env_vars()
+    try:
+        jellyfin_online = is_jellyfin_api_key_valid() # returns True or False
+    except:
+        jellyfin_online = False
+    jellyfin_series = get_jelly_recs(request)
+    if jellyfin_series:
+        return templates.TemplateResponse("jelly_rec.html", {
+            "request": request, 
+            "jellyfin_series": jellyfin_series, 
+            "check_env_vars_ok": check_env_vars_ok,
+            "check_env_vars_msg": check_env_vars_msg,
+            "jellyfin_online": jellyfin_online
+        }) """
+
+# route for jellyfin recommendations (async)
+async def jellyrec(request: Request):
+    check_env_vars_ok, check_env_vars_msg = check_jellyfin_env_vars()
+    try:
+        jellyfin_online = await is_jellyfin_api_key_valid()  # Await the async function
+    except Exception:
+        jellyfin_online = False
+    jellyfin_series = await get_jelly_recs(request)  # Await the async function
+    if jellyfin_series:
+        return templates.TemplateResponse("jelly_rec.html", {
+            "request": request, 
+            "jellyfin_series": jellyfin_series, 
+            "check_env_vars_ok": check_env_vars_ok,
+            "check_env_vars_msg": check_env_vars_msg,
+            "jellyfin_online": jellyfin_online
+        })
+    # Optionally handle the case when jellyfin_series is empty
+    return templates.TemplateResponse("jelly_rec.html", {
+        "request": request, 
+        "jellyfin_series": {},
+        "check_env_vars_ok": check_env_vars_ok,
+        "check_env_vars_msg": check_env_vars_msg,
+        "jellyfin_online": jellyfin_online
+    })
 
 # route for search and search results
 async def search(request: Request):
     form = await request.form()
     series_name = form.get('series-name')
-    try:
-        response = requests.get(f"https://api.tvmaze.com/search/shows?q={series_name}", timeout=10)
-    except Exception as err:
-        return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows, "message": err})
-    data = response.json()
-    with SessionLocal() as session:
-        lists = session.scalars(select(Lists)).all()
-        return templates.TemplateResponse('search_result.html', {'request': request, 'data': data, 'lists': lists})
+    search_term = request.query_params.get("q")
+    if search_term:
+        series_name = search_term
 
-# route for jellyfin recommendations
-async def jelly_rec(request: Request):
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(
+                f"https://api.tvmaze.com/search/shows?q={series_name}", timeout=10
+            ) as response:
+                response.raise_for_status()
+                data = await response.json()
+        except aiohttp.ClientError as err:
+            return templates.TemplateResponse(
+                "index.html",
+                {
+                    "request": request,
+                    "popular_tv_shows": popular_tv_shows,
+                    "message": f"Error fetching TV shows: {err}",
+                },
+            )
+
     with SessionLocal() as session:
-        recommendations = session.scalars(select(JellyfinRecommendation)).all()
         lists = session.scalars(select(Lists)).all()
         list_entries = session.scalars(select(ListEntries)).all()
-        # check if recommendation is already in list
-        existing_pairs = {(entry.list_id, str(entry.series_id)) for entry in list_entries}
-        return templates.TemplateResponse('jelly_rec.html', {'request': request, 'lists': lists, 'recommendations': recommendations, "existing_pairs": existing_pairs, 'selected_recs': True})
+        
+        available_lists_for_show = build_available_lists(lists, list_entries)
+
+        return templates.TemplateResponse(
+            'search_result.html',
+            {
+                'request': request,
+                'data': data,
+                'available_lists_for_show': available_lists_for_show,
+                'lists': lists
+            }
+        )
 
 #  route for /lists
 async def lists_page(request: Request):

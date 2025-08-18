@@ -4,16 +4,16 @@ from pathlib import Path
 
 def setup_logging(log_dir='/code/data/log', level=logging.INFO):
     
-    # Remove all existing handlers
+    # remove all existing handlers
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     
-    # Set global log level
+    # set global log level
     logging.basicConfig(encoding='utf-8', level=level)
     
-    # Silence specific libraries
+    # set specific libraries
     logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
-    logging.getLogger('apscheduler').setLevel(logging.INFO)
+    logging.getLogger('apscheduler').setLevel(logging.WARN)
 
     try:
         log_path = Path(log_dir)

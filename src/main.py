@@ -8,7 +8,7 @@ from src.db import db_migrations
 from src.scheduler import start_scheduler
 
 # web routes
-from src.routes.web_routes import homepage, search, list_page, lists_page, jelly_rec, download_redirect
+from src.routes.web_routes import homepage, search, list_page, lists_page, download_redirect, jellyrec
 
 # logic routes
 from src.cal_logic.input import add_to_series, add_to_archive
@@ -29,7 +29,7 @@ routes = [
     Route("/lists", endpoint=lists_page, methods=["GET", "POST"]),
     Route("/list/{list_id}", endpoint=list_page, methods=["GET", "POST"]),
     Route("/subscribe/{list_id}", endpoint=download_calendar, methods=["GET"]),
-    Route("/recommendations", endpoint=jelly_rec, methods=["GET", "POST"])
+    Route("/recommendations", endpoint=jellyrec, methods=["GET"])
 ]
 
 #app = Starlette(debug=True, routes=routes, on_startup=[setup_logging, start_scheduler])
