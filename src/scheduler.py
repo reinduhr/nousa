@@ -7,6 +7,7 @@ from apscheduler.jobstores.base import ConflictingIdError
 
 from sqlalchemy import select
 
+import os
 import logging
 from datetime import datetime, timedelta
 
@@ -14,6 +15,7 @@ from src.models import Series
 from src.db import engine, SessionLocal
 from src.services.mail import send_weekly_notification_email
 from src.cal_logic.update import series_update
+from services.sonarr import sync_nousa_sonarr
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +60,18 @@ def start_scheduler():
                 jobstore='default'
             )
     except ConflictingIdError as err:
+        logger.error(err)
+
+    try:
+        scheduler.add_job(
+            func=sync_nousa_sonarr,
+            trigger=CronTrigger(hour=0),
+            id="sync_nousa_to_sonarr",
+            name="sync_nousa_to_sonarr",
+            coalesce=True,
+            jobstore="default"
+        )
+    except Exception as err:
         logger.error(err)
 
 # series_update refreshes series and episodes data. scheduler automates it.
