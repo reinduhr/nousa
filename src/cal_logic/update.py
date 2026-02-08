@@ -2,6 +2,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from datetime import datetime
 from sqlalchemy import update, delete, select, func
+from sqlalchemy.orm import Session
 import logging
 
 from src.services.templates import templates
@@ -10,7 +11,7 @@ from src.models import Series, Episodes, AuditLogEntry, ListEntries
 
 logger = logging.getLogger(__name__)
 
-def series_update(series_id):
+def series_update(series_id, db: Session = None):
     # imports go here to prevent circular import error
     from src.cal_logic.gather import try_request_series, try_request_episodes
     from src.cal_logic.input import add_episodes
@@ -23,7 +24,14 @@ def series_update(series_id):
         sdata_ext_thetvdb = sdata['externals'].get('thetvdb')
         sdata_ext_imdb = sdata['externals'].get('imdb')
 
-        with SessionLocal() as session:
+        if db is None:
+            context = SessionLocal()
+        else: # create a dummy context manager in order to still use 'with'
+            from contextlib import nullcontext
+            context = nullcontext(db)
+
+        with context as session:
+            print(f"DEBUG: Session bind: {session.get_bind().url}")
             session.execute(
                 update(Series)
                 .where(Series.series_id == series_id)
@@ -57,7 +65,7 @@ async def del_series(request: Request):
         list_id = int(list_id_form)
     except:
         message = "Error: Invalid input. Try again, but no tricks this time"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        return templates.TemplateResponse(request, "index.html", {"message": message})
     with SessionLocal() as session:
         le_count = session.execute(select(func.count()).where(ListEntries.series_id == series_id)).scalar_one()
         if le_count > 1: # if series is on more than 1 list: delete entry from ListEntries

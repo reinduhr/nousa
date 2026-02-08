@@ -47,7 +47,7 @@ async def add_to_series(request: Request):
         list_id = int(list_id_form)
     except:
         message = "Error: Invalid input. Try again, but no tricks this time ;)"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
+        return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
     with SessionLocal() as session:
         try:
             series_exist = session.get(Series, series_id)
@@ -123,17 +123,17 @@ async def add_to_series(request: Request):
                     episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
                     logger.info(f"{series_name} has been added")
 
-                    return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
+                    return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
         except PendingRollbackError:
             session.rollback()
             logger.error("PendingRollbackError occurred. Transaction was rolled back.")
             message = "An error occurred. Please try again."
-            return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
+            return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
         except Exception as err:
             session.rollback()
             logger.error(f"An error occurred: {err}")
             message = "An error occurred while processing your request."
-            return templates.TemplateResponse("index.html", {"request": request, "message": message, "popular_tv_shows": popular_tv_shows})
+            return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
         redirect_url = f"/list/{list_id}"
         return RedirectResponse(url=redirect_url)
 
@@ -148,7 +148,7 @@ async def add_to_archive(request: Request):
         list_id = int(list_id_form)
     except:
         message = "Error: Invalid input. Try again, but no tricks this time"
-        return templates.TemplateResponse("index.html", {"request": request, "message": message})
+        return templates.TemplateResponse(request, "index.html", {"message": message})
     with SessionLocal() as session:
         show_exists = session.scalars(select(ListEntries).where(
                 ListEntries.list_id == int(list_id),

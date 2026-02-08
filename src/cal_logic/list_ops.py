@@ -18,7 +18,7 @@ async def create_list(request: Request):
         pattern = r'^[a-zA-Z0-9]+$'
         if not re.match(pattern, user_input):
             message = "Only letters and numbers are accepted"
-            return templates.TemplateResponse('lists.html', {'request': request, 'message': message, 'lists': lists})
+            return templates.TemplateResponse(request, 'lists.html', {'message': message, 'lists': lists})
         else:
             if not name_check:
                 new_list = Lists(list_name=user_input)
@@ -43,10 +43,10 @@ async def create_list(request: Request):
                 session.add(audit_log_entry)
                 session.commit()
                 
-                return templates.TemplateResponse('lists.html', {'request': request, 'message': message, 'lists': lists})
+                return templates.TemplateResponse(request, 'lists.html', {'message': message, 'lists': lists})
             else:
                 message = "A list with that name exists already"
-                return templates.TemplateResponse('lists.html', {'request': request, 'message': message, 'lists': lists})
+                return templates.TemplateResponse(request, 'lists.html', {'message': message, 'lists': lists})
 
 async def rename_list(request: Request):
     form_data = await request.form()
@@ -59,17 +59,17 @@ async def rename_list(request: Request):
             list_id = int(list_id_form)
         except:
             message = "Error: Invalid input. Try again, but no tricks this time ;)"
-            return templates.TemplateResponse('index.html', {'request': request, 'message': message})
+            return templates.TemplateResponse(request, 'index.html', {'message': message})
         # validate to only accept letters and numbers
         pattern = r'^[a-zA-Z0-9]+$'
         if not re.match(pattern, user_input):
             message = "Only letters and numbers are accepted"
-            return templates.TemplateResponse('index.html', {'request': request, 'message': message})
+            return templates.TemplateResponse(request, 'index.html', {'message': message})
         name_check = session.execute(select(func.count()).where(Lists.list_name == user_input)).scalar_one()
 
         if name_check > 0:
             message = "A list with that name exists already"
-            return templates.TemplateResponse('index.html', {'request': request, 'message': message})
+            return templates.TemplateResponse(request, 'index.html', {'message': message})
         else:
             session.execute(update(Lists)
                 .where(Lists.list_id == int(list_id))
