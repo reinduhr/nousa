@@ -1,0 +1,53 @@
+name: CI - Tests & Smoke Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:   # lets you run it manually from GitHub UI
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run pytest
+        PYTHONPATH: ${{ github.workspace }}/code/src
+        run: python -m pytest code/tests -v
+
+  smoke-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and start dev container
+        run: |
+          docker compose -f compose.dev.yaml up -d --build
+          sleep 15   # give time for uvicorn + alembic migrations + startup
+
+      - name: Check if server is alive
+        run: |
+          curl --fail http://localhost:5000/ || { echo "Homepage failed"; exit 1; }
+          curl --fail http://localhost:5000/lists || { echo "Lists page failed"; exit 1; }
+
+      - name: Stop containers
+        if: always()
+        run: docker compose -f compose.dev.yaml down

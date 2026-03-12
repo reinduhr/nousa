@@ -19,24 +19,7 @@ def download_redirect(request: Request):
 
 # route for home page
 async def homepage(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "popular_tv_shows": popular_tv_shows})
-
-""" # route for jellyfin recommendations (sync)
-async def jellyrec(request: Request):
-    check_env_vars_ok, check_env_vars_msg = check_jellyfin_env_vars()
-    try:
-        jellyfin_online = is_jellyfin_api_key_valid() # returns True or False
-    except:
-        jellyfin_online = False
-    jellyfin_series = get_jelly_recs(request)
-    if jellyfin_series:
-        return templates.TemplateResponse("jelly_rec.html", {
-            "request": request, 
-            "jellyfin_series": jellyfin_series, 
-            "check_env_vars_ok": check_env_vars_ok,
-            "check_env_vars_msg": check_env_vars_msg,
-            "jellyfin_online": jellyfin_online
-        }) """
+    return templates.TemplateResponse(request, "index.html", {"popular_tv_shows": popular_tv_shows})
 
 # route for jellyfin recommendations (async)
 async def jellyrec(request: Request):
@@ -47,16 +30,14 @@ async def jellyrec(request: Request):
         jellyfin_online = False
     jellyfin_series = await get_jelly_recs(request)  # Await the async function
     if jellyfin_series:
-        return templates.TemplateResponse("jelly_rec.html", {
-            "request": request, 
+        return templates.TemplateResponse(request, "jelly_rec.html", {
             "jellyfin_series": jellyfin_series, 
             "check_env_vars_ok": check_env_vars_ok,
             "check_env_vars_msg": check_env_vars_msg,
             "jellyfin_online": jellyfin_online
         })
     # Optionally handle the case when jellyfin_series is empty
-    return templates.TemplateResponse("jelly_rec.html", {
-        "request": request, 
+    return templates.TemplateResponse(request, "jelly_rec.html", {
         "jellyfin_series": {},
         "check_env_vars_ok": check_env_vars_ok,
         "check_env_vars_msg": check_env_vars_msg,
@@ -80,9 +61,9 @@ async def search(request: Request):
                 data = await response.json()
         except aiohttp.ClientError as err:
             return templates.TemplateResponse(
+                request, 
                 "index.html",
                 {
-                    "request": request,
                     "popular_tv_shows": popular_tv_shows,
                     "message": f"Error fetching TV shows: {err}",
                 },
@@ -95,9 +76,9 @@ async def search(request: Request):
         available_lists_for_show = build_available_lists(lists, list_entries)
 
         return templates.TemplateResponse(
+            request, 
             'search_result.html',
             {
-                'request': request,
                 'data': data,
                 'available_lists_for_show': available_lists_for_show,
                 'lists': lists
@@ -108,7 +89,7 @@ async def search(request: Request):
 async def lists_page(request: Request):
     with SessionLocal() as session:
         lists = session.execute(select(Lists)).scalars().all()
-        return templates.TemplateResponse('lists.html', {'request': request, 'lists': lists, 'selected_lists': True})
+        return templates.TemplateResponse(request, 'lists.html', {'lists': lists, 'selected_lists': True})
 
 # route e.g.: /list/1
 async def list_page(request: Request):
@@ -136,7 +117,7 @@ async def list_page(request: Request):
         archive_count = len(archive_list)
         series_count = len(series_list)
 
-        return templates.TemplateResponse('list.html', {'request': request, 
+        return templates.TemplateResponse(request, 'list.html', {
                                                         'listentries_list': listentries_list, 
                                                         'series_list': series_list, 
                                                         'archive_list': archive_list, 

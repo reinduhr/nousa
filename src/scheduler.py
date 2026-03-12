@@ -39,6 +39,7 @@ def start_scheduler():
             scheduler.add_job(
                 func=schedule_series_update,
                 trigger=CronTrigger(day_of_week='sun', hour=1, jitter=600), # job runs every Sunday around 1AM
+                #trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=30)),
                 id='series_update',
                 misfire_grace_time=600,
                 coalesce=True, # if multiple jobs did not run, discard all others and run only one job

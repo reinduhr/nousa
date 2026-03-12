@@ -9,7 +9,7 @@ SessionLocal = sessionmaker(bind=engine)
 logger = logging.getLogger(__name__)
 
 # Alembic database migrations
-async def db_migrations():
+def db_migrations():
     result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True)
     if result.returncode != 0:
         logger.error(f"Alembic database migrations failed: {result.stderr}")

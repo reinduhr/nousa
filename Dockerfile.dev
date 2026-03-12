@@ -1,4 +1,4 @@
-FROM python:3.13.3-slim
+FROM python:3.14-slim
 WORKDIR /code
 RUN addgroup --gid 3333 nousa
 RUN adduser --uid 3333 --gid 3333 --no-create-home --disabled-password --shell /usr/sbin/nologin nousa
@@ -11,8 +11,10 @@ COPY ./src ./src
 COPY ./static ./static
 COPY ./templates ./templates
 COPY ./requirements.txt .
+COPY ./requirements-dev.txt .
 COPY ./alembic.ini .
 RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements-dev.txt --no-cache-dir
 RUN find ./src -type f -name "*.py" -exec chmod +x {} \;
 EXPOSE 5000
 

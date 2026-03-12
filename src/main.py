@@ -1,10 +1,11 @@
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 
 # startup functions
 from src.log_config import setup_logging, delete_files_not_in_use
-from src.db import db_migrations
+from src.db import engine, db_migrations
 from src.scheduler import start_scheduler
 
 # web routes
@@ -32,5 +33,24 @@ routes = [
     Route("/recommendations", endpoint=jellyrec, methods=["GET"])
 ]
 
-#app = Starlette(debug=True, routes=routes, on_startup=[setup_logging, start_scheduler])
-app = Starlette(debug=False, routes=routes, on_startup=[db_migrations, delete_files_not_in_use, setup_logging, start_scheduler])
+@asynccontextmanager
+async def lifespan(app: Starlette):
+    # --- Startup Logic ---
+    # This runs before the app starts taking requests
+    setup_logging()
+    db_migrations()
+    delete_files_not_in_use()
+    start_scheduler()
+    
+    yield  # The app runs while execution is "paused" here
+    
+    # --- Shutdown Logic ---
+    # This runs when the app is shutting down
+    engine.dispose()
+    print("Shutting down...")
+
+app = Starlette(
+    debug=False, 
+    routes=routes, 
+    lifespan=lifespan
+)
