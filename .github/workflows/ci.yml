@@ -29,8 +29,8 @@ jobs:
 
       - name: Run pytest
         env:
-          PYTHONPATH: ${{ github.workspace }}/code/src
-        run: python -m pytest code/tests -v
+          PYTHONPATH: ${{ github.workspace }}/src
+        run: python -m pytest tests -v
 
   smoke-docker:
     runs-on: ubuntu-latest
