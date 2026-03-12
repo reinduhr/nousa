@@ -5,7 +5,7 @@ from src.cal_logic.update import series_update
 from src.models import Series, Episodes
 
 def test_series_update_updates_series_and_episodes(db_session):
-    series_id = 123
+    series_id = 1
 
     # --- Arrange -------------------------------------------------
 

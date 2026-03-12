@@ -18,7 +18,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.14'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -27,7 +28,8 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run pytest
-        run: pytest -v
+        PYTHONPATH: ${{ github.workspace }}/code/src
+        run: python -m pytest code/tests -v
 
   smoke-docker:
     runs-on: ubuntu-latest
