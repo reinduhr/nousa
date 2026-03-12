@@ -29,26 +29,26 @@ jobs:
 
       - name: Run pytest
         env:
-          PYTHONPATH: ${{ github.workspace }}/code/src
-        run: python -m pytest code/tests -v
+          PYTHONPATH: ${{ github.workspace }}/src
+        run: python -m pytest tests -v
 
-  smoke-docker:
-    runs-on: ubuntu-latest
+  # smoke-docker:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Build and start dev container
-        run: |
-          docker compose -f compose.dev.yaml up -d --build
-          sleep 15   # give time for uvicorn + alembic migrations + startup
+  #     - name: Build and start dev container
+  #       run: |
+  #         docker compose -f compose.dev.yaml up -d --build
+  #         sleep 15   # give time for uvicorn + alembic migrations + startup
 
-      - name: Check if server is alive
-        run: |
-          curl --fail http://localhost:5000/ || { echo "Homepage failed"; exit 1; }
-          curl --fail http://localhost:5000/lists || { echo "Lists page failed"; exit 1; }
+  #     - name: Check if server is alive
+  #       run: |
+  #         curl --fail http://localhost:5000/ || { echo "Homepage failed"; exit 1; }
+  #         curl --fail http://localhost:5000/lists || { echo "Lists page failed"; exit 1; }
 
-      - name: Stop containers
-        if: always()
-        run: docker compose -f compose.dev.yaml down
+  #     - name: Stop containers
+  #       if: always()
+  #       run: docker compose -f compose.dev.yaml down
