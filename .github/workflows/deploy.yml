@@ -1,13 +1,18 @@
 name: Build and Publish Image
 
 on:
-  push:
-    branches: ['main']
-    tags: ['v*.*.*']
+  workflow_run:
+    workflows: ["CI - Tests & Smoke Check"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
   build-and-push:
+    if: >
+      github.event.workflow_run.conclusion == 'success' && 
+      (github.event.workflow_run.head_branch == 'main' || startsWith(github.event.workflow_run.head_branch, 'v'))
+      
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,7 +49,6 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=branch
             type=semver,pattern={{version}}
-            type=sha
       
       # Build & push
       - name: Build and push to Docker Hub and GHCR
