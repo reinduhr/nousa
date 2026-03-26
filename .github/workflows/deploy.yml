@@ -45,11 +45,13 @@ jobs:
             type=ref,event=branch
             type=semver,pattern={{version}}
             type=sha
-
-      - name: Build and push Docker image
+      
+      # Build & push
+      - name: Build and push to Docker Hub and GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.prod
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
