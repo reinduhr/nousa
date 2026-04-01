@@ -7,4 +7,4 @@ python-multipart==0.0.22
 apscheduler==3.11.2
 itsdangerous==2.2.0
 alembic==1.15.2
-aiohttp==3.13.3
+aiohttp==3.13.4
