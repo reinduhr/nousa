@@ -2,12 +2,8 @@ import aiohttp
 import requests
 import logging
 import time
-from datetime import datetime, timedelta
-from apscheduler.triggers.date import DateTrigger
-from apscheduler.jobstores.base import ConflictingIdError
 
-from src.scheduler import scheduler
-from src.cal_logic.update import series_update
+#from src.scheduler import schedule_series_update_retry, schedule_episodes_update_retry
 
 logger = logging.getLogger(__name__)
 
@@ -38,21 +34,10 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
         retries += 1
         logger.error(f'series_update series retry {retries}')
         time.sleep(delay)
-    try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_series_{series_id}')
-        if existing_job:
-            logger.info("series_update_retry_request_series job already exists. not adding new job.")
-        else:
-            scheduler.add_job(
-                func=series_update,
-                args=[series_id],
-                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id=f'series_update_retry_request_series_{series_id}',
-                coalesce=True
-            )
-    except ConflictingIdError as err:
-        logger.error(err)
-    return None
+    
+    #schedule_series_update_retry(series_id, max_retries)
+    raise Exception
+
 
 def request_episodes(series_id):
     try:
@@ -71,18 +56,6 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         retries += 1
         logger.error(f'series_update episodes retry {retries}')
         time.sleep(delay)
-    try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_episodes_{series_id}')
-        if existing_job:
-            logger.info("series_update_retry_request_series job already exists. not adding new job.")
-        else:
-            scheduler.add_job(
-                func=series_update,
-                args=[series_id],
-                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id=f'series_update_retry_request_episodes_{series_id}',
-                coalesce=True
-            )
-    except ConflictingIdError as err:
-        logger.error(err)
-    return None
+
+    #schedule_episodes_update_retry(series_id, max_retries)
+    raise Exception

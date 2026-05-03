@@ -3,8 +3,10 @@ from starlette.responses import RedirectResponse
 from sqlalchemy import select, update, func
 import re
 from datetime import datetime
+import asyncio
 
 from src.services.templates import templates
+from src.tasks.ntfy_task import send_ntfy_task
 from src.db import SessionLocal
 from src.models import Lists, AuditLogEntry
 
@@ -42,6 +44,8 @@ async def create_list(request: Request):
                 )
                 session.add(audit_log_entry)
                 session.commit()
+
+                await send_ntfy_task(message=f"List {list_id}: {user_input} has been created")
                 
                 return templates.TemplateResponse(request, 'lists.html', {'message': message, 'lists': lists})
             else:
@@ -91,5 +95,8 @@ async def rename_list(request: Request):
             )
             session.add(audit_log_entry)
             session.commit()
+
+            await send_ntfy_task(message=f"List {list_id}: {prev_list_name} has been renamed to: {user_input}")
+
             
         return RedirectResponse(url=f"/list/{list_id}")

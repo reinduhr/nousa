@@ -92,13 +92,15 @@ async def lists_page(request: Request):
         return templates.TemplateResponse(request, 'lists.html', {'lists': lists, 'selected_lists': True})
 
 # route e.g.: /list/1
-async def list_page(request: Request):
-    list_id_path = request.path_params['list_id']
+async def list_page(request: Request, message: str = None, list_id: int = None):
+    
     try:
-        list_id = int(list_id_path)
+        if list_id is None:
+            list_id_path = request.path_params['list_id']
+            list_id = int(list_id_path)
     except:
         return RedirectResponse(url="/")
-
+    
     with SessionLocal() as session:
         listentries_list = session.execute(select(ListEntries).where(ListEntries.list_id == list_id)).scalars().all()
         lists = session.execute(select(Lists)).scalars().all()
@@ -125,5 +127,6 @@ async def list_page(request: Request):
                                                         'list_object': list_object, 
                                                         'lists': lists,
                                                         'archive_count': archive_count,
-                                                        'series_count': series_count
+                                                        'series_count': series_count,
+                                                        'message': message
                                                     })

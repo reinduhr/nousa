@@ -7,31 +7,30 @@ from apscheduler.jobstores.base import ConflictingIdError
 
 from sqlalchemy import select
 
-import os
 import logging
 from datetime import datetime, timedelta
+import asyncio
+import aiohttp
 
 from src.models import Series
 from src.db import engine, SessionLocal
 from src.services.mail import send_weekly_notification_email
 from src.cal_logic.update import series_update
-from services.sonarr import sync_nousa_sonarr
+from src.services.sonarr import sync_nousa_sonarr
+#from src.services.ntfy import send_ntfy
+#from src.helpers.events import error_listener
+
+from src.scheduler_core import get_scheduler
+
 
 logger = logging.getLogger(__name__)
 
-# scheduler
-jobstores = {
-    'default': SQLAlchemyJobStore(engine=engine), 
-    'single_show_updates': SQLAlchemyJobStore(engine=engine)
-}
-scheduler = AsyncIOScheduler(jobstores=jobstores)
 
-def start_scheduler():
+scheduler = get_scheduler()
 
-    scheduler.start(paused=True)
-    scheduler.remove_all_jobs() # remove all because existing jobs can have incorrect path which breaks server startup
-    scheduler.resume()
 
+def schedule_default_jobs():
+    
     # check if series_update job already exists in order to avoid conflict when adding job to db
     try:
         existing_job = scheduler.get_job(job_id='series_update')
@@ -104,3 +103,43 @@ def schedule_series_update():
                     )
             except ConflictingIdError as err:
                 logger.error(err)
+
+
+    
+
+""" def schedule_series_update_retry(series_id, max_retries):
+    #from services.ntfy import send_ntfy
+    try: # check if job already exists in order to avoid conflict when adding job to db
+        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_series_{series_id}')
+        if existing_job:
+            logger.info("series_update_retry_request_series job already exists. not adding new job.")
+        else:
+            scheduler.add_job(
+                func=series_update,
+                args=[series_id],
+                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+                id=f'series_update_retry_request_series_{series_id}',
+                coalesce=True
+            )
+            asyncio.create_task(send_ntfy(message=f"Series updater failed {max_retries} times. Retry in 24 hours."))
+
+    except ConflictingIdError as err:
+        logger.error(err)
+    return None
+
+def schedule_episodes_update_retry(series_id):
+    try: # check if job already exists in order to avoid conflict when adding job to db
+        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_episodes_{series_id}')
+        if existing_job:
+            logger.info("series_update_retry_request_series job already exists. not adding new job.")
+        else:
+            scheduler.add_job(
+                func=series_update,
+                args=[series_id],
+                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
+                id=f'series_update_retry_request_episodes_{series_id}',
+                coalesce=True
+            )
+    except ConflictingIdError as err:
+        logger.error(err)
+    return None """

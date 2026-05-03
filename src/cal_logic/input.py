@@ -9,10 +9,12 @@ import logging
 from collections import defaultdict
 
 from src.services.templates import templates
-from src.models import Episodes, Series, ListEntries, AuditLogEntry
+from src.models import Episodes, Series, ListEntries, AuditLogEntry, Lists
 from src.db import SessionLocal
 from src.routes.template_data import popular_tv_shows
 from src.cal_logic.gather import fetch_data
+
+from src.tasks.ntfy_task import send_ntfy_task
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +53,7 @@ async def add_to_series(request: Request):
     with SessionLocal() as session:
         try:
             series_exist = session.get(Series, series_id)
+            list_name = session.get_one(Lists, list_id).list_name
             
             le_exist = session.scalars(select(ListEntries).where(
                     ListEntries.list_id == int(list_id),
@@ -78,6 +81,8 @@ async def add_to_series(request: Request):
                     
                     session.commit()
                     message = f"{series_exist.series_name} has been moved to main"
+                    await send_ntfy_task(message=f"{series_name} has been put back from archive on List {list_id}: {list_name}")
+
                 else:
                     message = f"{series_name} is already in list {list_id}"
                 redirect_url = f"/list/{list_id}"
@@ -92,7 +97,7 @@ async def add_to_series(request: Request):
                     msg_type_name = "series_add",
                     ip = request.client.host,
                     list_id = list_id,
-                    list_name = None,
+                    list_name = list_name,
                     prev_list_name = None,
                     series_id = series_id,
                     series_name = series_name,
@@ -100,6 +105,8 @@ async def add_to_series(request: Request):
                 )
                 session.add(audit_log_entry)
                 session.commit()
+
+                await send_ntfy_task(message=f"{series_name} has been added to List {list_id}: {list_name}")
 
                 # Series logic
                 if not series_exist:
@@ -178,6 +185,9 @@ async def add_to_archive(request: Request):
     session.add(audit_log_entry)
     session.commit()
     
+    list_name = session.get_one(Lists, list_id).list_name
+    await send_ntfy_task(message=f"{series_name} has been archived on List {list_id}: {list_name}")
+
     redirect_url = f"/list/{list_id}"
     return RedirectResponse(url=redirect_url)
 
