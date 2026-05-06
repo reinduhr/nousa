@@ -12,7 +12,7 @@ from src.scheduler import schedule_default_jobs
 from src.routes.web_routes import homepage, search, list_page, lists_page, download_redirect, jellyrec
 
 # logic routes
-from src.cal_logic.input import add_to_series, add_to_archive
+from src.cal_logic.input import add_to_series, toggle_archive
 from src.cal_logic.remove import del_series
 from src.cal_logic.list_ops import create_list, rename_list
 from src.cal_logic.output import download_calendar
@@ -22,7 +22,7 @@ routes = [
     Mount("/nousa", app=StaticFiles(directory="static"), name="static"),
     Route("/search", endpoint=search, methods=["GET", "POST"]),
     Route("/add_show", endpoint=add_to_series, methods=["GET", "POST"]),
-    Route("/archive_show", endpoint=add_to_archive, methods=["GET", "POST"]),
+    Route("/toggle_archive", endpoint=toggle_archive, methods=["GET", "POST"]),
     Route("/delete_show", endpoint=del_series, methods=["GET", "POST"]),
     Route("/subscribe", endpoint=download_redirect, methods=["GET"]),
     Route("/create_list", endpoint=create_list, methods=["GET", "POST"]),
