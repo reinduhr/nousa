@@ -51,4 +51,3 @@ def series_update(series_id, db: Session = None):
                 add_episodes(series_id, edata)
             session.commit()
             logger.info(f"series_update success. series_id: {series_id}")
-

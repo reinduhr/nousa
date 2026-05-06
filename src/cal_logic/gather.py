@@ -3,8 +3,6 @@ import requests
 import logging
 import time
 
-#from src.scheduler import schedule_series_update_retry, schedule_episodes_update_retry
-
 logger = logging.getLogger(__name__)
 
 # asynchronous api calls used in add_to_database()
@@ -35,7 +33,6 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
         logger.error(f'series_update series retry {retries}')
         time.sleep(delay)
     
-    #schedule_series_update_retry(series_id, max_retries)
     raise Exception
 
 
@@ -57,5 +54,4 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         logger.error(f'series_update episodes retry {retries}')
         time.sleep(delay)
 
-    #schedule_episodes_update_retry(series_id, max_retries)
     raise Exception

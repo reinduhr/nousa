@@ -198,12 +198,14 @@ async def toggle_archive(request: Request):
         if state == 1:
             msg_type_id = 2
             msg_type_name = "series_archive"
-            await send_ntfy_task(message=f"{series_name} has been archived on List {list_id}: {list_name}")
+            message = f"{series_name} has been archived on List {list_id}: {list_name}"
+            await send_ntfy_task(message)
         
         else:
             msg_type_id = 20
             msg_type_name = "series_main"
-            await send_ntfy_task(message=f"{series_name} has been moved to main on List {list_id}: {list_name}")
+            message = f"{series_name} has been moved to main on List {list_id}: {list_name}"
+            await send_ntfy_task(message)
 
         await add_audit_log_entry(
             msg_type_id = msg_type_id,

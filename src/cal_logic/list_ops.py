@@ -9,6 +9,8 @@ from src.services.templates import templates
 from src.tasks.ntfy_task import send_ntfy_task
 from src.db import SessionLocal
 from src.models import Lists, AuditLogEntry
+from src.helpers.logging import add_audit_log_entry
+
 
 async def create_list(request: Request):
     with SessionLocal() as session:
@@ -31,7 +33,7 @@ async def create_list(request: Request):
                 message = f"{user_input} has been created"
                 list_id = new_list.list_id
 
-                audit_log_entry = AuditLogEntry(
+                await add_audit_log_entry(
                     msg_type_id = 4,
                     msg_type_name = "list_create",
                     ip = request.client.host,
@@ -39,11 +41,8 @@ async def create_list(request: Request):
                     list_name = user_input,
                     prev_list_name = None,
                     series_id = None,
-                    series_name = None,
-                    created_at = datetime.now()
+                    series_name = None
                 )
-                session.add(audit_log_entry)
-                session.commit()
 
                 await send_ntfy_task(message=f"List {list_id}: {user_input} has been created")
                 
@@ -82,7 +81,7 @@ async def rename_list(request: Request):
             )
             session.commit()
 
-            audit_log_entry = AuditLogEntry(
+            await add_audit_log_entry(
                 msg_type_id = 5,
                 msg_type_name = "list_rename",
                 ip = request.client.host,
@@ -90,11 +89,8 @@ async def rename_list(request: Request):
                 list_name = user_input,
                 prev_list_name = prev_list_name,
                 series_id = None,
-                series_name = None,
-                created_at = datetime.now()
+                series_name = None
             )
-            session.add(audit_log_entry)
-            session.commit()
 
             await send_ntfy_task(message=f"List {list_id}: {prev_list_name} has been renamed to: {user_input}")
 

@@ -15,7 +15,9 @@ async def send_ntfy_task(
         priority: str = "3",
         retry_count: int = 0
     ):
-    logger.info(f"Running ntfy task (retry={retry_count})")
+    
+    if retry_count > 0:
+        logger.info(f"Running ntfy task (retry={retry_count})")
 
     try:
         await send_ntfy(message, topic, title, priority)
@@ -31,15 +33,9 @@ async def send_ntfy_task(
 
         scheduler = get_scheduler()
 
-        logger.warning(f"DEBUG SCHEDULER: ntfy task {id(scheduler)}")
-
-        logger.warning(f"Scheduler running: {scheduler.running}")
-
         scheduler.add_job(
             func=send_ntfy_task,
             trigger=DateTrigger(run_date=datetime.now() + timedelta(seconds=delay)),
-            #trigger='date',
-            #run_date=datetime.now() + timedelta(seconds=delay),
             kwargs={
                 "message": message,
                 "topic": topic,
@@ -51,9 +47,3 @@ async def send_ntfy_task(
             replace_existing=True,
             jobstore="ntfy"
         )
-
-        jobs = scheduler.get_jobs()
-        logger.warning(f"TOTAL JOBS: {len(jobs)}")
-
-        for job in jobs:
-            logger.warning(f"JOB: {job.id}")

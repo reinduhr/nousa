@@ -91,7 +91,7 @@ async def lists_page(request: Request):
         lists = session.execute(select(Lists)).scalars().all()
         return templates.TemplateResponse(request, 'lists.html', {'lists': lists, 'selected_lists': True})
 
-# route e.g.: /list/1
+# route for a list (e.g.: /list/1)
 async def list_page(request: Request, message: str = None, list_id: int = None):
     
     try:
