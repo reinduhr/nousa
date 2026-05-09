@@ -1,6 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.events import EVENT_JOB_ERROR
+#from apscheduler.events import EVENT_JOB_ERROR
 import logging
 
 from src.db import engine
@@ -15,13 +15,12 @@ jobstores = {
 }
 
 scheduler = AsyncIOScheduler(jobstores=jobstores)
-if not scheduler.running:
-    scheduler.start()
 
-logger.warning(f"DEBUG SCHEDULER: scheduler core {id(scheduler)}")
-#print("DEBUG: Adding listener to scheduler instance...")
+def start_scheduler():
+    if not scheduler.running:
+        scheduler.start()
+
 #scheduler.add_listener(error_listener, EVENT_JOB_ERROR)
 
 def get_scheduler():
-    logger.warning(f"DEBUG SCHEDULER: scheduler core get_scheduler() {id(scheduler)}")
     return scheduler

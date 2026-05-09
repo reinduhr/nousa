@@ -7,18 +7,18 @@ this is a tool with an easy to use UI which is accessible by a browser. you can 
 
 ## optional features
 can be enabled by environment variables.
-### email notifications
-send out an email (basic auth) to notify you of any changes anyone makes regarding list/calendar entries.\
+### email and ntfy notifications
+get notified by application events.
 ### jellyfin integration
 scan your jellyfin media server and present those shows on the recommendations page where you can easily add them to your list.
 ### sonarr integration
-sync shows (that are not archived) to sonarr.\
+sync shows to sonarr.\
 you can optionally pass a comma separated list of nousa list ids (e.g. "1,2") to the allowed list environment variable. all lists will be synced if you don't use this env var.
 
 see .env.example for more information on environment variables\
 container exposes port 5000\
 mount path to data for database and logs is: /code/data\
-username:group = nousa:nousa, uid:gid = 3333:3333\
+username:group = nousa:nousa, uid:gid = 3333:3333
 
 docker.io/reinduhr/nousa:latest
 

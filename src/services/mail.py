@@ -2,7 +2,6 @@ import os
 import smtplib
 from email.message import EmailMessage
 import logging
-from datetime import datetime
 from sqlalchemy import select
 
 from src.db import SessionLocal

@@ -23,7 +23,7 @@ def request_series(series_id):
     except:
         return None
 
-def try_request_series(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
+def try_request_series(series_id, max_retries=3, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_series(series_id)
@@ -44,7 +44,7 @@ def request_episodes(series_id):
     except:
         return None
 
-def try_request_episodes(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
+def try_request_episodes(series_id, max_retries=3, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_episodes(series_id)

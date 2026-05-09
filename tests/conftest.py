@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch, AsyncMock
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -29,3 +30,9 @@ def db_session():
     finally:
         session.close()
         Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture(autouse=True, scope="session")
+def mock_external_tasks():
+    # Patch the helpers at their definition source
+    with patch("src.cal_logic.list_ops.send_ntfy_task", new_callable=AsyncMock):
+        yield

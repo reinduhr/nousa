@@ -1,11 +1,11 @@
 
 from datetime import datetime
-from sqlalchemy import update, delete, select, func
+from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
 import logging
 
 from src.db import SessionLocal
-from src.models import Series, Episodes, AuditLogEntry, ListEntries, Lists
+from src.models import Series, Episodes
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,6 @@ def series_update(series_id, db: Session = None):
             context = nullcontext(db)
 
         with context as session:
-            #print(f"DEBUG: Session bind: {session.get_bind().url}")
             session.execute(
                 update(Series)
                 .where(Series.series_id == series_id)
@@ -51,3 +50,5 @@ def series_update(series_id, db: Session = None):
                 add_episodes(series_id, edata)
             session.commit()
             logger.info(f"series_update success. series_id: {series_id}")
+            return True
+    return False

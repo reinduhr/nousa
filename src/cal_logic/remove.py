@@ -1,11 +1,9 @@
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
-from sqlalchemy import update, delete, select, func
-from datetime import datetime
+from sqlalchemy import delete, select, func
 import logging
 
-from src.models import Series, Episodes, AuditLogEntry, ListEntries, Lists
-from src.routes.web_routes import list_page
+from src.models import Series, Episodes, ListEntries
 from src.services.templates import templates
 from src.db import SessionLocal
 from src.helpers.logging import add_audit_log_entry
@@ -60,8 +58,8 @@ async def del_series(request: Request):
             
             await send_ntfy_task(message=f"{series_name} has been deleted from List {list_id}: {list_name}")
 
-            message = f"{series_name} has been deleted from List {list_id}: {list_name}"
-            return await list_page(request, message=message, list_id=list_id)
+            url = f"/list/{list_id}"
+            return RedirectResponse(url)
         
         except Exception:
             logger.exception("error while deleting series")

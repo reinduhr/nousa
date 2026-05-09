@@ -69,22 +69,24 @@ async def add_list_entry(series_id: int, list_id: int):
 
 # add episode data to Episodes table in db
 def add_episodes(series_id, edata):
-    for episode in edata:
-        ep_id = episode.get("id")
-        ep_name = episode.get("name")
-        ep_season = episode.get("season")
-        ep_number = episode.get("number")
-        ep_airdate_str = episode.get("airdate")
-        ep_airdate = datetime.strptime(ep_airdate_str, "%Y-%m-%d")
-        # filter episodes so only episodes between one year ago and one year into the future get into the calendar
-        one_year_ago = datetime.now() - timedelta(days=365)
-        one_year_future = datetime.now() + timedelta(days=365)
-        if ep_airdate >= one_year_ago and ep_airdate <= one_year_future:
+    with SessionLocal() as session:
+
+        for episode in edata:
+            ep_id = episode.get("id")
+            ep_name = episode.get("name")
+            ep_season = episode.get("season")
+            ep_number = episode.get("number")
+            ep_airdate_str = episode.get("airdate")
+            ep_airdate = datetime.strptime(ep_airdate_str, "%Y-%m-%d")
+            # filter episodes so only episodes between one year ago and one year into the future get into the calendar
+            one_year_ago = datetime.now() - timedelta(days=365)
+            one_year_future = datetime.now() + timedelta(days=365)
             
-            episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=ep_airdate)
-            with SessionLocal() as session:
+            if ep_airdate >= one_year_ago and ep_airdate <= one_year_future:
+                
+                episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=ep_airdate)
                 session.add(episodes)
-                session.commit()
+        session.commit()
 
 async def fetch_series_data(series_id):
     
@@ -113,24 +115,25 @@ async def add_series(sdata, edata, series_id):
     # Add TV show to Series
     series = Series(series_id=int(series_id), series_name=sdata['name'], series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb, series_last_updated=today)
     
-    try:
-        with SessionLocal() as session:
+    with SessionLocal() as session:
+
+        try:
             session.add(series)
             session.commit()
+            
+            episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
         
-        episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
-    
-    except PendingRollbackError:
-        session.rollback()
-        logger.error("PendingRollbackError occurred. Transaction was rolled back.")
-        message = "An error occurred. Please try again."
-        return
-        
-    except Exception as err:
-        session.rollback()
-        logger.error(f"An error occurred: {err}")
-        message = "An error occurred while processing your request."
-        return
+        except PendingRollbackError:
+            session.rollback()
+            logger.error("PendingRollbackError occurred. Transaction was rolled back.")
+            message = "An error occurred. Please try again."
+            return
+            
+        except Exception as err:
+            session.rollback()
+            logger.error(f"An error occurred: {err}")
+            message = "An error occurred while processing your request."
+            return
     
     logger.info(f"{sdata['name']} has been added")
     return episode_task
