@@ -6,6 +6,7 @@ from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates, _TemplateResponse
 
 from src.cal_logic.list_ops import create_list, rename_list
+from src.helpers.logging import add_audit_log_entry
 from src.models import Lists, AuditLogEntry
 
 @pytest.mark.asyncio
@@ -99,11 +100,11 @@ async def test_rename_list_valid(db_session):
     db_session.expire_all() # Ensure we aren't looking at cached data
     updated_list = db_session.get(Lists, list_id)
     assert updated_list.list_name == new_list_name
-
+    
     # Verify Audit Log was created
     audit = db_session.query(AuditLogEntry).filter(
         AuditLogEntry.list_id == list_id,
         AuditLogEntry.list_name == new_list_name
     ).first()    
     assert audit is not None
-
+    

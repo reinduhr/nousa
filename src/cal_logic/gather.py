@@ -2,12 +2,6 @@ import aiohttp
 import requests
 import logging
 import time
-from datetime import datetime, timedelta
-from apscheduler.triggers.date import DateTrigger
-from apscheduler.jobstores.base import ConflictingIdError
-
-from src.scheduler import scheduler
-from src.cal_logic.update import series_update
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +23,7 @@ def request_series(series_id):
     except:
         return None
 
-def try_request_series(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
+def try_request_series(series_id, max_retries=3, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_series(series_id)
@@ -38,21 +32,9 @@ def try_request_series(series_id, max_retries=30, delay=60): # try a request eve
         retries += 1
         logger.error(f'series_update series retry {retries}')
         time.sleep(delay)
-    try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_series_{series_id}')
-        if existing_job:
-            logger.info("series_update_retry_request_series job already exists. not adding new job.")
-        else:
-            scheduler.add_job(
-                func=series_update,
-                args=[series_id],
-                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id=f'series_update_retry_request_series_{series_id}',
-                coalesce=True
-            )
-    except ConflictingIdError as err:
-        logger.error(err)
-    return None
+    
+    raise Exception
+
 
 def request_episodes(series_id):
     try:
@@ -62,7 +44,7 @@ def request_episodes(series_id):
     except:
         return None
 
-def try_request_episodes(series_id, max_retries=30, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
+def try_request_episodes(series_id, max_retries=3, delay=60): # try a request every minute for half an hour, if all fail then schedule new job in 24h
     retries = 0
     while retries < max_retries:
         result = request_episodes(series_id)
@@ -71,18 +53,5 @@ def try_request_episodes(series_id, max_retries=30, delay=60): # try a request e
         retries += 1
         logger.error(f'series_update episodes retry {retries}')
         time.sleep(delay)
-    try: # check if job already exists in order to avoid conflict when adding job to db
-        existing_job = scheduler.get_job(job_id=f'series_update_retry_request_episodes_{series_id}')
-        if existing_job:
-            logger.info("series_update_retry_request_series job already exists. not adding new job.")
-        else:
-            scheduler.add_job(
-                func=series_update,
-                args=[series_id],
-                trigger=DateTrigger(run_date=datetime.now() + timedelta(hours=24)),
-                id=f'series_update_retry_request_episodes_{series_id}',
-                coalesce=True
-            )
-    except ConflictingIdError as err:
-        logger.error(err)
-    return None
+
+    raise Exception

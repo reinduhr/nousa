@@ -2,184 +2,227 @@ from datetime import datetime, timedelta
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.background import BackgroundTask
-from sqlalchemy import select, update
+from sqlalchemy import update
 from sqlalchemy.exc import PendingRollbackError
 import asyncio
 import logging
 from collections import defaultdict
 
 from src.services.templates import templates
-from src.models import Episodes, Series, ListEntries, AuditLogEntry
+from src.models import Episodes, Series, ListEntries, Lists
 from src.db import SessionLocal
 from src.routes.template_data import popular_tv_shows
 from src.cal_logic.gather import fetch_data
+from src.helpers.logging import add_audit_log_entry
+from src.tasks.ntfy_task import send_ntfy_task
 
 logger = logging.getLogger(__name__)
 
-# add episode data to Episodes table in db
-def add_episodes(series_id, edata):
-    for episode in edata:
-        ep_id = episode.get("id")
-        ep_name = episode.get("name")
-        ep_season = episode.get("season")
-        ep_number = episode.get("number")
-        ep_airdate_str = episode.get("airdate")
-        ep_airdate = datetime.strptime(ep_airdate_str, "%Y-%m-%d")
-        # filter episodes so only episodes between one year ago and one year into the future get into the calendar
-        one_year_ago = datetime.now() - timedelta(days=365)
-        one_year_future = datetime.now() + timedelta(days=365)
-        if ep_airdate >= one_year_ago and ep_airdate <= one_year_future:
-            
-            episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=ep_airdate)
-            with SessionLocal() as session:
-                session.add(episodes)
-                session.commit()
-
-# add TV show to ListEntries table and Series table
-async def add_to_series(request: Request):
-    form = await request.form()
-    series_id_form = form.get("series-id")  # "series-id" is taken from search_result.html input name value
-    list_id_form = form.get('list-id')
-    series_name = form.get("series-name")
-    message = f"{series_name} has been added"
-    try:  # validate input
-        series_id = int(series_id_form) 
-        list_id = int(list_id_form)
-    except:
-        message = "Error: Invalid input. Try again, but no tricks this time ;)"
-        return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
+async def get_record(model, **kwargs):
+    """
+    Returns the record if it exists, otherwise returns None, and upon failure returns False.
+    """
     with SessionLocal() as session:
         try:
-            series_exist = session.get(Series, series_id)
-            
-            le_exist = session.scalars(select(ListEntries).where(
+            # .filter_by handles multiple keyword arguments
+            result = session.query(model).filter_by(**kwargs).first()
+            return result if result else None
+        except Exception:
+            return False
+
+
+async def toggle_list_entry_archive(series_id, list_id) -> bool:
+    try:
+
+        with SessionLocal() as session:
+            # This flips 0 to 1 and 1 to 0 in a single round trip
+            stmt = (
+                update(ListEntries)
+                .where(
                     ListEntries.list_id == int(list_id),
                     ListEntries.series_id == int(series_id)
                 )
-            ).first()
+                .values(archive=1 - ListEntries.archive)
+                .returning(ListEntries.archive)
+            )
 
-            le_exist_archive = session.scalars(select(ListEntries).where(
-                    ListEntries.list_id == int(list_id),
-                    ListEntries.series_id == int(series_id),
-                    ListEntries.archive == 1
-                )
-            ).first()
+            result = session.execute(stmt)
+            new_archive_status = result.scalar()
 
-            # ListEntries logic
-            if le_exist is not None:
-                if le_exist_archive is not None:
-                    
-                    session.execute(update(ListEntries).where(
-                        ListEntries.list_id == int(list_id),
-                        ListEntries.series_id == int(series_id)
-                    )
-                    .values(archive=0)
-                    .execution_options(synchronize_session="fetch"))
-                    
-                    session.commit()
-                    message = f"{series_exist.series_name} has been moved to main"
-                else:
-                    message = f"{series_name} is already in list {list_id}"
-                redirect_url = f"/list/{list_id}"
-                return RedirectResponse(url=redirect_url)
-            elif le_exist is None:
-                add_series = ListEntries(list_id=int(list_id), series_id=int(series_id))
-                session.add(add_series)
-                session.commit()
+            session.commit()
 
-                audit_log_entry = AuditLogEntry(
-                    msg_type_id = 1,
-                    msg_type_name = "series_add",
-                    ip = request.client.host,
-                    list_id = list_id,
-                    list_name = None,
-                    prev_list_name = None,
-                    series_id = series_id,
-                    series_name = series_name,
-                    created_at = datetime.now()
-                )
-                session.add(audit_log_entry)
-                session.commit()
+            return True, new_archive_status
+    
+    except Exception as e:
+        logger.error(f"Caught an exception: {e}")
+        return False, None
 
-                # Series logic
-                if not series_exist:
-                    today = datetime.now()
-                    series_url = f"https://api.tvmaze.com/shows/{series_id}"
-                    episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
-                    # Create async tasks
-                    task1 = asyncio.create_task(fetch_data(series_url))
-                    task2 = asyncio.create_task(fetch_data(episode_url))
-                    # Wait for tasks to complete
-                    sdata = await task1
-                    edata = await task2
-                    # Assign series variables
-                    series_status = sdata.get("status")
-                    series_ext_thetvdb = sdata["externals"].get("thetvdb")
-                    series_ext_imdb = sdata["externals"].get("imdb")
-                    # Add TV show to Series
-                    series = Series(series_id=int(series_id), series_name=series_name, series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb, series_last_updated=today)
-                    session.add(series)
-                    session.commit()
-                    episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
-                    logger.info(f"{series_name} has been added")
+    
+async def add_list_entry(series_id: int, list_id: int):
+   
+    with SessionLocal() as session:
+        
+        list_entry = ListEntries(list_id=list_id, series_id=series_id)
+        session.add(list_entry)
+        session.commit()
 
-                    return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task)
+
+# add episode data to Episodes table in db
+def add_episodes(series_id, edata):
+    with SessionLocal() as session:
+
+        for episode in edata:
+            ep_id = episode.get("id")
+            ep_name = episode.get("name")
+            ep_season = episode.get("season")
+            ep_number = episode.get("number")
+            ep_airdate_str = episode.get("airdate")
+            ep_airdate = datetime.strptime(ep_airdate_str, "%Y-%m-%d")
+            # filter episodes so only episodes between one year ago and one year into the future get into the calendar
+            one_year_ago = datetime.now() - timedelta(days=365)
+            one_year_future = datetime.now() + timedelta(days=365)
+            
+            if ep_airdate >= one_year_ago and ep_airdate <= one_year_future:
+                
+                episodes = Episodes(ep_series_id=int(series_id), ep_id=ep_id, ep_name=ep_name, ep_season=ep_season, ep_number=ep_number, ep_airdate=ep_airdate)
+                session.add(episodes)
+        session.commit()
+
+async def fetch_series_data(series_id):
+    
+    series_url = f"https://api.tvmaze.com/shows/{series_id}"
+    episode_url = f"https://api.tvmaze.com/shows/{series_id}/episodes"
+    
+    # Create async tasks
+    task1 = asyncio.create_task(fetch_data(series_url))
+    task2 = asyncio.create_task(fetch_data(episode_url))
+    
+    # Wait for tasks to complete
+    sdata = await task1
+    edata = await task2
+
+    return sdata, edata
+
+
+async def add_series(sdata, edata, series_id):
+    today = datetime.now()
+
+    # Assign series variables
+    series_status = sdata.get("status")
+    series_ext_thetvdb = sdata["externals"].get("thetvdb")
+    series_ext_imdb = sdata["externals"].get("imdb")
+    
+    # Add TV show to Series
+    series = Series(series_id=int(series_id), series_name=sdata['name'], series_status=series_status, series_ext_thetvdb=series_ext_thetvdb, series_ext_imdb=series_ext_imdb, series_last_updated=today)
+    
+    with SessionLocal() as session:
+
+        try:
+            session.add(series)
+            session.commit()
+            
+            episode_task = BackgroundTask(add_episodes, series_id=series_id, edata=edata)
+        
         except PendingRollbackError:
             session.rollback()
             logger.error("PendingRollbackError occurred. Transaction was rolled back.")
             message = "An error occurred. Please try again."
-            return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
+            return
+            
         except Exception as err:
             session.rollback()
             logger.error(f"An error occurred: {err}")
             message = "An error occurred while processing your request."
-            return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
-        redirect_url = f"/list/{list_id}"
-        return RedirectResponse(url=redirect_url)
-
-# move TV show from Main to Archive
-async def add_to_archive(request: Request):
-    form_data = await request.form()
-    series_id_form = form_data['series-id'] # input id of serie to be deleted
-    list_id_form = form_data['list-id']
-    series_name = form_data['series-name']
-    try:
-        series_id = int(series_id_form) # validate input
-        list_id = int(list_id_form)
-    except:
-        message = "Error: Invalid input. Try again, but no tricks this time"
-        return templates.TemplateResponse(request, "index.html", {"message": message})
-    with SessionLocal() as session:
-        show_exists = session.scalars(select(ListEntries).where(
-                ListEntries.list_id == int(list_id),
-                ListEntries.series_id == int(series_id)
-            )
-        ).first()
-        if show_exists is not None:
-            session.execute(update(ListEntries).where(
-                        ListEntries.list_id == int(list_id),
-                        ListEntries.series_id == int(series_id)
-                    )
-                    .values(archive=1)
-                    .execution_options(synchronize_session="fetch"))
-            session.commit()
-
-    audit_log_entry = AuditLogEntry(
-        msg_type_id = 2,
-        msg_type_name = "series_archive",
-        ip = request.client.host,
-        list_id = list_id,
-        list_name = None,
-        prev_list_name = None,
-        series_id = series_id,
-        series_name = series_name,
-        created_at = datetime.now()
-    )
-    session.add(audit_log_entry)
-    session.commit()
+            return
     
-    redirect_url = f"/list/{list_id}"
-    return RedirectResponse(url=redirect_url)
+    logger.info(f"{sdata['name']} has been added")
+    return episode_task
+
+
+# add TV show to ListEntries table and if needed to Series table
+async def add_series_to_list(request: Request):
+    form = await request.form()
+    
+    series_id_form = form.get("series-id")
+    list_id_form = form.get('list-id')
+    series_name = form.get("series-name")
+    
+    try:  # validate input
+        series_id = int(series_id_form)
+        list_id = int(list_id_form)
+   
+    except:
+        message = "Error: Invalid input. Try again, but no tricks this time ;)"
+        return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows})
+    
+    series = await get_record(Series, series_id=series_id)
+    list_entry = await get_record(ListEntries, list_id=list_id, series_id=series_id)
+    calendar_list = await get_record(Lists, list_id=list_id)
+
+    sdata, edata = await fetch_series_data(series_id)
+
+    if not series:
+        episode_task = await add_series(sdata, edata, series_id)
+    
+    if not list_entry:
+        message = f"{series_name} has been added"
+        
+        await add_list_entry(series_id, list_id)
+
+        await add_audit_log_entry(
+            msg_type_id = 1,
+            msg_type_name = "series_add",
+            ip = request.client.host,
+            list_id = list_id,
+            list_name = calendar_list.list_name,
+            prev_list_name = None,
+            series_id = series_id,
+            series_name = series_name,
+        )
+
+        await send_ntfy_task(message=f"{sdata['name']} has been added to List {list_id}: {calendar_list.list_name}")
+    
+    return templates.TemplateResponse(request, "index.html", {"message": message, "popular_tv_shows": popular_tv_shows}, background=episode_task or None)
+        
+
+# move TV show from Main to Archive or the other way around depending
+async def toggle_archive(request: Request):
+    form = await request.form()
+    url = request.headers.get("referer")
+    
+    series_id = form.get('series-id')
+    series_name = form.get('series-name')
+    list_id = form.get('list-id')
+    list_name = form.get('list-name')
+    
+    success, state = await toggle_list_entry_archive(series_id, list_id)
+
+    if success:
+        if state == 1:
+            msg_type_id = 2
+            msg_type_name = "series_archive"
+            message = f"{series_name} has been archived on List {list_id}: {list_name}"
+            await send_ntfy_task(message)
+        
+        else:
+            msg_type_id = 20
+            msg_type_name = "series_main"
+            message = f"{series_name} has been moved to main on List {list_id}: {list_name}"
+            await send_ntfy_task(message)
+
+        await add_audit_log_entry(
+            msg_type_id = msg_type_id,
+            msg_type_name = msg_type_name,
+            ip = request.client.host,
+            list_id = list_id,
+            list_name = list_name,
+            prev_list_name = None,
+            series_id = series_id,
+            series_name = series_name
+        )
+    
+    return RedirectResponse(url=url)
+
 
 # helper function to filter search results against series in lists
 def build_available_lists(lists, list_entries):

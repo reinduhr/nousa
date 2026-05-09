@@ -2,11 +2,13 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from sqlalchemy import select, update, func
 import re
-from datetime import datetime
 
 from src.services.templates import templates
+from src.tasks.ntfy_task import send_ntfy_task
 from src.db import SessionLocal
-from src.models import Lists, AuditLogEntry
+from src.models import Lists
+from src.helpers.logging import add_audit_log_entry
+
 
 async def create_list(request: Request):
     with SessionLocal() as session:
@@ -29,7 +31,7 @@ async def create_list(request: Request):
                 message = f"{user_input} has been created"
                 list_id = new_list.list_id
 
-                audit_log_entry = AuditLogEntry(
+                await add_audit_log_entry(
                     msg_type_id = 4,
                     msg_type_name = "list_create",
                     ip = request.client.host,
@@ -38,10 +40,10 @@ async def create_list(request: Request):
                     prev_list_name = None,
                     series_id = None,
                     series_name = None,
-                    created_at = datetime.now()
+                    db = session
                 )
-                session.add(audit_log_entry)
-                session.commit()
+
+                await send_ntfy_task(message=f"List {list_id}: {user_input} has been created")
                 
                 return templates.TemplateResponse(request, 'lists.html', {'message': message, 'lists': lists})
             else:
@@ -78,7 +80,7 @@ async def rename_list(request: Request):
             )
             session.commit()
 
-            audit_log_entry = AuditLogEntry(
+            await add_audit_log_entry(
                 msg_type_id = 5,
                 msg_type_name = "list_rename",
                 ip = request.client.host,
@@ -87,9 +89,10 @@ async def rename_list(request: Request):
                 prev_list_name = prev_list_name,
                 series_id = None,
                 series_name = None,
-                created_at = datetime.now()
+                db = session
             )
-            session.add(audit_log_entry)
-            session.commit()
+
+            await send_ntfy_task(message=f"List {list_id}: {prev_list_name} has been renamed to: {user_input}")
+
             
         return RedirectResponse(url=f"/list/{list_id}")
