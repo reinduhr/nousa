@@ -37,7 +37,7 @@ def schedule_default_jobs():
     try:
         scheduler.add_job(
             func=send_weekly_notification_email,
-            trigger=CronTrigger(day_of_week='wed', hour=9, jitter=600),
+            trigger=CronTrigger(day_of_week='wed', hour=12, jitter=600),
             id="weekly_notification_email",
             name="weekly_notification_email",
             misfire_grace_time=345600,

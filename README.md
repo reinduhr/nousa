@@ -3,7 +3,7 @@ add your favorite shows and nousa will create an ical feed keeping you informed 
 
 ![nousa ui preview](https://github.com/reinduhr/nousa/blob/main/static/nousa.gif)
 
-this is a tool with an easy to use UI which is accessible by a browser. you can search for tv shows and add them to a list. episode data is updated once a week. nousa adds one day to an episode's official air date due to worldwide availability.\
+this is a tool with an easy to use UI which is accessible by a browser. you can search for tv shows and add them to a list. episode data is updated once a week. nousa adds one day to an episode's official air date due to worldwide availability.
 
 ## optional features
 can be enabled by environment variables.

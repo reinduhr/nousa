@@ -44,7 +44,7 @@ def download_calendar(request: Request):
                         f"DTSTAMP:{now:%Y%m%d}T{now:%H%M%S}Z\n"
                         f"DTSTART;VALUE=DATE:{start_convert}\n"
                         f"DTEND;VALUE=DATE:{end_convert}\n"
-                        f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d-%b-%Y %H:%M}\\nIMDb ID: {show.series_ext_imdb}\n"
+                        f"DESCRIPTION:Episode name: {episode.ep_name}\\nLast updated: {show.series_last_updated:%d %b %Y %H:%M}\\nIMDb ID: {show.series_ext_imdb}\n"
                         f"SUMMARY:{show.series_name} S{int(episode.ep_season):02d}E{int(episode.ep_number):02d}\n"
                         f"UID:{episode.ep_id}\n"
                         "BEGIN:VALARM\n"
@@ -59,6 +59,6 @@ def download_calendar(request: Request):
                     calendar_file_memory.write(calendar_event.encode('utf-8'))
         calendar_file_memory.write(b"END:VCALENDAR")
         calendar_file_memory.seek(0)
-        logger.info(f"Calendar from {list_id} was downloaded from IP: {request.client.host}")
+        logger.info(f"Calendar from list {list_id} was downloaded from IP: {request.client.host}")
         headers = {'Content-Disposition': 'attachment; filename="nousa.ics"'}
         return StreamingResponse(calendar_file_memory, media_type="text/calendar", headers=headers)
