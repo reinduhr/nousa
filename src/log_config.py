@@ -2,7 +2,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
-def setup_logging(log_dir='/code/data/log', level=logging.DEBUG):
+def setup_logging(log_dir='/code/data/log', level=logging.INFO):
     
     # remove all existing handlers
     for handler in logging.root.handlers[:]:
@@ -13,7 +13,7 @@ def setup_logging(log_dir='/code/data/log', level=logging.DEBUG):
     
     # set specific libraries
     logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
-    logging.getLogger('apscheduler').setLevel(level)
+    logging.getLogger('apscheduler').setLevel(logging.WARN)
 
     try:
         log_path = Path(log_dir)
