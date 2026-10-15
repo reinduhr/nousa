@@ -3,7 +3,7 @@ version: 2
 updates:
   # Maintain Docker dependencies
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/Dockerfile.prod"
     schedule:
       interval: "monthly"
   

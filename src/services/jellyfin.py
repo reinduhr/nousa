@@ -9,7 +9,13 @@ JELLYFIN_API_KEY = os.getenv("JELLYFIN_API_KEY", None)
 JELLYFIN_IP = os.getenv("JELLYFIN_IP")
 JELLYFIN_PORT = os.getenv("JELLYFIN_PORT")
 BASE_URL = f"http://{JELLYFIN_IP}" + (f":{JELLYFIN_PORT}" if JELLYFIN_PORT else "")
-HEADERS = {"X-Emby-Token": JELLYFIN_API_KEY}
+
+def get_headers():
+    api_key = os.getenv("JELLYFIN_API_KEY")
+    return {
+        "Authorization": f'MediaBrowser Token="{api_key}", Client="nousa"',
+        "Content-Type": "application/json"
+    }
 
 def check_jellyfin_env_vars():
     required_vars = ["JELLYFIN_API_KEY", "JELLYFIN_IP", "JELLYFIN_PORT"]
@@ -36,7 +42,7 @@ async def is_jellyfin_api_key_valid() -> bool:
     url = f"{BASE_URL}/Users"
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(url, headers=HEADERS) as response:
+            async with session.get(url, headers=get_headers()) as response:
                 return response.status == 200
         except aiohttp.ClientError:
             return False
@@ -44,7 +50,7 @@ async def is_jellyfin_api_key_valid() -> bool:
 async def get_tv_shows():
     url = f"{BASE_URL}/Items?IncludeItemTypes=Series&Recursive=true"
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=HEADERS) as response:
+        async with session.get(url, headers=get_headers()) as response:
             response.raise_for_status()
             data = await response.json()
             return data.get("Items", [])
@@ -52,7 +58,7 @@ async def get_tv_shows():
 async def get_episodes(show_id: str):
     url = f"{BASE_URL}/Shows/{show_id}/Episodes"
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=HEADERS) as response:
+        async with session.get(url, headers=get_headers()) as response:
             response.raise_for_status()
             data = await response.json()
             return data.get("Items", [])
@@ -60,14 +66,14 @@ async def get_episodes(show_id: str):
 async def get_users():
     url = f"{BASE_URL}/Users"
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=HEADERS) as response:
+        async with session.get(url, headers=get_headers()) as response:
             response.raise_for_status()
             return await response.json()
 
 async def get_show_metadata(user_id: str, item_id: str):
     url = f"{BASE_URL}/Users/{user_id}/Items/{item_id}"
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=HEADERS) as response:
+        async with session.get(url, headers=get_headers()) as response:
             response.raise_for_status()
             return await response.json()
 
@@ -98,7 +104,7 @@ async def get_jelly_recs(request: Request):
                 provider_ids = meta.get("ProviderIds", {})
                 show["Imdb"] = provider_ids.get("Imdb", None)
                 show["Thetvdb"] = provider_ids.get("Tvdb", None)
-                show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?X-Emby-Token={JELLYFIN_API_KEY}"
+                show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?ApiKey={JELLYFIN_API_KEY}"
                 show["Overview"] = meta.get("Overview", None)
 
                 if show.get("Status", "Unknown") != "Ended":
