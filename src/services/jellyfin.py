@@ -74,6 +74,9 @@ async def get_show_metadata(user_id: str, item_id: str):
     url = f"{BASE_URL}/Users/{user_id}/Items/{item_id}"
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=get_headers()) as response:
+            if response.status == 404:
+                logger.warning(f"Item {item_id} not visible to user {user_id}, skipping.")
+                return None
             response.raise_for_status()
             return await response.json()
 
@@ -101,6 +104,8 @@ async def get_jelly_recs(request: Request):
                     continue
 
                 meta = await get_show_metadata(user["Id"], show["Id"])
+                if meta is None:
+                    continue
                 provider_ids = meta.get("ProviderIds", {})
                 show["Imdb"] = provider_ids.get("Imdb", None)
                 show["Thetvdb"] = provider_ids.get("Tvdb", None)
