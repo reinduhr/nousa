@@ -48,7 +48,10 @@ async def is_jellyfin_api_key_valid() -> bool:
             return False
 
 async def get_tv_shows():
-    url = f"{BASE_URL}/Items?IncludeItemTypes=Series&Recursive=true"
+    url = (
+        f"{BASE_URL}/Items?IncludeItemTypes=Series&Recursive=true"
+        "&Fields=ProviderIds,Overview,Status"
+    )
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=get_headers()) as response:
             response.raise_for_status()
@@ -81,39 +84,30 @@ async def get_show_metadata(user_id: str, item_id: str):
             return await response.json()
 
 async def get_jelly_recs(request: Request):
-    if await is_jellyfin_api_key_valid() and await are_services_online():
-        shows = await get_tv_shows()
-        users = await get_users()
+    if not (await is_jellyfin_api_key_valid() and await are_services_online()):
+        return {}
 
-        unique_shows = {}
-        for show in shows:
-            key = (show["Name"], show.get("PremiereDate"))
-            if key not in unique_shows:
-                unique_shows[key] = show
-        
-        shows_dict = {}
-        for user in users:
-            if not user:
-                logger.warning("Jellyfin user not found.")
-                continue
+    shows = await get_tv_shows()
 
-            for show in unique_shows.values():
-                episodes = await get_episodes(show["Id"])
-                logger.debug(f"episodes debug: {episodes}")
-                if not episodes:
-                    continue
+    unique_shows = {}
+    for show in shows:
+        key = (show["Name"], show.get("PremiereDate"))
+        unique_shows.setdefault(key, show)
 
-                meta = await get_show_metadata(user["Id"], show["Id"])
-                if meta is None:
-                    continue
-                provider_ids = meta.get("ProviderIds", {})
-                show["Imdb"] = provider_ids.get("Imdb", None)
-                show["Thetvdb"] = provider_ids.get("Tvdb", None)
-                show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?ApiKey={JELLYFIN_API_KEY}"
-                show["Overview"] = meta.get("Overview", None)
+    shows_dict = {}
+    for show in unique_shows.values():
+        if show.get("Status", "Unknown") == "Ended":
+            continue
 
-                if show.get("Status", "Unknown") != "Ended":
-                    shows_dict[show["Id"]] = show
+        episodes = await get_episodes(show["Id"])
+        if not episodes:
+            continue
 
-        return shows_dict
-    return {}
+        provider_ids = show.get("ProviderIds", {})
+        show["Imdb"] = provider_ids.get("Imdb")
+        show["Thetvdb"] = provider_ids.get("Tvdb")
+        show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?ApiKey={JELLYFIN_API_KEY}"
+        show["Overview"] = show.get("Overview")
+        shows_dict[show["Id"]] = show
+
+    return shows_dict
