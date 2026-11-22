@@ -10,7 +10,7 @@ from src.scheduler import schedule_default_jobs
 from src.scheduler_core import start_scheduler
 
 # web routes
-from src.routes.web_routes import homepage, search, list_page, lists_page, download_redirect, jellyrec
+from src.routes.web_routes import homepage, search, list_page, lists_page, download_redirect, jellyrec, link_jellyfin_user
 
 # logic routes
 from src.cal_logic.input import add_series_to_list, toggle_archive
@@ -31,7 +31,8 @@ routes = [
     Route("/lists", endpoint=lists_page, methods=["GET", "POST"]),
     Route("/list/{list_id}", endpoint=list_page, methods=["GET", "POST"]),
     Route("/subscribe/{list_id}", endpoint=download_calendar, methods=["GET"]),
-    Route("/recommendations", endpoint=jellyrec, methods=["GET"])
+    Route("/recommendations", endpoint=jellyrec, methods=["GET"]),
+    Route("/recommendations/link_user", endpoint=link_jellyfin_user, methods=["POST"])
 ]
 
 @asynccontextmanager

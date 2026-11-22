@@ -1,7 +1,6 @@
 import os
 import logging
 import aiohttp
-from starlette.requests import Request
 
 logger = logging.getLogger(__name__)
 
@@ -47,25 +46,6 @@ async def is_jellyfin_api_key_valid() -> bool:
         except aiohttp.ClientError:
             return False
 
-async def get_tv_shows():
-    url = (
-        f"{BASE_URL}/Items?IncludeItemTypes=Series&Recursive=true"
-        "&Fields=ProviderIds,Overview,Status"
-    )
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=get_headers()) as response:
-            response.raise_for_status()
-            data = await response.json()
-            return data.get("Items", [])
-
-async def get_episodes(show_id: str):
-    url = f"{BASE_URL}/Shows/{show_id}/Episodes"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=get_headers()) as response:
-            response.raise_for_status()
-            data = await response.json()
-            return data.get("Items", [])
-
 async def get_users():
     url = f"{BASE_URL}/Users"
     async with aiohttp.ClientSession() as session:
@@ -73,41 +53,70 @@ async def get_users():
             response.raise_for_status()
             return await response.json()
 
-async def get_show_metadata(user_id: str, item_id: str):
-    url = f"{BASE_URL}/Users/{user_id}/Items/{item_id}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=get_headers()) as response:
-            if response.status == 404:
-                logger.warning(f"Item {item_id} not visible to user {user_id}, skipping.")
-                return None
-            response.raise_for_status()
-            return await response.json()
+async def get_user_series(session: aiohttp.ClientSession, user_id: str) -> list:
+    """All series this Jellyfin user can see, incl. provider ids, overview and episode count."""
+    url = (f"{BASE_URL}/Users/{user_id}/Items?IncludeItemTypes=Series&Recursive=true"
+           f"&Fields=ProviderIds,Overview,RecursiveItemCount")
+    async with session.get(url, headers=get_headers()) as response:
+        if response.status in (400, 404):
+            logger.warning(f"Jellyfin user {user_id} not found, skipping.")
+            return []
+        response.raise_for_status()
+        data = await response.json()
+        return data.get("Items", [])
 
-async def get_jelly_recs(request: Request):
-    if not (await is_jellyfin_api_key_valid() and await are_services_online()):
+def _norm_tvdb(value) -> str:
+    """Normalize a TheTVDB id: nousa stores an int, Jellyfin returns a string."""
+    if value in (None, ""):
+        return ""
+    return str(value).strip()
+
+def exclude_series_in_list(recommendations: dict, list_series) -> dict:
+    """
+    Remove Jellyfin recommendations that already exist in a nousa list,
+    matched on TheTVDB id. `list_series` is an iterable of Series rows.
+    """
+    tvdb_ids = {_norm_tvdb(s.series_ext_thetvdb) for s in list_series} - {""}
+
+    filtered = {}
+    for rec_id, rec in recommendations.items():
+        tvdb = _norm_tvdb(rec.get("Thetvdb"))
+        if tvdb and tvdb in tvdb_ids:
+            logger.debug(f"Excluding recommendation '{rec.get('Name')}' (tvdb={tvdb}): already in list")
+            continue
+        logger.debug(f"Keeping recommendation '{rec.get('Name')}' (tvdb={tvdb or '-'})")
+        filtered[rec_id] = rec
+    logger.info(f"Recommendations: {len(recommendations)} from Jellyfin, "
+                f"{len(recommendations) - len(filtered)} hidden because already in list "
+                f"({len(list_series)} series in list)")
+    return filtered
+
+async def get_jelly_recs(user_ids) -> dict:
+    """
+    Recommendations = series in Jellyfin that are not ended and have episodes,
+    limited to what the given Jellyfin users can see. Returns {jellyfin_item_id: show}.
+    """
+    if not user_ids or not (await is_jellyfin_api_key_valid() and await are_services_online()):
         return {}
 
-    shows = await get_tv_shows()
-
-    unique_shows = {}
-    for show in shows:
-        key = (show["Name"], show.get("PremiereDate"))
-        unique_shows.setdefault(key, show)
-
+    seen = set()
     shows_dict = {}
-    for show in unique_shows.values():
-        if show.get("Status", "Unknown") == "Ended":
-            continue
+    async with aiohttp.ClientSession() as session:
+        for user_id in user_ids:
+            for show in await get_user_series(session, user_id):
+                # the same show can exist in several libraries
+                key = (show["Name"], show.get("PremiereDate"))
+                if key in seen:
+                    continue
+                if show.get("Status", "Unknown") == "Ended" or not show.get("RecursiveItemCount"):
+                    continue
+                seen.add(key)
 
-        episodes = await get_episodes(show["Id"])
-        if not episodes:
-            continue
+                provider_ids = show.get("ProviderIds") or {}
+                show["Imdb"] = provider_ids.get("Imdb")
+                show["Thetvdb"] = provider_ids.get("Tvdb")
+                show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?ApiKey={JELLYFIN_API_KEY}"
+                shows_dict[show["Id"]] = show
 
-        provider_ids = show.get("ProviderIds", {})
-        show["Imdb"] = provider_ids.get("Imdb")
-        show["Thetvdb"] = provider_ids.get("Tvdb")
-        show["ImgUrl"] = f"{BASE_URL}/Items/{show['Id']}/Images/Primary?ApiKey={JELLYFIN_API_KEY}"
-        show["Overview"] = show.get("Overview")
-        shows_dict[show["Id"]] = show
-
+    logger.info(f"Recommendations: {len(shows_dict)} series for Jellyfin user(s) {', '.join(user_ids)}")
     return shows_dict

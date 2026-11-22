@@ -1,7 +1,36 @@
 {% include 'header.html' %}
 <div class="nousa-content">
     <h1>Recommended Shows</h1>
-    
+
+    {% if lists %}
+        <form action="/recommendations" method="get" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <label for="rec-list-select" style="margin: 0; min-width: 100px;">Choose a list:</label>
+            <select id="rec-list-select" name="list_id" class="form-control" style="max-width: 300px;" onchange="this.form.submit()">
+                {% for list in lists %}
+                    <option value="{{ list.list_id }}" {% if list.list_id == selected_list_id %}selected{% endif %}>{{ list.list_name }}</option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="btn btn-primary">Show</button></noscript>
+        </form>
+
+        {% if jellyfin_users %}
+            <form action="/recommendations/link_user" method="post" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <input type="hidden" name="list_id" value="{{ selected_list_id }}">
+                <label for="rec-user-select" style="margin: 0; min-width: 100px;">Jellyfin user:</label>
+                <select id="rec-user-select" name="jellyfin_user_id" class="form-control" style="max-width: 300px;" onchange="this.form.submit()">
+                    <option value="" {% if not linked_user_id or linked_user_missing %}selected{% endif %}>All users (not linked)</option>
+                    {% for user in jellyfin_users %}
+                        <option value="{{ user.Id }}" {% if user.Id == linked_user_id %}selected{% endif %}>{{ user.Name }}</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn btn-primary">Link</button></noscript>
+            </form>
+            {% if linked_user_missing %}
+                <p>⚠️ The Jellyfin user linked to this list no longer exists. Showing recommendations for all users.</p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
     {% if not check_env_vars_ok and check_env_vars_msg and not jellyfin_series and not jellyfin_online %}
         {% if check_env_vars_msg %}
             <h5>⚠️ {{ check_env_vars_msg }}</h5>
@@ -15,7 +44,7 @@
 
     {% elif jellyfin_online and not jellyfin_series %}
         <h5>✅ Connected to Jellyfin Media Server</h5>
-        <p>Content is being refreshed every first day of the month</p>
+        <p>The selected user doesn't have access to any series</p>
 
     {% elif jellyfin_series %}
 
