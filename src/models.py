@@ -36,6 +36,7 @@ class Lists(Base):
 
     list_id = Column(Integer, primary_key=True, autoincrement=True)
     list_name = Column(String, unique=True, nullable=False)
+    jellyfin_user_id = Column(String, nullable=True)  # Jellyfin user linked to this list (for /recommendations)
 
 class ListEntries(Base):
     __tablename__ = "ListEntries"

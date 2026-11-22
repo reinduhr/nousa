@@ -1,13 +1,13 @@
 import aiohttp
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse, HTMLResponse
-from sqlalchemy import select
+from sqlalchemy import select, update
 import logging
 
 from src.db import SessionLocal
 from src.models import Lists, ListEntries, Series
 from src.services.templates import templates
-from src.services.jellyfin import is_jellyfin_api_key_valid, check_jellyfin_env_vars, get_jelly_recs
+from src.services.jellyfin import is_jellyfin_api_key_valid, check_jellyfin_env_vars, get_jelly_recs, get_users, exclude_series_in_list
 from src.routes.template_data import popular_tv_shows
 from src.cal_logic.input import build_available_lists
 
@@ -25,24 +25,91 @@ async def homepage(request: Request):
 async def jellyrec(request: Request):
     check_env_vars_ok, check_env_vars_msg = check_jellyfin_env_vars()
     try:
-        jellyfin_online = await is_jellyfin_api_key_valid()  # Await the async function
+        jellyfin_online = await is_jellyfin_api_key_valid()
     except Exception:
         jellyfin_online = False
-    jellyfin_series = await get_jelly_recs(request)  # Await the async function
-    if jellyfin_series:
-        return templates.TemplateResponse(request, "jelly_rec.html", {
-            "jellyfin_series": jellyfin_series, 
-            "check_env_vars_ok": check_env_vars_ok,
-            "check_env_vars_msg": check_env_vars_msg,
-            "jellyfin_online": jellyfin_online
-        })
-    # Optionally handle the case when jellyfin_series is empty
+
+    jellyfin_users = []
+    if jellyfin_online:
+        try:
+            jellyfin_users = await get_users()
+        except Exception as e:
+            logger.warning(f"Could not fetch Jellyfin users: {e}")
+    jellyfin_user_ids = [u["Id"] for u in jellyfin_users]
+
+    with SessionLocal() as session:
+        lists = session.scalars(select(Lists).order_by(Lists.list_id)).all()
+
+        # selected list from ?list_id=, defaulting to the first list
+        selected_list_id = None
+        try:
+            selected_list_id = int(request.query_params.get("list_id"))
+        except (TypeError, ValueError):
+            pass
+        if lists and selected_list_id not in {l.list_id for l in lists}:
+            selected_list_id = lists[0].list_id
+        selected_list = next((l for l in lists if l.list_id == selected_list_id), None)
+
+        list_series = []
+        if selected_list is not None:
+            series_ids = select(ListEntries.series_id).where(ListEntries.list_id == selected_list_id)
+            list_series = session.scalars(select(Series).where(Series.series_id.in_(series_ids))).all()
+
+    # which Jellyfin user(s) to recommend for: the user linked to the list, otherwise everyone
+    linked_user_id = selected_list.jellyfin_user_id if selected_list else None
+    linked_user_missing = bool(linked_user_id) and bool(jellyfin_users) and linked_user_id not in jellyfin_user_ids
+    if linked_user_id and not linked_user_missing:
+        rec_user_ids = [linked_user_id]
+    else:
+        rec_user_ids = jellyfin_user_ids
+
+    try:
+        jellyfin_series = await get_jelly_recs(rec_user_ids)
+    except Exception as e:
+        logger.error(f"Could not fetch Jellyfin recommendations: {e}")
+        jellyfin_series = {}
+
+    # hide recommendations that are already in the selected list (main or archive)
+    if jellyfin_series and list_series:
+        jellyfin_series = exclude_series_in_list(jellyfin_series, list_series)
+
     return templates.TemplateResponse(request, "jelly_rec.html", {
-        "jellyfin_series": {},
+        "jellyfin_series": jellyfin_series or {},
         "check_env_vars_ok": check_env_vars_ok,
         "check_env_vars_msg": check_env_vars_msg,
-        "jellyfin_online": jellyfin_online
+        "jellyfin_online": jellyfin_online,
+        "lists": lists,
+        "selected_list_id": selected_list_id,
+        "jellyfin_users": jellyfin_users,
+        "linked_user_id": linked_user_id,
+        "linked_user_missing": linked_user_missing,
+        "selected_recs": True
     })
+
+# link a nousa list to a Jellyfin user (empty value = unlink)
+async def link_jellyfin_user(request: Request):
+    form = await request.form()
+    try:
+        list_id = int(form.get("list_id"))
+    except (TypeError, ValueError):
+        return RedirectResponse(url="/recommendations", status_code=303)
+
+    user_id = (form.get("jellyfin_user_id") or "").strip() or None
+    if user_id is not None:
+        try:
+            valid_ids = {u["Id"] for u in await get_users()}
+        except Exception as e:
+            logger.warning(f"Could not verify Jellyfin user {user_id}: {e}")
+            valid_ids = set()
+        if user_id not in valid_ids:
+            logger.warning(f"Refusing to link list {list_id} to unknown Jellyfin user {user_id}")
+            return RedirectResponse(url=f"/recommendations?list_id={list_id}", status_code=303)
+
+    with SessionLocal() as session:
+        session.execute(update(Lists).where(Lists.list_id == list_id).values(jellyfin_user_id=user_id))
+        session.commit()
+    logger.info(f"List {list_id} linked to Jellyfin user {user_id or '(none)'}")
+    return RedirectResponse(url=f"/recommendations?list_id={list_id}", status_code=303)
 
 # route for search and search results
 async def search(request: Request):
